@@ -1,0 +1,5 @@
+<div class="col-sm-12 my-1">
+    <p class="m-0">
+        Sodexo Portal &copy; 2025. Version <?= esc($latestVersion) ?> - Last Updated On <?= date('d M Y') ?>
+    </p>
+</div>

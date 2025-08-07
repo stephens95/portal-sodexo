@@ -1,7 +1,7 @@
 <nav class="pc-sidebar">
     <div class="navbar-wrapper">
         <div class="m-header">
-            <a href="../dashboard/index.html" class="b-brand text-primary">
+            <a href="<?= base_url('/home') ?>" class="b-brand text-primary">
                 <!-- ========   Change your logo from here   ============ -->
                 <img src="<?= base_url('assets/logo.jpeg') ?>" alt="Logo" width="100" height="auto" />
             </a>
@@ -13,7 +13,7 @@
                     <i class="ti ti-dashboard"></i>
                 </li>
                 <li class="pc-item">
-                    <a href="../dashboard/index.html" class="pc-link"><span class="pc-micon"><i class="ti ti-news"></i></span><span class="pc-mtext">News & Updates</span></a>
+                    <a href="<?= base_url('/news-updates') ?>" class="pc-link"><span class="pc-micon"><i class="ti ti-news"></i></span><span class="pc-mtext">News & Updates</span></a>
                 </li>
 
                 <li class="pc-item pc-caption">

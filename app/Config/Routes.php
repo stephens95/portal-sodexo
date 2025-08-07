@@ -24,6 +24,8 @@ $routes->get('/home', function () {
     // echo "Welcome, " . session()->get('name') . " | <a href='/logout'>Logout</a>";
 });
 
+$routes->get('/news-updates', 'ProgramUpdates::index');
+
 
 // --------- Dashboard Routes ---------
 $routes->get('/home', function () {
