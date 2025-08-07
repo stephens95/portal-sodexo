@@ -9,9 +9,9 @@ class CompaniesSeeder extends Seeder
     public function run()
     {
         $data = [
-            ['name' => 'PT Maju Jaya'],
-            ['name' => 'CV Sukses Abadi'],
-            ['name' => 'UD Makmur Sentosa'],
+            ['company_name' => 'PT Maju Jaya'],
+            ['company_name' => 'CV Sukses Abadi'],
+            ['company_name' => 'UD Makmur Sentosa'],
         ];
 
         $this->db->table('companies')->insertBatch($data);
