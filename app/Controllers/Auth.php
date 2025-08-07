@@ -19,6 +19,11 @@ class Auth extends BaseController
 
     public function index()
     {
+        // Kalau sudah login, jangan tampilkan form login lagi
+        if (session()->get('logged_in')) {
+            return redirect()->to('/home');
+        }
+
         return view('auth/login');
     }
 
