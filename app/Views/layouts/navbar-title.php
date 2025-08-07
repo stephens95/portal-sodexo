@@ -9,7 +9,9 @@
             <div class="col-auto">
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item"><a href="<?= base_url('/home') ?>">Home</a></li>
-                    <li class="breadcrumb-item"><?= isset($segment1) ? $segment1 : '' ?></li>
+                    <?php if (isset($segment1)): ?>
+                        <li class="breadcrumb-item"><?= isset($segment1) ? $segment1 : '' ?></li>
+                    <?php endif; ?>
                     <li class="breadcrumb-item" aria-current="page"><?= $title ?></li>
                 </ul>
             </div>

@@ -56,4 +56,9 @@ class UserModel extends Model
             ->where('users.email', $email)
             ->first();
     }
+
+    public function updateUser($id, $data)
+    {
+        return $this->update($id, $data);
+    }
 }

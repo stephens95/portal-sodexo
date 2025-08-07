@@ -26,6 +26,10 @@ $routes->get('/home', function () {
 
 $routes->get('/news-updates', 'ProgramUpdates::index');
 
+// --------- Account Settings Routes ---------
+$routes->get('/account-settings', 'Account::index');
+$routes->post('/account/update', 'Account::update');
+
 
 // --------- Dashboard Routes ---------
 $routes->get('/home', function () {

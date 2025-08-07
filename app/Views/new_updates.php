@@ -27,8 +27,19 @@
         </div>
     <?php endforeach; ?>
 <?php else: ?>
-    <p>No updates found.</p>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>
+                        <p>Updated</p>
+                    </h5>
+                </div>
+                <div class="card-body pc-component">
+                    <p>No updates found.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 <?php endif; ?>
-</div>
-</div>
 <?php include('layouts/footer.php'); ?>

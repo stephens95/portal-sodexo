@@ -143,7 +143,5 @@
         </div>
     </div>
 </div>
-</div>
-</div>
 
 <?php include('layouts/footer.php'); ?>

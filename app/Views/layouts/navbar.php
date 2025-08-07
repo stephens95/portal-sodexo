@@ -43,7 +43,7 @@
           <!-- [Mobile Media Block end] -->
           <div class="ms-auto">
               <ul class="list-unstyled">
-                  <li class="dropdown pc-h-item">
+                  <!-- <li class="dropdown pc-h-item">
                       <a
                           class="pc-head-link head-link-secondary dropdown-toggle arrow-none me-0"
                           data-bs-toggle="dropdown"
@@ -96,7 +96,7 @@
                               <a href="#!" class="link-primary">Mark as all read</a>
                           </div>
                       </div>
-                  </li>
+                  </li> -->
                   <li class="dropdown pc-h-item header-user-profile">
                       <a
                           class="pc-head-link head-link-primary dropdown-toggle arrow-none me-0"
@@ -105,7 +105,7 @@
                           role="button"
                           aria-haspopup="false"
                           aria-expanded="false">
-                          <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar" />
+                          <img src="<?= base_url('assets/images/logo_account.png') ?>" alt="user-image" class="user-avtar" />
                           <span>
                               <i class="ti ti-settings"></i>
                           </span>
@@ -118,7 +118,7 @@
                               </h4>
                               <p class="text-muted"><?= session()->get('role') ?></p>
                               <hr />
-                              <a href="../application/account-profile-v1.html" class="dropdown-item">
+                              <a href="<?= base_url('/account-settings') ?>" class="dropdown-item">
                                   <i class="ti ti-settings"></i>
                                   <span>Account Settings</span>
                               </a>
