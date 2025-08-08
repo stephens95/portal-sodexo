@@ -3,7 +3,7 @@
         <div class="m-header">
             <a href="<?= base_url('/home') ?>" class="b-brand text-primary">
                 <!-- ========   Change your logo from here   ============ -->
-                <img src="<?= base_url('assets/logo.jpeg') ?>" alt="Logo" width="100" height="auto" />
+                <img src="<?= base_url('assets/logo.jpeg') ?>" alt="Logo" width="150" height="auto" />
             </a>
         </div>
         <div class="navbar-content">
@@ -21,7 +21,7 @@
                     <i class="ti ti-apps"></i>
                 </li>
                 <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link"><span class="pc-micon"><i class="ti ti-menu"></i></span><span class="pc-mtext">Sales Distribution</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
+                    <a href="#!" class="pc-link"><span class="pc-micon"><i class="ti ti-database-export"></i></span><span class="pc-mtext">Sales Distribution</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
                     <ul class="pc-submenu">
                         <li class="pc-item"><a class="pc-link" href="#!">Selling</a></li>
                         <li class="pc-item"><a class="pc-link" href="#!">Shipment</a></li>
@@ -29,13 +29,13 @@
                     </ul>
                 </li>
                 <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link"><span class="pc-micon"><i class="ti ti-menu"></i></span><span class="pc-mtext">Material Management</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
+                    <a href="#!" class="pc-link"><span class="pc-micon"><i class="ti ti-database-export"></i></span><span class="pc-mtext">Material Management</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
                     <ul class="pc-submenu">
                         <li class="pc-item"><a class="pc-link" href="#!">Inventory</a></li>
                     </ul>
                 </li>
                 <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link"><span class="pc-micon"><i class="ti ti-menu"></i></span><span class="pc-mtext">Finance</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
+                    <a href="#!" class="pc-link"><span class="pc-micon"><i class="ti ti-database-export"></i></span><span class="pc-mtext">Finance</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
                     <ul class="pc-submenu">
                         <li class="pc-item"><a class="pc-link" href="#!">Payment</a></li>
                         <li class="pc-item"><a class="pc-link" href="#!">Shuttlement Payment</a></li>
@@ -48,7 +48,7 @@
                 </li>
                 <li class="pc-item">
                     <a class="pc-link" target="_blank" href="../pages/login-v3.html">
-                        <span class="pc-micon"><i class="ti ti-arrows-left-right"></i></span>
+                        <span class="pc-micon"><i class="ti ti-screen-share"></i></span>
                         <span class="pc-mtext">Inventory</span>
                     </a>
                 </li>

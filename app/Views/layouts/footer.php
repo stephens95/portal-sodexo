@@ -21,7 +21,6 @@
     <script src="<?= base_url('assets/js/theme.js') ?>"></script>
     <script src="<?= base_url('assets/js/plugins/feather.min.js') ?>"></script>
 
-
     <script>
         layout_change('light');
     </script>

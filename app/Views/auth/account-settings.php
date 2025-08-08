@@ -26,13 +26,22 @@
                     </div>
                 <?php endif; ?>
                 <form method="post" action="<?= base_url('/account/update') ?>">
-                    <div class="mb-3">
+                    <div class="mb-2">
+                        <label for="email" class="form-label">Name</label>
+                        <input type="name" class="form-control" value="<?= session()->get('name') ?>" readonly>
+                    </div>
+                    <div class="mb-2">
+                        <label for="email" class="form-label">Company</label>
+                        <input type="name" class="form-control" value="<?= session()->get('company') ?>" readonly>
+                    </div>
+                    <div class="mb-2">
                         <label for="email" class="form-label">Email address</label>
                         <input type="email" class="form-control" id="email" name="email" value="<?= session()->get('email') ?>" readonly>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label for="password" class="form-label">New Password</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Leave blank to keep current password">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter password (minimum 6 characters)" minlength="6">
+                        <small class="form-text text-muted">Leave blank to keep current password.</small>
                     </div>
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                 </form>

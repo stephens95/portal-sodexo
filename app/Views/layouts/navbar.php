@@ -105,7 +105,7 @@
                           role="button"
                           aria-haspopup="false"
                           aria-expanded="false">
-                          <img src="<?= base_url('assets/images/logo_account.png') ?>" alt="user-image" class="user-avtar" />
+                          <img src="<?= base_url('assets/images/logo_account.jpg') ?>" alt="user-image" class="user-avtar" />
                           <span>
                               <i class="ti ti-settings"></i>
                           </span>

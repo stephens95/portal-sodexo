@@ -13,7 +13,7 @@
         name="keywords"
         content="Bootstrap admin template, Dashboard UI Kit, Dashboard Template, Backend Panel, react dashboard, angular dashboard" />
     <meta name="author" content="codedthemes" />
-    <link rel="icon" href="<?= base_url('assets/images/favicon.svg') ?>" type="image/x-icon" />
+    <link rel="icon" href="<?= base_url('assets/images/logo_account.png') ?>" type="image/x-icon" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" id="main-font-link" />
     <link rel="stylesheet" href="<?= base_url('assets/fonts/phosphor/duotone/style.css') ?>" />
     <link rel="stylesheet" href="<?= base_url('assets/fonts/tabler-icons.min.css') ?>" />
