@@ -1,7 +1,7 @@
-<?php include(__DIR__ . '/../layouts/header.php'); ?>
-<?php include(__DIR__ . '/../layouts/sidebar.php'); ?>
-<?php include(__DIR__ . '/../layouts/navbar.php'); ?>
-<?php include(__DIR__ . '/../layouts/navbar-title.php'); ?>
+<?= view('layouts/header') ?>
+<?= view('layouts/sidebar.php'); ?>
+<?= view('layouts/navbar.php'); ?>
+<?= view('layouts/navbar-title.php'); ?>
 
 <div class="row mt-4">
     <div class="col-md-6 offset-md-3">
@@ -28,11 +28,11 @@
                 <form method="post" action="<?= base_url('/account/update') ?>">
                     <div class="mb-2">
                         <label for="email" class="form-label">Name</label>
-                        <input type="name" class="form-control" value="<?= session()->get('name') ?>" readonly>
+                        <input type="text" class="form-control" value="<?= session()->get('name') ?>" readonly>
                     </div>
                     <div class="mb-2">
-                        <label for="email" class="form-label">Company</label>
-                        <input type="name" class="form-control" value="<?= session()->get('company') ?>" readonly>
+                        <label for="email" class="form-label">Buyer</label>
+                        <input type="text" class="form-control" value="<?= session()->get('buyer') ?>" readonly>
                     </div>
                     <div class="mb-2">
                         <label for="email" class="form-label">Email address</label>
@@ -49,4 +49,4 @@
         </div>
     </div>
 </div>
-<?php include(__DIR__ . '/../layouts/footer.php'); ?>
+<?= view('layouts/footer.php'); ?>

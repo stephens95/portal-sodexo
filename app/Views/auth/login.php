@@ -37,10 +37,17 @@
             <div class="auth-form">
                 <div class="card my-5">
                     <div class="card-body">
-                        <a href="#" class="d-flex justify-content-center">
-                            <img src="<?= base_url('assets/logo.jpeg') ?>" alt="image" />
-                        </a>
-                        <h5 class="my-4 d-flex justify-content-center">Sodexo Web Portal</h5>
+                        <!-- <a href="#" class="d-flex justify-content-center align-items-center">
+                            <img src="<?= base_url('assets/logo.jpeg') ?>" alt="Sodexo Logo" width="200" height="auto">
+                            <img src="<?= base_url('assets/images/logo_amt.jpg') ?>" alt="AMT Logo" width="200" height="auto">
+                        </a> -->
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 24px; padding: 12px 0;">
+                            <img src="<?= base_url('assets/logo.jpeg') ?>" style="height:48px; object-fit:contain; background:#fff; border-radius:8px; box-shadow:0 2px 8px #0001; padding:4px;">
+                            <div style="height:40px; border-left:2px solid #e0e0e0;"></div>
+                            <img src="<?= base_url('assets/images/logo_amt.jpg') ?>" style="height:60px; object-fit:contain; background:#fff; border-radius:8px; box-shadow:0 2px 8px #0001; padding:4px;">
+                        </div>
+
+                        <h5 class="my-4 d-flex justify-content-center">Sodexo - AMT Web Portal</h5>
                         <?php if (session()->getFlashdata('error')) : ?>
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 <?= session()->getFlashdata('error') ?>
@@ -74,13 +81,13 @@
         </div>
     </div>
 
-    <script src="../assets/js/plugins/popper.min.js"></script>
-    <script src="../assets/js/plugins/simplebar.min.js"></script>
-    <script src="../assets/js/plugins/bootstrap.min.js"></script>
-    <script src="../assets/js/icon/custom-font.js"></script>
-    <script src="../assets/js/script.js"></script>
-    <script src="../assets/js/theme.js"></script>
-    <script src="../assets/js/plugins/feather.min.js"></script>
+    <script src="<?= base_url('assets/js/plugins/popper.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/plugins/simplebar.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/plugins/bootstrap.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/fonts/custom-font.js') ?>"></script>
+    <script src="<?= base_url('assets/js/script.js') ?>"></script>
+    <script src="<?= base_url('assets/js/theme.js') ?>"></script>
+    <script src="<?= base_url('assets/js/plugins/feather.min.js') ?>"></script>
 
     <script>
         layout_change('light');

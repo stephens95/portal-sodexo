@@ -34,16 +34,22 @@ class Auth extends BaseController
         $remember = $this->request->getPost('remember_me'); // cek checkbox
 
         // $user = $this->userModel->getUserByUsername($username);
-        $user = $this->userModel->getUserWithRole($username);
+        $user = $this->userModel->getUserWithRolesAndBuyers($username);
 
         if ($user && password_verify($password, $user['password'])) {
+            // Update last_login
+            $this->userModel->update($user['user_id'], [
+                'last_login' => date('Y-m-d H:i:s')
+            ]);
+
             // Set session
             $this->session->set([
-                'user_id'   => $user['id'],
+                'user_id'   => $user['user_id'],
                 'name'      => $user['name'],
                 'email'     => $user['email'],
                 'role'      => $user['role_name'],
-                'company'   => $user['company_name'],
+                'buyer'     => $user['buyer_name'],
+                'group'     => $user['group_name'],
                 'logged_in' => true,
             ]);
 

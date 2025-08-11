@@ -30,6 +30,8 @@ $routes->get('/news-updates', 'ProgramUpdates::index');
 $routes->get('/account-settings', 'Account::index');
 $routes->post('/account/update', 'Account::update');
 
+// -------- Report Inventory ----------------
+$routes->get('/report-inventory', 'Inventory::index');
 
 // --------- Dashboard Routes ---------
 $routes->get('/home', function () {

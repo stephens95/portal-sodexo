@@ -8,6 +8,7 @@ class ProgramUpdatesSeeder extends Seeder
 {
     public function run()
     {
+        $this->db->table('program_updates')->truncate();
         $data = [
             [
                 'version'     => 'v1.0.0',

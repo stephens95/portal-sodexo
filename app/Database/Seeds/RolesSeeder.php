@@ -8,9 +8,9 @@ class RolesSeeder extends Seeder
 {
     public function run()
     {
+        // $this->db->table('roles')->truncate();
         $data = [
             ['role_name' => 'Admin'],
-            ['role_name' => 'Manager'],
             ['role_name'  => 'User'],
         ];
 
