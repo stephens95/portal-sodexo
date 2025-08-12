@@ -9,6 +9,14 @@
         <div class="navbar-content">
             <ul class="pc-navbar">
                 <li class="pc-item pc-caption">
+                    <label>Administrator</label>
+                    <i class="ti ti-settings"></i>
+                </li>
+                <li class="pc-item">
+                    <a href="<?= base_url('/users') ?>" class="pc-link"><span class="pc-micon"><i class="ti ti-users"></i></span><span class="pc-mtext">Users</span></a>
+                </li>
+
+                <li class="pc-item pc-caption">
                     <label>Dashboard</label>
                     <i class="ti ti-dashboard"></i>
                 </li>

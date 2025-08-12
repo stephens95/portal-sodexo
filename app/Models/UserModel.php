@@ -58,6 +58,26 @@ class UserModel extends Model
     //         ->first();
     // }
 
+    public function getUser()
+    {
+        return $this->select('users.*, roles.role_name, buyers.buyer_id, buyers.buyer_name, buyers.group_name')
+            ->join('user_has_roles', 'user_has_roles.user_id = users.user_id', 'left')
+            ->join('roles', 'roles.role_id = user_has_roles.role_id', 'left')
+            ->join('user_has_buyers', 'user_has_buyers.user_id = users.user_id', 'left')
+            ->join('buyers', 'buyers.buyer_id = user_has_buyers.buyer_id', 'left')
+            ->findAll();
+    }
+
+    public function getUserPaginated($perPage = 10)
+    {
+        return $this->select('users.*, roles.role_name, buyers.buyer_id, buyers.buyer_name, buyers.group_name')
+            ->join('user_has_roles', 'user_has_roles.user_id = users.user_id', 'left')
+            ->join('roles', 'roles.role_id = user_has_roles.role_id', 'left')
+            ->join('user_has_buyers', 'user_has_buyers.user_id = users.user_id', 'left')
+            ->join('buyers', 'buyers.buyer_id = user_has_buyers.buyer_id', 'left')
+            ->paginate($perPage);
+    }
+
     public function getUserWithRolesAndBuyers($email)
     {
         return $this->select('users.*, roles.role_name, buyers.buyer_name, buyers.group_name')

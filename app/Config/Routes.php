@@ -30,6 +30,18 @@ $routes->get('/news-updates', 'ProgramUpdates::index');
 $routes->get('/account-settings', 'Account::index');
 $routes->post('/account/update', 'Account::update');
 
+// --------- User Management Routes ---------
+$routes->get('/users', 'User::index');
+// $routes->get('/users/create', 'User::create');
+$routes->get('/users/getUserById/(:num)', 'User::getUserById/$1');
+$routes->post('/users/updateUser', 'User::updateUser');
+$routes->post('users/createUser', 'User::createUser');
+$routes->get('roles/listAll', 'Role::listAll');
+$routes->get('buyers/listAll', 'Buyer::listAll');
+$routes->get('/users/delete/(:num)', 'User::delete/$1');
+
+// $routes->post('/users/store', 'User::store'); // Uncomment if you have a store method
+
 // -------- Report Inventory ----------------
 $routes->get('/report-inventory', 'Inventory::index');
 

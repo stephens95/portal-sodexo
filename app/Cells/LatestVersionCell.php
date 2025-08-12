@@ -12,7 +12,7 @@ class LatestVersionCell extends Cell
         $model = new ProgramUpdatesModel();
         $last  = $model->orderBy('created_at', 'DESC')->first();
         $data  = [
-            'latestVersion' => $last['version'] ?? 'v1.0.0'
+            'latestVersion' => $last['version']  . ' - Last Updated On ' . date("d M Y", strtotime($last['created_at'])) ?? 'v1.0.0'
         ];
 
         return view('components/version_footer', $data);
