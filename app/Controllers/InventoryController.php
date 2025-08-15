@@ -5,7 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class Inventory extends BaseController
+class InventoryController extends BaseController
 {
     public function index()
     {

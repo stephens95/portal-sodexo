@@ -6,14 +6,9 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-// --------- Authentication Routes ---------
-// $routes->get('/', function () {
-//     return view('auth/login');
-// });
-
-$routes->get('/', 'Auth::index');
-$routes->post('/login', 'Auth::login');
-$routes->get('/logout', 'Auth::logout');
+$routes->get('/', 'AuthController::index');
+$routes->post('/login', 'AuthController::login');
+$routes->get('/logout', 'AuthController::logout');
 
 // Halaman setelah login
 $routes->get('/home', function () {
@@ -21,29 +16,25 @@ $routes->get('/home', function () {
         return redirect()->to('/');
     }
     return view('home');
-    // echo "Welcome, " . session()->get('name') . " | <a href='/logout'>Logout</a>";
 });
 
-$routes->get('/news-updates', 'ProgramUpdates::index');
+$routes->get('/news-updates', 'ProgramUpdateController::index');
 
 // --------- Account Settings Routes ---------
-$routes->get('/account-settings', 'Account::index');
-$routes->post('/account/update', 'Account::update');
+$routes->get('/account-settings', 'AccountController::index');
+$routes->post('/account/update', 'AccountController::update');
 
 // --------- User Management Routes ---------
-$routes->get('/users', 'User::index');
-// $routes->get('/users/create', 'User::create');
-$routes->get('/users/getUserById/(:num)', 'User::getUserById/$1');
-$routes->post('/users/updateUser', 'User::updateUser');
-$routes->post('users/createUser', 'User::createUser');
+$routes->get('/users', 'UserController::index');
+$routes->get('/users/getUserById/(:num)', 'UserController::getUserById/$1');
+$routes->post('/users/updateUser', 'UserController::updateUser');
+$routes->post('users/createUser', 'UserController::createUser');
 $routes->get('roles/listAll', 'Role::listAll');
 $routes->get('buyers/listAll', 'Buyer::listAll');
-$routes->get('/users/delete/(:num)', 'User::delete/$1');
-
-// $routes->post('/users/store', 'User::store'); // Uncomment if you have a store method
+$routes->get('/users/delete/(:num)', 'UserController::delete/$1');
 
 // -------- Report Inventory ----------------
-$routes->get('/report-inventory', 'Inventory::index');
+$routes->get('/report-inventory', 'InventoryController::index');
 
 // --------- Dashboard Routes ---------
 $routes->get('/home', function () {
@@ -51,7 +42,6 @@ $routes->get('/home', function () {
 });
 
 // ---------- API Routes ---------
-// $routes->get('api/api_sodexo/(:num)', 'LineItemAPI::getLineItems/$1');
 $routes->group('portal', ['namespace' => 'App\Controllers\Api'], function ($routes) {
     $routes->get('api-sodexo/inventory/(:num)', 'LineItemAPI::getLineItems/$1'); // GET /api/users/1
 });

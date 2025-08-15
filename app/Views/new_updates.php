@@ -1,8 +1,10 @@
-<?php include('layouts/header.php'); ?>
-<?php include('layouts/sidebar.php'); ?>
-<?php include('layouts/navbar.php'); ?>
-<?php include('layouts/navbar-title.php'); ?>
+<?= $this->extend('layouts/template') ?>
+<!-- Additional CSS -->
+<!-- <?= $this->section('css') ?>
+ <?= $this->endSection() ?> -->
 
+<?= $this->section('content') ?>
+<?= $this->include('layouts/navbar-title') ?>
 <?php if (!empty($updates)) : ?>
     <?php foreach ($updates as $update): ?>
         <div class="row">
@@ -31,9 +33,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h5>
-                        <p>Updated</p>
-                    </h5>
+                    <h5>Updated</h5>
                 </div>
                 <div class="card-body pc-component">
                     <p>No updates found.</p>
@@ -42,4 +42,8 @@
         </div>
     </div>
 <?php endif; ?>
-<?php include('layouts/footer.php'); ?>
+<?= $this->endSection() ?>
+
+<!-- Additional JS -->
+<!-- <?= $this->section('js') ?>
+ <?= $this->endSection() ?> -->

@@ -1,8 +1,10 @@
-<?= view('layouts/header') ?>
-<?= view('layouts/sidebar.php'); ?>
-<?= view('layouts/navbar.php'); ?>
-<?= view('layouts/navbar-title.php'); ?>
+<?= $this->extend('layouts/template') ?>
+<!-- Additional CSS -->
+<!-- <?= $this->section('css') ?>
+ <?= $this->endSection() ?> -->
 
+<?= $this->section('content') ?>
+<?= $this->include('layouts/navbar-title') ?>
 <div class="row mt-2">
     <div class="col-md-12">
         <div class="card">
@@ -60,8 +62,8 @@
         </div>
     </div>
 </div>
+<?= $this->endSection() ?>
 
-<?= view('users/edit.php'); ?>
-<?= view('users/create.php'); ?>
-<?= view('layouts/footer.php'); ?>
-<?= view('users/jquery.php'); ?>
+<!-- Additional JS -->
+<!-- <?= $this->section('js') ?>
+ <?= $this->endSection() ?> -->

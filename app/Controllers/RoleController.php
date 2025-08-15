@@ -2,11 +2,12 @@
 
 namespace App\Controllers;
 
-use App\Models\RoleModel;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class Role extends BaseController
+use App\Models\RoleModel;
+
+class RoleController extends BaseController
 {
     public function index()
     {

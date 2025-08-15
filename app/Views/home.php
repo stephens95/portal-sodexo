@@ -1,6 +1,9 @@
-<?php include('layouts/header.php'); ?>
-<?php include('layouts/sidebar.php'); ?>
-<?php include('layouts/navbar.php'); ?>
+<?= $this->extend('layouts/template') ?>
+<!-- Additional CSS -->
+<!-- <?= $this->section('css') ?>
+ <?= $this->endSection() ?> -->
+
+<?= $this->section('content') ?>
 <div class="row">
     <div class="col-xl-4 col-md-6">
         <div class="card bg-secondary-dark dashnum-card text-white overflow-hidden">
@@ -143,5 +146,10 @@
         </div>
     </div>
 </div>
+<?= $this->endSection() ?>
 
-<?php include('layouts/footer.php'); ?>
+<!-- Additional JS -->
+<?= $this->section('js') ?>
+<script src="<?= base_url('assets/js/plugins/apexcharts.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/pages/dashboard-default.js') ?>"></script>
+<?= $this->endSection() ?>

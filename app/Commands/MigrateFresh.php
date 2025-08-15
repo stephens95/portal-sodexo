@@ -60,13 +60,11 @@ class MigrateFresh extends BaseCommand
      */
     public function run(array $params)
     {
-        // Check if -all flag is present (optional, karena default behavior)
         $refreshAll = in_array('-all', $params) || in_array('--all', $params);
         $runSeed = !isset($params['seed']) || $params['seed'] !== 'false';
 
         CLI::write('🔄 Dropping all tables and re-running migrations...', 'yellow');
 
-        // Refresh migrations (always use -all for consistency)
         command('migrate:refresh -all');
 
         if ($runSeed) {

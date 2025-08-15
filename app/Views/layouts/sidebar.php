@@ -2,7 +2,6 @@
     <div class="navbar-wrapper">
         <div class="m-header">
             <a href="<?= base_url('/home') ?>" class="b-brand text-primary">
-                <!-- ========   Change your logo from here   ============ -->
                 <img src="<?= base_url('assets/logo.jpeg') ?>" alt="Logo" width="150" height="auto" />
             </a>
         </div>

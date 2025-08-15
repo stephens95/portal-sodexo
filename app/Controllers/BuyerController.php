@@ -2,11 +2,12 @@
 
 namespace App\Controllers;
 
-use App\Models\BuyerModel;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class Buyer extends BaseController
+use App\Models\BuyerModel;
+
+class BuyerController extends BaseController
 {
     public function index()
     {

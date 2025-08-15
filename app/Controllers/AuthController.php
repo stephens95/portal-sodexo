@@ -2,11 +2,12 @@
 
 namespace App\Controllers;
 
-use App\Models\UserModel;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class Auth extends BaseController
+use App\Models\UserModel;
+
+class AuthController extends BaseController
 {
     protected $session;
     protected $userModel;
@@ -19,7 +20,6 @@ class Auth extends BaseController
 
     public function index()
     {
-        // Kalau sudah login, jangan tampilkan form login lagi
         if (session()->get('logged_in')) {
             return redirect()->to('/home');
         }
@@ -37,12 +37,10 @@ class Auth extends BaseController
         $user = $this->userModel->getUserWithRolesAndBuyers($username);
 
         if ($user && password_verify($password, $user['password'])) {
-            // Update last_login
             $this->userModel->update($user['user_id'], [
                 'last_login' => date('Y-m-d H:i:s')
             ]);
 
-            // Set session
             $this->session->set([
                 'user_id'   => $user['user_id'],
                 'name'      => $user['name'],
@@ -53,9 +51,7 @@ class Auth extends BaseController
                 'logged_in' => true,
             ]);
 
-            // Jika remember me dicentang, buat cookie login
             if ($remember) {
-                // Simpan di cookie selama 7 hari (604800 detik)
                 set_cookie('remember_username', $username, 604800);
                 set_cookie('remember_token', hash('sha256', $user['password']), 604800);
             }

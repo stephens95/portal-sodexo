@@ -2,11 +2,12 @@
 
 namespace App\Controllers;
 
-use App\Models\UserModel;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class Account extends BaseController
+use App\Models\UserModel;
+
+class AccountController extends BaseController
 {
     protected $session;
     protected $userModel;

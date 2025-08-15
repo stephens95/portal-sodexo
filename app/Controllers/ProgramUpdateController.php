@@ -3,10 +3,11 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
-use App\Models\ProgramUpdatesModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class ProgramUpdates extends BaseController
+use App\Models\ProgramUpdatesModel;
+
+class ProgramUpdateController extends BaseController
 {
     public function index()
     {
