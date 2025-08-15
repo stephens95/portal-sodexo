@@ -32,11 +32,33 @@
             <div class="card">
                 <div class="card-header">
                     <h5>
-                        <p>Updated</p>
+                        <p>Filter By</p>
                     </h5>
                 </div>
                 <div class="card-body pc-component">
-                    <p>No updates found.</p>
+                    <form id="filterForm">
+                        <div class="row g-3">
+                            <!-- FORECAST_QUOTATION -->
+                            <div class="col-md-6">
+                                <label for="forecast_quotation" class="form-label">FORECAST QUOTATION</label>
+                                <input type="text" class="form-control" id="forecast_quotation" name="forecast_quotation" placeholder="Masukkan Forecast Quotation">
+                            </div>
+
+                            <!-- STYLE -->
+                            <div class="col-md-6">
+                                <label for="style" class="form-label">
+                                    STYLE <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="style" name="style" placeholder="Masukkan Style" required>
+                            </div>
+
+                            <!-- Tombol -->
+                            <div class="col-md-12 text-end">
+                                <button type="submit" class="btn btn-primary">Filter</button>
+                                <button type="reset" class="btn btn-secondary">Reset</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

@@ -41,10 +41,14 @@
                             <img src="<?= base_url('assets/logo.jpeg') ?>" alt="Sodexo Logo" width="200" height="auto">
                             <img src="<?= base_url('assets/images/logo_amt.jpg') ?>" alt="AMT Logo" width="200" height="auto">
                         </a> -->
-                        <div style="display: flex; align-items: center; justify-content: center; gap: 24px; padding: 12px 0;">
-                            <img src="<?= base_url('assets/logo.jpeg') ?>" style="height:48px; object-fit:contain; background:#fff; border-radius:8px; box-shadow:0 2px 8px #0001; padding:4px;">
-                            <div style="height:40px; border-left:2px solid #e0e0e0;"></div>
-                            <img src="<?= base_url('assets/images/logo_amt.jpg') ?>" style="height:60px; object-fit:contain; background:#fff; border-radius:8px; box-shadow:0 2px 8px #0001; padding:4px;">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 32px; padding: 16px 0;">
+                            <div style="height:80px; width:140px; display:flex; align-items:center; justify-content:center; background:#fff; border-radius:8px; box-shadow:0 2px 8px #0001; padding:6px;">
+                                <img src="<?= base_url('assets/logo.jpeg') ?>" style="max-height:100%; max-width:100%; object-fit:contain;">
+                            </div>
+                            <div style="height:60px; border-left:2px solid #e0e0e0;"></div>
+                            <div style="height:80px; width:170px; display:flex; align-items:center; justify-content:center; background:#fff; border-radius:8px; box-shadow:0 2px 8px #0001; padding:6px;">
+                                <img src="<?= base_url('assets/images/logo_amt.jpg') ?>" style="max-height:100%; max-width:100%; object-fit:contain;">
+                            </div>
                         </div>
 
                         <h5 class="my-4 d-flex justify-content-center">Sodexo - AMT Web Portal</h5>

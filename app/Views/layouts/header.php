@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="<?= base_url('assets/css/style.css') ?>" id="main-style-link" />
     <link rel="stylesheet" href="<?= base_url('assets/css/style-preset.css') ?>" />
     <link rel="stylesheet" href="<?= base_url('assets/css/plugins/bootstrap.css') ?>" />
-    <link rel="stylesheet" href="<?= base_url('assets/css/plugins/dataTables.bootstrap4.css') ?>" />
+    <!-- <link rel="stylesheet" href="<?= base_url('assets/css/plugins/dataTables.bootstrap4.css') ?>" /> -->
 </head>
 
 <body>
