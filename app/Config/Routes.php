@@ -27,7 +27,7 @@ $routes->post('/account/update', 'AccountController::update');
 // --------- User Management Routes ---------
 $routes->get('/users', 'UserController::index');
 $routes->get('/users/getUserById/(:num)', 'UserController::getUserById/$1');
-$routes->post('/users/updateUser', 'UserController::updateUser');
+$routes->post('/users/update', 'UserController::updateUser');  // Changed from updateUser to update
 $routes->post('users/createUser', 'UserController::createUser');
 $routes->get('roles/listAll', 'Role::listAll');
 $routes->get('buyers/listAll', 'Buyer::listAll');

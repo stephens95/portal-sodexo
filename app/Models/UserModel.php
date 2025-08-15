@@ -44,53 +44,114 @@ class UserModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    // public function getUserByUsername($email)
-    // {
-    //     return $this->where('email', $email)->first();
-    // }
-
-    // public function getUserWithRole($email)
-    // {
-    //     return $this->select('users.*, role_name, buyers.buyer_name')
-    //         ->join('roles', 'roles.rolesid = users.role_id')
-    //         ->join('buyers', 'buyers.id = users.user_id')
-    //         ->where('users.email', $email)
-    //         ->first();
-    // }
-
     public function getUser()
     {
-        return $this->select('users.*, roles.role_name, buyers.buyer_id, buyers.buyer_name, buyers.group_name')
-            ->join('user_has_roles', 'user_has_roles.user_id = users.user_id', 'left')
-            ->join('roles', 'roles.role_id = user_has_roles.role_id', 'left')
-            ->join('user_has_buyers', 'user_has_buyers.user_id = users.user_id', 'left')
-            ->join('buyers', 'buyers.buyer_id = user_has_buyers.buyer_id', 'left')
-            ->findAll();
-    }
-
-    public function getUserPaginated($perPage = 10)
-    {
-        return $this->select('users.*, roles.role_name, buyers.buyer_id, buyers.buyer_name, buyers.group_name')
-            ->join('user_has_roles', 'user_has_roles.user_id = users.user_id', 'left')
-            ->join('roles', 'roles.role_id = user_has_roles.role_id', 'left')
-            ->join('user_has_buyers', 'user_has_buyers.user_id = users.user_id', 'left')
-            ->join('buyers', 'buyers.buyer_id = user_has_buyers.buyer_id', 'left')
-            ->paginate($perPage);
+        $users = $this->findAll();
+        $db = \Config\Database::connect();
+        
+        foreach ($users as &$user) {
+            // Get roles
+            $roles = $db->table('user_has_roles uhr')
+                       ->select('r.role_name, r.role_id')
+                       ->join('roles r', 'r.role_id = uhr.role_id')
+                       ->where('uhr.user_id', $user['user_id'])
+                       ->get()
+                       ->getResultArray();
+            
+            // Get buyers
+            $buyers = $db->table('user_has_buyers uhb')
+                        ->select('b.buyer_name, b.buyer_id, b.group_name')
+                        ->join('buyers b', 'b.buyer_id = uhb.buyer_id')
+                        ->where('uhb.user_id', $user['user_id'])
+                        ->get()
+                        ->getResultArray();
+            
+            // Format data
+            $user['role_name'] = implode(', ', array_column($roles, 'role_name'));
+            $user['role_ids'] = implode(',', array_column($roles, 'role_id'));
+            $user['buyer_name'] = implode(', ', array_column($buyers, 'buyer_name'));
+            $user['buyer_ids'] = implode(',', array_column($buyers, 'buyer_id'));
+            $user['group_name'] = implode(', ', array_unique(array_column($buyers, 'group_name')));
+        }
+        
+        return $users;
     }
 
     public function getUserWithRolesAndBuyers($email)
     {
-        return $this->select('users.*, roles.role_name, buyers.buyer_name, buyers.group_name')
-            ->join('user_has_roles', 'user_has_roles.user_id = users.user_id', 'left')
-            ->join('roles', 'roles.role_id = user_has_roles.role_id', 'left')
-            ->join('user_has_buyers', 'user_has_buyers.user_id = users.user_id', 'left')
-            ->join('buyers', 'buyers.buyer_id = user_has_buyers.buyer_id', 'left')
-            ->where('users.email', $email)
-            ->first();
+        $user = $this->where('email', $email)->first();
+        if (!$user) return null;
+        
+        $db = \Config\Database::connect();
+        
+        // Get roles
+        $roles = $db->table('user_has_roles uhr')
+                   ->select('r.role_name')
+                   ->join('roles r', 'r.role_id = uhr.role_id')
+                   ->where('uhr.user_id', $user['user_id'])
+                   ->get()
+                   ->getResultArray();
+        
+        // Get buyers
+        $buyers = $db->table('user_has_buyers uhb')
+                    ->select('b.buyer_name, b.group_name')
+                    ->join('buyers b', 'b.buyer_id = uhb.buyer_id')
+                    ->where('uhb.user_id', $user['user_id'])
+                    ->get()
+                    ->getResultArray();
+        
+        // Format data
+        $user['role_name'] = implode(', ', array_column($roles, 'role_name'));
+        $user['buyer_name'] = implode(', ', array_column($buyers, 'buyer_name'));
+        $user['group_name'] = implode(', ', array_unique(array_column($buyers, 'group_name')));
+        
+        return $user;
+    }
+
+    public function getUserById($id)
+    {
+        $user = $this->find($id);
+        if (!$user) return null;
+        
+        $db = \Config\Database::connect();
+        
+        // Get roles
+        $roles = $db->table('user_has_roles uhr')
+                   ->select('r.role_id')
+                   ->join('roles r', 'r.role_id = uhr.role_id')
+                   ->where('uhr.user_id', $user['user_id'])
+                   ->get()
+                   ->getResultArray();
+        
+        // Get buyers
+        $buyers = $db->table('user_has_buyers uhb')
+                    ->select('b.buyer_id')
+                    ->join('buyers b', 'b.buyer_id = uhb.buyer_id')
+                    ->where('uhb.user_id', $user['user_id'])
+                    ->get()
+                    ->getResultArray();
+        
+        // Format data
+        $user['role_ids'] = implode(',', array_column($roles, 'role_id'));
+        $user['buyer_ids'] = implode(',', array_column($buyers, 'buyer_id'));
+        
+        return $user;
     }
 
     public function updateUser($id, $data)
     {
         return $this->update($id, $data);
+    }
+
+    public function deleteUser($id)
+    {
+        $db = \Config\Database::connect();
+        
+        // Delete relations first
+        $db->table('user_has_roles')->where('user_id', $id)->delete();
+        $db->table('user_has_buyers')->where('user_id', $id)->delete();
+        
+        // Delete user
+        return $this->delete($id);
     }
 }

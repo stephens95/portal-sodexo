@@ -7,13 +7,19 @@
         </div>
         <div class="navbar-content">
             <ul class="pc-navbar">
+                
+                <?php if (isAdmin()): ?>
                 <li class="pc-item pc-caption">
                     <label>Administrator</label>
                     <i class="ti ti-settings"></i>
                 </li>
                 <li class="pc-item">
-                    <a href="<?= base_url('/users') ?>" class="pc-link"><span class="pc-micon"><i class="ti ti-users"></i></span><span class="pc-mtext">Users</span></a>
+                    <a href="<?= base_url('/users') ?>" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-users"></i></span>
+                        <span class="pc-mtext">Users</span>
+                    </a>
                 </li>
+                <?php endif; ?>
 
                 <li class="pc-item pc-caption">
                     <label>Dashboard</label>
@@ -22,11 +28,11 @@
                 <li class="pc-item">
                     <a href="<?= base_url('/news-updates') ?>" class="pc-link"><span class="pc-micon"><i class="ti ti-news"></i></span><span class="pc-mtext">News & Updates</span></a>
                 </li>
-
                 <li class="pc-item pc-caption">
                     <label>Report</label>
                     <i class="ti ti-apps"></i>
                 </li>
+                
                 <li class="pc-item pc-hasmenu">
                     <a href="#!" class="pc-link"><span class="pc-micon"><i class="ti ti-database-export"></i></span><span class="pc-mtext">Sales Distribution</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
                     <ul class="pc-submenu">

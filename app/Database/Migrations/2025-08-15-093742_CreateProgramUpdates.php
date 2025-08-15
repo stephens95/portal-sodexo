@@ -4,7 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreateProgramUpdatesTable extends Migration
+class CreateProgramUpdates extends Migration
 {
     public function up()
     {

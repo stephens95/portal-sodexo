@@ -7,6 +7,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 use App\Models\UserModel;
 use App\Models\BuyerModel;
+use App\Models\RoleModel;
 
 class UserController extends BaseController
 {
@@ -14,11 +15,15 @@ class UserController extends BaseController
     {
         if (session()->get('logged_in')) {
             $userModel        = new UserModel();
+            $buyerModel       = new BuyerModel();
+            $roleModel        = new RoleModel();
+            
             $data['title']    = 'Users Management';
             $data['segment1'] = 'Administrator';
             $data['users']    = $userModel->getUser();
-            // $data['users']    = $userModel->getUserPaginated(10); // 10 data per halaman
-            // $data['pager']    = $userModel->pager;
+            $data['buyers']   = $buyerModel->findAll();
+            $data['roles']    = $roleModel->findAll();
+            
             return view('users/index', $data);
         }
         return view('auth/login');
@@ -28,86 +33,145 @@ class UserController extends BaseController
     {
         $userModel = new UserModel();
         $buyerModel = new BuyerModel();
+        $roleModel = new RoleModel();
 
-        // Data user
-        $user = $userModel->getUser()
-            ->where('users.user_id', $id)
-            ->first();
-
-        // Semua buyers untuk dropdown
-        $buyers = $buyerModel->select('buyer_id, buyer_name')->findAll();
+        $user = $userModel->getUserById($id);
+        $buyers = $buyerModel->findAll();
+        $roles = $roleModel->findAll();
 
         return $this->response->setJSON([
             'user'   => $user,
-            'buyers' => $buyers
+            'buyers' => $buyers,
+            'roles'  => $roles
         ]);
-
-        return $this->response->setJSON($user);
     }
 
     public function updateUser()
     {
-        $id       = $this->request->getPost('user_id');
-        $buyer_id = $this->request->getPost('buyer_id');
+        $id = $this->request->getPost('user_id');
+        $buyer_ids = $this->request->getPost('buyer_ids');
+        $role_ids = $this->request->getPost('role_ids');
+
+        $rules = [
+            'name'  => 'required|min_length[3]',
+            'email' => 'required|valid_email'
+        ];
+
+        if (!$this->validate($rules)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $this->validator->getErrors()
+            ]);
+        }
 
         $userModel = new UserModel();
-        $userModel->update($id, [
+        $userData = [
             'name'  => $this->request->getPost('name'),
             'email' => $this->request->getPost('email')
-        ]);
+        ];
 
-        // Update relasi buyer
+        // Update password if provided
+        $password = $this->request->getPost('password');
+        if (!empty($password)) {
+            if (strlen($password) < 6) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Password minimal 6 karakter'
+                ]);
+            }
+            $userData['password'] = password_hash($password, PASSWORD_DEFAULT);
+        }
+
+        $userModel->update($id, $userData);
+
         $db = \Config\Database::connect();
-        $builder = $db->table('user_has_buyers');
-        $builder->where('user_id', $id)->delete(); // hapus dulu
-        if (!empty($buyer_id)) {
-            $builder->insert([
-                'user_id'  => $id,
-                'buyer_id' => $buyer_id
-            ]);
+
+        // Update relasi buyers
+        $db->table('user_has_buyers')->where('user_id', $id)->delete();
+        if (!empty($buyer_ids)) {
+            foreach ($buyer_ids as $buyer_id) {
+                $db->table('user_has_buyers')->insert([
+                    'user_id'  => $id,
+                    'buyer_id' => $buyer_id
+                ]);
+            }
+        }
+
+        // Update relasi roles
+        $db->table('user_has_roles')->where('user_id', $id)->delete();
+        if (!empty($role_ids)) {
+            foreach ($role_ids as $role_id) {
+                $db->table('user_has_roles')->insert([
+                    'user_id' => $id,
+                    'role_id' => $role_id
+                ]);
+            }
         }
 
         return $this->response->setJSON(['status' => 'success']);
     }
 
-
     public function createUser()
     {
-        $password = $this->request->getPost('password');
-        if (strlen($password) < 6) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Password minimal 6 karakter']);
+        // Validation
+        $rules = [
+            'name'     => 'required|min_length[3]',
+            'email'    => 'required|valid_email|is_unique[users.email]',
+            'password' => 'required|min_length[6]'
+        ];
+
+        if (!$this->validate($rules)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $this->validator->getErrors()
+            ]);
         }
 
         $userModel = new UserModel();
         $data = [
             'name'     => $this->request->getPost('name'),
             'email'    => $this->request->getPost('email'),
-            'password' => password_hash($password, PASSWORD_DEFAULT),
+            'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
         ];
         $userId = $userModel->insert($data);
 
-        // Insert relasi buyer
-        $buyer_id = $this->request->getPost('buyer_id');
-        if ($buyer_id) {
-            $db = \Config\Database::connect();
-            $builder = $db->table('user_has_buyers');
-            $builder->insert([
-                'user_id'  => $userId,
-                'buyer_id' => $buyer_id,
-            ]);
+        $db = \Config\Database::connect();
+
+        // Insert relasi buyers
+        $buyer_ids = $this->request->getPost('buyer_ids');
+        if (!empty($buyer_ids)) {
+            foreach ($buyer_ids as $buyer_id) {
+                $db->table('user_has_buyers')->insert([
+                    'user_id'  => $userId,
+                    'buyer_id' => $buyer_id,
+                ]);
+            }
         }
 
-        // Insert relasi role
-        $role_id = $this->request->getPost('role_id');
-        if ($role_id) {
-            $db = \Config\Database::connect();
-            $builderRole = $db->table('user_has_roles');
-            $builderRole->insert([
-                'user_id' => $userId,
-                'role_id' => $role_id,
-            ]);
+        // Insert relasi roles
+        $role_ids = $this->request->getPost('role_ids');
+        if (!empty($role_ids)) {
+            foreach ($role_ids as $role_id) {
+                $db->table('user_has_roles')->insert([
+                    'user_id' => $userId,
+                    'role_id' => $role_id,
+                ]);
+            }
         }
 
         return $this->response->setJSON(['status' => 'success']);
+    }
+
+    public function deleteUser($id)
+    {
+        $userModel = new UserModel();
+        
+        if ($userModel->deleteUser($id)) {
+            return redirect()->to('/users')->with('success', 'User deleted successfully');
+        } else {
+            return redirect()->to('/users')->with('error', 'Failed to delete user');
+        }
     }
 }

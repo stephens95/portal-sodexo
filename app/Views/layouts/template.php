@@ -16,6 +16,9 @@
     <!-- Required CSS - All Pages -->
     <link rel="stylesheet" href="<?= base_url('assets/css/style.css') ?>" id="main-style-link" />
     <link rel="stylesheet" href="<?= base_url('assets/css/style-preset.css') ?>" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
     
     <!-- Additional CSS - every page -->
     <?= $this->renderSection('css') ?>
@@ -59,6 +62,11 @@
     <script src="<?= base_url('assets/js/script.js') ?>"></script>
     <script src="<?= base_url('assets/js/theme.js') ?>"></script>
     <script src="<?= base_url('assets/js/plugins/feather.min.js') ?>"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <!-- Additional JS - Every Page -->
     <?= $this->renderSection('js') ?>

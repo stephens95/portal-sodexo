@@ -4,17 +4,11 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class UserHasBuyers extends Migration
+class CreateUserHasBuyers extends Migration
 {
     public function up()
     {
         $this->forge->addField([
-            'id' => [
-                'type' => 'INT',
-                'constraint' => 11,
-                'unsigned' => true,
-                'auto_increment' => true,
-            ],
             'user_id' => [
                 'type' => 'INT',
                 'constraint' => 11,
@@ -25,7 +19,8 @@ class UserHasBuyers extends Migration
                 'constraint' => 50,
             ],
         ]);
-        $this->forge->addKey('id', true);
+        
+        $this->forge->addKey(['user_id', 'buyer_id'], true);
         $this->forge->addForeignKey('user_id', 'users', 'user_id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('buyer_id', 'buyers', 'buyer_id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('user_has_buyers');
