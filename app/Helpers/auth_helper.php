@@ -1,37 +1,38 @@
 <?php
 
+use App\Libraries\Auth;
+
+if (!function_exists('auth')) {
+    /**
+     * Get Auth instance
+     */
+    function auth()
+    {
+        static $auth = null;
+        if ($auth === null) {
+            $auth = new Auth();
+        }
+        return $auth;
+    }
+}
+
 if (!function_exists('hasRole')) {
     /**
      * Check if user has specific role
      */
     function hasRole($roleName)
     {
-        if (!session()->get('logged_in')) {
-            return false;
-        }
-
-        $userRoles = session()->get('role');
-        if (is_string($userRoles)) {
-            $roleArray = explode(', ', $userRoles);
-            return in_array($roleName, $roleArray);
-        }
-
-        return false;
+        return auth()->hasRole($roleName);
     }
 }
 
-if (!function_exists('hasRoleId')) {
+if (!function_exists('hasRoles')) {
     /**
-     * Check if user has specific role ID
+     * Check if user has any of the specified roles
      */
-    function hasRoleId($roleId)
+    function hasRoles($roleNames)
     {
-        if (!session()->get('logged_in')) {
-            return false;
-        }
-
-        $roleIds = session()->get('role_ids');
-        return is_array($roleIds) && in_array($roleId, $roleIds);
+        return auth()->hasRoles($roleNames);
     }
 }
 
@@ -41,24 +42,26 @@ if (!function_exists('isAdmin')) {
      */
     function isAdmin()
     {
-        return hasRole('Admin');
+        return auth()->isAdmin();
     }
 }
 
-if (!function_exists('checkPageAccess')) {
+if (!function_exists('hasBuyer')) {
     /**
-     * Check page access and redirect if unauthorized
+     * Check if user has specific buyer
      */
-    function checkPageAccess($requiredRole)
+    function hasBuyer($buyerId)
     {
-        if (!session()->get('logged_in')) {
-            return redirect()->to('/');
-        }
+        return auth()->hasBuyer($buyerId);
+    }
+}
 
-        if (!hasRole($requiredRole)) {
-            return redirect()->to('/home')->with('error', 'Access denied. You do not have permission to access this page.');
-        }
-
-        return true;
+if (!function_exists('hasBuyers')) {
+    /**
+     * Check if user has any of the specified buyers
+     */
+    function hasBuyers($buyerIds)
+    {
+        return auth()->hasBuyers($buyerIds);
     }
 }

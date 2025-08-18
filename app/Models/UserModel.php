@@ -12,7 +12,7 @@ class UserModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['email', 'password', 'name', 'last_login', 'created_at', 'updated_at'];
+    protected $allowedFields    = ['email', 'password', 'name', 'verified', 'last_login', 'created_at', 'updated_at'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -48,7 +48,7 @@ class UserModel extends Model
     {
         $users = $this->findAll();
         $db = \Config\Database::connect();
-        
+
         foreach ($users as &$user) {
             // Get roles
             $roles = $db->table('user_has_roles uhr')
@@ -57,7 +57,7 @@ class UserModel extends Model
                        ->where('uhr.user_id', $user['user_id'])
                        ->get()
                        ->getResultArray();
-            
+
             // Get buyers
             $buyers = $db->table('user_has_buyers uhb')
                         ->select('b.buyer_name, b.buyer_id, b.group_name')
@@ -65,7 +65,7 @@ class UserModel extends Model
                         ->where('uhb.user_id', $user['user_id'])
                         ->get()
                         ->getResultArray();
-            
+
             // Format data
             $user['role_name'] = implode(', ', array_column($roles, 'role_name'));
             $user['role_ids'] = implode(',', array_column($roles, 'role_id'));
@@ -73,7 +73,7 @@ class UserModel extends Model
             $user['buyer_ids'] = implode(',', array_column($buyers, 'buyer_id'));
             $user['group_name'] = implode(', ', array_unique(array_column($buyers, 'group_name')));
         }
-        
+
         return $users;
     }
 
@@ -81,9 +81,9 @@ class UserModel extends Model
     {
         $user = $this->where('email', $email)->first();
         if (!$user) return null;
-        
+
         $db = \Config\Database::connect();
-        
+
         // Get roles
         $roles = $db->table('user_has_roles uhr')
                    ->select('r.role_name')
@@ -91,7 +91,7 @@ class UserModel extends Model
                    ->where('uhr.user_id', $user['user_id'])
                    ->get()
                    ->getResultArray();
-        
+
         // Get buyers
         $buyers = $db->table('user_has_buyers uhb')
                     ->select('b.buyer_name, b.group_name')
@@ -99,12 +99,12 @@ class UserModel extends Model
                     ->where('uhb.user_id', $user['user_id'])
                     ->get()
                     ->getResultArray();
-        
+
         // Format data
         $user['role_name'] = implode(', ', array_column($roles, 'role_name'));
         $user['buyer_name'] = implode(', ', array_column($buyers, 'buyer_name'));
         $user['group_name'] = implode(', ', array_unique(array_column($buyers, 'group_name')));
-        
+
         return $user;
     }
 
@@ -112,9 +112,9 @@ class UserModel extends Model
     {
         $user = $this->find($id);
         if (!$user) return null;
-        
+
         $db = \Config\Database::connect();
-        
+
         // Get roles
         $roles = $db->table('user_has_roles uhr')
                    ->select('r.role_id')
@@ -122,7 +122,7 @@ class UserModel extends Model
                    ->where('uhr.user_id', $user['user_id'])
                    ->get()
                    ->getResultArray();
-        
+
         // Get buyers
         $buyers = $db->table('user_has_buyers uhb')
                     ->select('b.buyer_id')
@@ -130,11 +130,11 @@ class UserModel extends Model
                     ->where('uhb.user_id', $user['user_id'])
                     ->get()
                     ->getResultArray();
-        
+
         // Format data
         $user['role_ids'] = implode(',', array_column($roles, 'role_id'));
         $user['buyer_ids'] = implode(',', array_column($buyers, 'buyer_id'));
-        
+
         return $user;
     }
 
@@ -146,12 +146,20 @@ class UserModel extends Model
     public function deleteUser($id)
     {
         $db = \Config\Database::connect();
-        
-        // Delete relations first
+
         $db->table('user_has_roles')->where('user_id', $id)->delete();
         $db->table('user_has_buyers')->where('user_id', $id)->delete();
-        
-        // Delete user
+
         return $this->delete($id);
+    }
+
+    public function verifyUser($id)
+    {
+        return $this->update($id, ['verified' => 1]);
+    }
+
+    public function unverifyUser($id)
+    {
+        return $this->update($id, ['verified' => 0]);
     }
 }

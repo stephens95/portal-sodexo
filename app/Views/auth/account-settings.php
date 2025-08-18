@@ -23,7 +23,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 <?php endif; ?>
-                
+
                 <form method="post" action="<?= base_url('/account/update') ?>" id="accountForm">
                     <div class="row">
                         <!-- Kolom Kiri -->
@@ -37,8 +37,23 @@
                                 <input type="email" class="form-control" id="email" name="email" value="<?= session()->get('email') ?>" required>
                             </div>
                             <div class="mb-3">
-                                <label for="buyer_ids" class="form-label">Buyers</label>
-                                <select class="form-select" id="buyer_ids" name="buyer_ids[]" multiple>
+                                <label for="password" class="form-label">New Password</label>
+                                <input type="password" class="form-control" id="password" name="password" 
+                                       placeholder="Enter password (minimum 6 characters)" minlength="6">
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirm_password" class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
+                                       placeholder="Re-type new password" minlength="6">
+                                <div class="invalid-feedback" id="passwordError"></div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <?php if (auth()->isAdmin()): ?>
+                            <div class="mb-3">
+                                <label for="buyer_ids" class="form-label">Buyers <span class="text-danger">*</span></label>
+                                <select class="form-select" id="buyer_ids" name="buyer_ids[]" multiple required>
                                     <?php foreach ($buyers as $buyer) : ?>
                                         <?php 
                                         $selected = '';
@@ -50,26 +65,15 @@
                                         <option value="<?= $buyer['buyer_id'] ?>" <?= $selected ?>><?= esc($buyer['buyer_name']) ?></option>
                                     <?php endforeach; ?>
                                 </select>
+                                <div class="invalid-feedback"></div>
+                                <small class="text-muted">Select at least one buyer</small>
                             </div>
-                        </div>
-                        
-                        <!-- Kolom Kanan -->
-                        <div class="col-md-6">
+                            <?php endif; ?>
+
+                            <?php if (auth()->isAdmin()): ?>
                             <div class="mb-3">
-                                <label for="password" class="form-label">New Password</label>
-                                <input type="password" class="form-control" id="password" name="password" 
-                                       placeholder="Enter password (minimum 6 characters)" minlength="6">
-                                <small class="form-text text-muted">Leave blank to keep current password.</small>
-                            </div>
-                            <div class="mb-3">
-                                <label for="confirm_password" class="form-label">Confirm New Password</label>
-                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
-                                       placeholder="Re-type new password" minlength="6">
-                                <div class="invalid-feedback" id="passwordError"></div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="role_ids" class="form-label">Roles</label>
-                                <select class="form-select" id="role_ids" name="role_ids[]" multiple>
+                                <label for="role_ids" class="form-label">Roles <span class="text-danger">*</span></label>
+                                <select class="form-select" id="role_ids" name="role_ids[]" multiple required>
                                     <?php foreach ($roles as $role) : ?>
                                         <?php 
                                         $selected = '';
@@ -81,10 +85,13 @@
                                         <option value="<?= $role['role_id'] ?>" <?= $selected ?>><?= esc($role['role_name']) ?></option>
                                     <?php endforeach; ?>
                                 </select>
+                                <div class="invalid-feedback"></div>
+                                <small class="text-muted">Select at least one role</small>
                             </div>
+                            <?php endif; ?>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-12">
                             <button type="submit" class="btn btn-primary" id="saveBtn">
@@ -97,7 +104,9 @@
         </div>
     </div>
 </div>
-<?= $this->endSection() ?><?= $this->section('js') ?>
+<?= $this->endSection() ?>
+
+<?= $this->section('js') ?>
 <script>
 $(document).ready(function() {
     // Initialize Select2
@@ -116,11 +125,61 @@ $(document).ready(function() {
         validatePasswordMatch();
     });
 
+    // Validate buyers selection
+    $('#buyer_ids').on('change', function() {
+        const buyerIds = $(this).val();
+        if (!buyerIds || buyerIds.length === 0) {
+            $(this).addClass('is-invalid');
+            $(this).siblings('.invalid-feedback').text('Please select at least one buyer');
+        } else {
+            $(this).removeClass('is-invalid');
+        }
+    });
+
+    // Validate roles selection
+    $('#role_ids').on('change', function() {
+        const roleIds = $(this).val();
+        if (!roleIds || roleIds.length === 0) {
+            $(this).addClass('is-invalid');
+            $(this).siblings('.invalid-feedback').text('Please select at least one role');
+        } else {
+            $(this).removeClass('is-invalid');
+        }
+    });
+
     $('#accountForm').on('submit', function(e) {
+        let isValid = true;
+
+        // Validate password match
         if (!validatePasswordMatch()) {
+            isValid = false;
+        }
+
+        // Validate buyers (only if admin)
+        if ($('#buyer_ids').length > 0) {
+            const buyerIds = $('#buyer_ids').val();
+            if (!buyerIds || buyerIds.length === 0) {
+                $('#buyer_ids').addClass('is-invalid');
+                $('#buyer_ids').siblings('.invalid-feedback').text('Please select at least one buyer');
+                isValid = false;
+            }
+        }
+
+        // Validate roles (only if admin)
+        if ($('#role_ids').length > 0) {
+            const roleIds = $('#role_ids').val();
+            if (!roleIds || roleIds.length === 0) {
+                $('#role_ids').addClass('is-invalid');
+                $('#role_ids').siblings('.invalid-feedback').text('Please select at least one role');
+                isValid = false;
+            }
+        }
+
+        if (!isValid) {
             e.preventDefault();
             return false;
         }
+
         $('#saveBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
     });
 

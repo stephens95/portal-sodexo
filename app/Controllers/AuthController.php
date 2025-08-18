@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 
 use App\Models\UserModel;
+use App\Models\BuyerModel;
 
 class AuthController extends BaseController
 {
@@ -20,7 +21,7 @@ class AuthController extends BaseController
 
     public function index()
     {
-        if (session()->get('logged_in')) {
+        if (auth()->check()) {
             return redirect()->to('/home');
         }
 
@@ -37,26 +38,20 @@ class AuthController extends BaseController
         $user = $this->userModel->getUserWithRolesAndBuyers($username);
 
         if ($user && password_verify($password, $user['password'])) {
+            // Check if user is verified
+            if (!$user['verified']) {
+                return redirect()->back()->with('error', 'Your account is pending verification. Please contact administrator.');
+            }
+
             $this->userModel->update($user['user_id'], [
                 'last_login' => date('Y-m-d H:i:s')
             ]);
-
-            $db = \Config\Database::connect();
-            $roles = $db->table('user_has_roles uhr')
-                       ->select('r.role_id, r.role_name')
-                       ->join('roles r', 'r.role_id = uhr.role_id')
-                       ->where('uhr.user_id', $user['user_id'])
-                       ->get()
-                       ->getResultArray();
 
             $this->session->set([
                 'user_id'   => $user['user_id'],
                 'name'      => $user['name'],
                 'email'     => $user['email'],
-                'role'      => $user['role_name'],
-                'role_ids'  => array_column($roles, 'role_id'),
-                'buyer'     => $user['buyer_name'],
-                'group'     => $user['group_name'],
+                'verified'  => $user['verified'],
                 'logged_in' => true,
             ]);
 
@@ -73,11 +68,13 @@ class AuthController extends BaseController
 
     public function register()
     {
-        if (session()->get('logged_in')) {
+        if (auth()->check()) {
             return redirect()->to('/home');
         }
 
+        $buyerModel = new BuyerModel();
         $data['title'] = 'Register';
+        $data['buyers'] = $buyerModel->findAll();
         return view('auth/register', $data);
     }
 
@@ -87,21 +84,47 @@ class AuthController extends BaseController
             'name'             => 'required|min_length[3]|max_length[100]',
             'email'            => 'required|valid_email|is_unique[users.email]',
             'password'         => 'required|min_length[6]',
-            'confirm_password' => 'required|matches[password]'
+            'confirm_password' => 'required|matches[password]',
+            'buyer_ids'        => 'required'
         ];
 
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $data = [
+        $userData = [
             'name'     => $this->request->getPost('name'),
             'email'    => $this->request->getPost('email'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+            'verified' => 0 // Default not verified
         ];
 
-        if ($this->userModel->insert($data)) {
-            return redirect()->to('/')->with('success', 'Registration successful! Please login with your credentials.');
+        $userId = $this->userModel->insert($userData);
+
+        if ($userId) {
+            $db = \Config\Database::connect();
+            
+            // Insert buyer relations
+            $buyerIds = $this->request->getPost('buyer_ids');
+            if (!empty($buyerIds)) {
+                foreach ($buyerIds as $buyerId) {
+                    $db->table('user_has_buyers')->insert([
+                        'user_id'  => $userId,
+                        'buyer_id' => $buyerId
+                    ]);
+                }
+            }
+
+            // Assign default "User" role
+            $userRole = $db->table('roles')->where('role_name', 'User')->get()->getRow();
+            if ($userRole) {
+                $db->table('user_has_roles')->insert([
+                    'user_id' => $userId,
+                    'role_id' => $userRole->role_id
+                ]);
+            }
+
+            return redirect()->to('/')->with('success', 'Registration successful! Please wait for admin verification before login.');
         } else {
             return redirect()->back()->with('error', 'Registration failed. Please try again.');
         }
@@ -109,7 +132,7 @@ class AuthController extends BaseController
 
     public function forgotPassword()
     {
-        if (session()->get('logged_in')) {
+        if (auth()->check()) {
             return redirect()->to('/home');
         }
 

@@ -22,6 +22,7 @@ class UsersSeeder extends Seeder
             'password'    => password_hash('1234', PASSWORD_DEFAULT),
             'name'        => 'Stephen',
             'last_login'  => date('Y-m-d H:i:s'),
+            'verified'    => 1,
             'created_at'  => date('Y-m-d H:i:s')
         ]);
 
@@ -30,6 +31,7 @@ class UsersSeeder extends Seeder
             'password'    => password_hash('1234', PASSWORD_DEFAULT),
             'name'        => 'Jojo',
             'last_login'  => date('Y-m-d H:i:s'),
+            'verified'    => 1,
             'created_at'  => date('Y-m-d H:i:s')
         ]);
     }

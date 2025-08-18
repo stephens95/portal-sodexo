@@ -11,11 +11,11 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Updated - <?= date('d M Y', strtotime($update['created_at'])) ?></h5>
+                        <h5>Updated - <?= date('d M Y', timestamp: strtotime($update['created_at'])) ?></h5>
                     </div>
                     <div class="card-body pc-component">
                         <dl class="dl-horizontal row">
-                            <dt class="col-sm-3">Version</dt>
+                            <dt class="col-sm-3">Version</dt>   
                             <dd class="col-sm-9"><strong><?= esc($update['version']) ?></strong></dd>
 
                             <dt class="col-sm-3">Title</dt>

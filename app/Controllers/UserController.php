@@ -13,24 +13,29 @@ class UserController extends BaseController
 {
     public function index()
     {
-        if (session()->get('logged_in')) {
-            $userModel        = new UserModel();
-            $buyerModel       = new BuyerModel();
-            $roleModel        = new RoleModel();
-            
-            $data['title']    = 'Users Management';
-            $data['segment1'] = 'Administrator';
-            $data['users']    = $userModel->getUser();
-            $data['buyers']   = $buyerModel->findAll();
-            $data['roles']    = $roleModel->findAll();
-            
-            return view('users/index', $data);
+        if (!auth()->check() || !auth()->isAdmin()) {
+            return redirect()->to('/home')->with('error', 'Access denied.');
         }
-        return view('auth/login');
+
+        $userModel        = new UserModel();
+        $buyerModel       = new BuyerModel();
+        $roleModel        = new RoleModel();
+        
+        $data['title']    = 'Users';
+        $data['segment1'] = 'Administrator';
+        $data['users']    = $userModel->getUser();
+        $data['buyers']   = $buyerModel->findAll();
+        $data['roles']    = $roleModel->findAll();
+        
+        return view('users/index', $data);
     }
 
     public function getUserById($id)
     {
+        if (!auth()->isAdmin()) {
+            return $this->response->setStatusCode(403)->setJSON(['error' => 'Access denied']);
+        }
+
         $userModel = new UserModel();
         $buyerModel = new BuyerModel();
         $roleModel = new RoleModel();
@@ -46,11 +51,16 @@ class UserController extends BaseController
         ]);
     }
 
-    public function updateUser()
+    public function update()
     {
+        if (!auth()->isAdmin()) {
+            return $this->response->setStatusCode(403)->setJSON(['error' => 'Access denied']);
+        }
+
         $id = $this->request->getPost('user_id');
         $buyer_ids = $this->request->getPost('buyer_ids');
         $role_ids = $this->request->getPost('role_ids');
+        $verified = $this->request->getPost('verified') ? 1 : 0;
 
         $rules = [
             'name'  => 'required|min_length[3]',
@@ -67,11 +77,11 @@ class UserController extends BaseController
 
         $userModel = new UserModel();
         $userData = [
-            'name'  => $this->request->getPost('name'),
-            'email' => $this->request->getPost('email')
+            'name'     => $this->request->getPost('name'),
+            'email'    => $this->request->getPost('email'),
+            'verified' => $verified
         ];
 
-        // Update password if provided
         $password = $this->request->getPost('password');
         if (!empty($password)) {
             if (strlen($password) < 6) {
@@ -112,9 +122,12 @@ class UserController extends BaseController
         return $this->response->setJSON(['status' => 'success']);
     }
 
-    public function createUser()
+    public function create()
     {
-        // Validation
+        if (!auth()->isAdmin()) {
+            return $this->response->setStatusCode(403)->setJSON(['error' => 'Access denied']);
+        }
+
         $rules = [
             'name'     => 'required|min_length[3]',
             'email'    => 'required|valid_email|is_unique[users.email]',
@@ -130,10 +143,13 @@ class UserController extends BaseController
         }
 
         $userModel = new UserModel();
+        $verified = $this->request->getPost('verified') ? 1 : 0;
+        
         $data = [
             'name'     => $this->request->getPost('name'),
             'email'    => $this->request->getPost('email'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+            'verified' => $verified
         ];
         $userId = $userModel->insert($data);
 
@@ -164,8 +180,31 @@ class UserController extends BaseController
         return $this->response->setJSON(['status' => 'success']);
     }
 
-    public function deleteUser($id)
+    public function toggleVerification()
     {
+        if (!auth()->isAdmin()) {
+            return $this->response->setStatusCode(403)->setJSON(['error' => 'Access denied']);
+        }
+
+        $userId = $this->request->getPost('user_id');
+        $verified = $this->request->getPost('verified');
+
+        $userModel = new UserModel();
+        $result = $userModel->update($userId, ['verified' => $verified]);
+
+        if ($result) {
+            return $this->response->setJSON(['status' => 'success']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to update verification']);
+        }
+    }
+
+    public function delete($id)
+    {
+        if (!auth()->isAdmin()) {
+            return redirect()->to('/home')->with('error', 'Access denied');
+        }
+
         $userModel = new UserModel();
         
         if ($userModel->deleteUser($id)) {

@@ -48,6 +48,8 @@ Vagrantfile
 #-------------------------
 # Temporary Files
 #-------------------------
+writable/database.sqlite
+
 writable/cache/*
 !writable/cache/index.html
 

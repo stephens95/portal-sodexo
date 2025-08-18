@@ -51,10 +51,21 @@
                     </a>
                     <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
                         <div class="dropdown-header">
-                            <h4>
-                                Welcome Back,
-                                <span class="small text-muted"><?= session()->get('name') ?></span>
+                            <h4 class="text-center">
+                                <?= session()->get('name') ?>
+                                <!-- <span class="small text-muted"><?= session()->get('name') ?></span> -->
                             </h4>
+                            <div class="w-100 text-center">
+                                <div class="badge theme-version badge rounded-pill bg-light text-dark f-12">
+                                    <?= implode(' | ', auth()->roleNames()) ?>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="w-100 text-center">
+                                <div class="badge theme-version badge rounded-pill bg-light text-dark f-12">
+                                    <?= implode(' | ', auth()->buyerNames()) ?>
+                                </div>
+                            </div>
                             <p class="text-muted"><?= session()->get('buyer') ?></p>
                             <hr />
                             <a href="<?= base_url('/account-settings') ?>" class="dropdown-item">

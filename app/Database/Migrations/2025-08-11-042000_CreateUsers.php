@@ -32,6 +32,12 @@ class CreateUsers extends Migration
                 'type' => 'DATETIME',
                 'null' => true,
             ],
+            'verified' => [
+                'type' => 'TINYINT',
+                'constraint' => 1,
+                'default' => 0,
+                'after' => 'name'
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,

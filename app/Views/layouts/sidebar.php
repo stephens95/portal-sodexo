@@ -7,8 +7,14 @@
         </div>
         <div class="navbar-content">
             <ul class="pc-navbar">
-                
-                <?php if (isAdmin()): ?>
+
+            <!-- Cara Cara implementasi Roles & Buyers -->
+            <!-- Roles --> <?php if (auth()->isAdmin()): ?> <?php endif; ?>
+            <!-- Roles --> <?php if (auth()->hasRoles(['Admin', 'Test'])): ?><?php endif; ?>
+            <!-- Buyers --> <?php if (auth()->hasBuyers(['1000000038', '1000002046'])): ?><?php endif; ?>
+
+                <!-- Administrator Section - Only for Admin -->
+                <?php if (auth()->isAdmin()): ?>
                 <li class="pc-item pc-caption">
                     <label>Administrator</label>
                     <i class="ti ti-settings"></i>
@@ -26,32 +32,55 @@
                     <i class="ti ti-dashboard"></i>
                 </li>
                 <li class="pc-item">
-                    <a href="<?= base_url('/news-updates') ?>" class="pc-link"><span class="pc-micon"><i class="ti ti-news"></i></span><span class="pc-mtext">News & Updates</span></a>
+                    <a href="<?= base_url('/news-updates') ?>" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-news"></i></span>
+                        <span class="pc-mtext">News & Updates</span>
+                    </a>
                 </li>
+
                 <li class="pc-item pc-caption">
                     <label>Report</label>
                     <i class="ti ti-apps"></i>
                 </li>
-                
+
+                <!-- Sales Distribution -->
                 <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link"><span class="pc-micon"><i class="ti ti-database-export"></i></span><span class="pc-mtext">Sales Distribution</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
+                    <a href="#!" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-database-export"></i></span>
+                        <span class="pc-mtext">Sales Distribution</span>
+                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                    </a>
                     <ul class="pc-submenu">
                         <li class="pc-item"><a class="pc-link" href="#!">Selling</a></li>
                         <li class="pc-item"><a class="pc-link" href="#!">Shipment</a></li>
                         <li class="pc-item"><a class="pc-link" href="#!">Billing</a></li>
                     </ul>
                 </li>
+
+                <!-- Material Management -->
                 <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link"><span class="pc-micon"><i class="ti ti-database-export"></i></span><span class="pc-mtext">Material Management</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
+                    <a href="#!" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-database-export"></i></span>
+                        <span class="pc-mtext">Material Management</span>
+                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                    </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-inventory') ?>">Inventory</a></li>
+                        <li class="pc-item">
+                            <a class="pc-link" href="<?= base_url('/report-inventory') ?>">Inventory</a>
+                        </li>
                     </ul>
                 </li>
+
+                <!-- Finance -->
                 <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link"><span class="pc-micon"><i class="ti ti-database-export"></i></span><span class="pc-mtext">Finance</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
+                    <a href="#!" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-database-export"></i></span>
+                        <span class="pc-mtext">Finance</span>
+                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                    </a>
                     <ul class="pc-submenu">
                         <li class="pc-item"><a class="pc-link" href="#!">Payment</a></li>
-                        <li class="pc-item"><a class="pc-link" href="#!">Shuttlement Payment</a></li>
+                        <li class="pc-item"><a class="pc-link" href="#!">Settlement Payment</a></li>
                     </ul>
                 </li>
 
@@ -66,9 +95,6 @@
                     </a>
                 </li>
             </ul>
-            <div class="w-100 text-center">
-                <div class="badge theme-version badge rounded-pill bg-light text-dark f-12"></div>
-            </div>
         </div>
     </div>
 </nav>
