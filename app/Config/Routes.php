@@ -7,13 +7,9 @@ use CodeIgniter\Router\RouteCollection;
  */
 
 // --------- Auth Routes ---------
-$routes->group('', ['filter' => 'guest'], function($routes) {
-    $routes->get('/', 'AuthController::index');
-    $routes->get('/register', 'AuthController::register');
-    $routes->get('/forgot-password', 'AuthController::forgotPassword');
-});
-
-// --------- Auth Actions ---------
+$routes->get('/', 'AuthController::index');
+$routes->get('/register', 'AuthController::register');
+$routes->get('/forgot-password', 'AuthController::forgotPassword');
 $routes->post('/login', 'AuthController::login');
 $routes->post('/register', 'AuthController::processRegister');
 $routes->post('/forgot-password', 'AuthController::processForgotPassword');

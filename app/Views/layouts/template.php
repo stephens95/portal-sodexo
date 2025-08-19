@@ -76,54 +76,6 @@
     <!-- Additional JS - Every Page -->
     <?= $this->renderSection('js') ?>
 
-    <!-- Security Script - Aggressive History Control -->
-    <script>
-        (function() {
-            if (window.history && window.history.replaceState) {
-                window.history.replaceState(null, null, window.location.href);
-            }
-
-            window.addEventListener('popstate', function(e) {
-                e.preventDefault();
-                window.location.href = '<?= base_url('/home') ?>';
-                return false;
-            });
-
-            if (window.performance) {
-                if (window.performance.navigation.type == 2) {
-                    window.location.reload(true);
-                }
-            }
-
-            document.addEventListener('keydown', function(e) {
-                if (e.keyCode == 116 || (e.ctrlKey && e.keyCode == 82)) {
-                    e.preventDefault();
-                    window.location.href = '<?= base_url('/home') ?>';
-                    return false;
-                }
-
-                if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
-
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                return false;
-            });
-
-            setInterval(function() {
-                fetch('<?= base_url('/home') ?>', {
-                    method: 'HEAD',
-                    cache: 'no-cache'
-                }).catch(function() {
-                    window.location.href = '<?= base_url('/') ?>';
-                });
-            }, 30000);
-        })();
-    </script>
-
     <!-- Theme Scripts -->
     <script>
         layout_change('light');

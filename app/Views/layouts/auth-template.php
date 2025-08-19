@@ -98,28 +98,6 @@
     <!-- Additional JS -->
     <?= $this->renderSection('js') ?>
 
-    <!-- Security Script for Auth Pages -->
-    <script>
-        fetch('<?= base_url('/home') ?>', {
-            method: 'HEAD',
-            cache: 'no-cache'
-        }).then(function(response) {
-            if (response.ok) {
-                window.location.href = '<?= base_url('/home') ?>';
-            }
-        }).catch(function() {
-        });
-
-        window.history.pushState(null, "", window.location.href);
-        window.onpopstate = function() {
-            window.history.pushState(null, "", window.location.href);
-        };
-
-        if(window.performance && window.performance.navigation.type == 2) {
-            window.location.reload(true);
-        }
-    </script>
-
     <!-- Theme Scripts -->
     <script>
         layout_change('light');
