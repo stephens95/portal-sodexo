@@ -25,6 +25,11 @@ class AuthController extends BaseController
             return redirect()->to('/home');
         }
 
+        $intendedUrl = $this->request->getGet('redirect');
+        if ($intendedUrl) {
+            $this->session->set('intended_url', $intendedUrl);
+        }
+
         $data['title'] = 'Login';
         return view('auth/login', $data);
     }
@@ -58,6 +63,12 @@ class AuthController extends BaseController
             if ($remember) {
                 set_cookie('remember_username', $username, 604800);
                 set_cookie('remember_token', hash('sha256', $user['password']), 604800);
+            }
+
+            $intendedUrl = $this->session->get('intended_url');
+            if ($intendedUrl) {
+                $this->session->remove('intended_url');
+                return redirect()->to($intendedUrl);
             }
 
             return redirect()->to('/home');

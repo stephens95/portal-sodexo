@@ -6,7 +6,7 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-// --------- Pages Routes ---------
+// --------- Auth Routes ---------
 $routes->get('/', 'AuthController::index');
 $routes->post('/login', 'AuthController::login');
 $routes->get('/logout', 'AuthController::logout');
@@ -15,38 +15,32 @@ $routes->post('/register', 'AuthController::processRegister');
 $routes->get('/forgot-password', 'AuthController::forgotPassword');
 $routes->post('/forgot-password', 'AuthController::processForgotPassword');
 
-// --------- Pages Routes ---------
-$routes->get('/home', function () {
-    if (!session()->get('logged_in')) {
-        return redirect()->to('/');
-    }
-    return view('home');
-});
-$routes->get('/news-updates', 'ProgramUpdateController::index');
-
-// --------- Account Settings Routes ---------
-$routes->get('/account-settings', 'AccountController::index');
-$routes->post('/account/update', 'AccountController::update');
-
-// --------- User Management Routes ---------
-$routes->get('/users', 'UserController::index');
-$routes->get('/users/getUserById/(:num)', 'UserController::getUserById/$1');
-$routes->post('/users/update', 'UserController::update');  // Changed from updateUser to update
-$routes->post('/users/create', 'UserController::create');
-$routes->post('/users/toggle-verification', 'UserController::toggleVerification'); // Add this line
-$routes->get('/roles/listAll', 'Role::listAll');
-$routes->get('/buyers/listAll', 'Buyer::listAll');
-$routes->get('/users/delete/(:num)', 'UserController::delete/$1');
-
-// -------- Report Inventory ----------------
-$routes->get('/report-inventory', 'InventoryController::index');
-
-// --------- Dashboard Routes ---------
-$routes->get('/home', function () {
-    return view('home');
+// --------- Protected Routes ---------
+$routes->group('', ['filter' => 'auth'], function($routes) {
+    $routes->get('/home', function () {
+        return view('home');
+    });
+    $routes->get('/news-updates', 'ProgramUpdateController::index');
+    
+    // Account Settings Routes
+    $routes->get('/account-settings', 'AccountController::index');
+    $routes->post('/account/update', 'AccountController::update');
+    
+    // User Management Routes
+    $routes->get('/users', 'UserController::index');
+    $routes->get('/users/getUserById/(:num)', 'UserController::getUserById/$1');
+    $routes->post('/users/update', 'UserController::update');
+    $routes->post('/users/create', 'UserController::create');
+    $routes->post('/users/toggle-verification', 'UserController::toggleVerification');
+    $routes->get('/roles/listAll', 'Role::listAll');
+    $routes->get('/buyers/listAll', 'Buyer::listAll');
+    $routes->get('/users/delete/(:num)', 'UserController::delete/$1');
+    
+    // Report Inventory
+    $routes->get('/report-inventory', 'InventoryController::index');
 });
 
-// ---------- API Routes ---------
+// API Routes
 $routes->group('portal', ['namespace' => 'App\Controllers\Api'], function ($routes) {
-    $routes->get('api-sodexo/inventory/(:num)', 'LineItemAPI::getLineItems/$1'); // GET /api/users/1
+    $routes->get('api-sodexo/inventory/(:num)', 'LineItemAPI::getLineItems/$1');
 });
