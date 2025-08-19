@@ -7,25 +7,27 @@ use CodeIgniter\Router\RouteCollection;
  */
 
 // --------- Auth Routes ---------
-$routes->get('/', 'AuthController::index');
+$routes->group('', ['filter' => 'guest'], function($routes) {
+    $routes->get('/', 'AuthController::index');
+    $routes->get('/register', 'AuthController::register');
+    $routes->get('/forgot-password', 'AuthController::forgotPassword');
+});
+
+// --------- Auth Actions ---------
 $routes->post('/login', 'AuthController::login');
-$routes->get('/logout', 'AuthController::logout');
-$routes->get('/register', 'AuthController::register');
 $routes->post('/register', 'AuthController::processRegister');
-$routes->get('/forgot-password', 'AuthController::forgotPassword');
 $routes->post('/forgot-password', 'AuthController::processForgotPassword');
+$routes->get('/logout', 'AuthController::logout');
 
 // --------- Protected Routes ---------
 $routes->group('', ['filter' => 'auth'], function($routes) {
-    $routes->get('/home', function () {
-        return view('home');
-    });
+    $routes->get('/home', 'HomeController::index');
     $routes->get('/news-updates', 'ProgramUpdateController::index');
-    
+
     // Account Settings Routes
     $routes->get('/account-settings', 'AccountController::index');
     $routes->post('/account/update', 'AccountController::update');
-    
+
     // User Management Routes
     $routes->get('/users', 'UserController::index');
     $routes->get('/users/getUserById/(:num)', 'UserController::getUserById/$1');
@@ -35,7 +37,6 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('/roles/listAll', 'Role::listAll');
     $routes->get('/buyers/listAll', 'Buyer::listAll');
     $routes->get('/users/delete/(:num)', 'UserController::delete/$1');
-    
     // Report Inventory
     $routes->get('/report-inventory', 'InventoryController::index');
 });

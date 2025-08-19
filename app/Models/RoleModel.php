@@ -7,7 +7,7 @@ use CodeIgniter\Model;
 class RoleModel extends Model
 {
     protected $table            = 'roles';
-    protected $primaryKey       = 'role_id'; // Ubah dari 'id' ke 'role_id'
+    protected $primaryKey       = 'role_id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;

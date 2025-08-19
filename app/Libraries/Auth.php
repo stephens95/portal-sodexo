@@ -75,7 +75,7 @@ class Auth
     public function hasRole($roleName)
     {
         if (!$this->roles) return false;
-        
+
         foreach ($this->roles as $role) {
             if ($role['role_name'] === $roleName) {
                 return true;
@@ -101,7 +101,7 @@ class Auth
     public function hasRoleId($roleId)
     {
         if (!$this->roles) return false;
-        
+
         foreach ($this->roles as $role) {
             if ($role['role_id'] == $roleId) {
                 return true;
@@ -113,7 +113,7 @@ class Auth
     public function hasBuyer($buyerId)
     {
         if (!$this->buyers) return false;
-        
+
         foreach ($this->buyers as $buyer) {
             if ($buyer['buyer_id'] === $buyerId) {
                 return true;

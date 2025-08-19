@@ -6,7 +6,7 @@ use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class AuthFilter implements FilterInterface
+class GuestFilter implements FilterInterface
 {
     /**
      * Do whatever processing this filter needs to do.
@@ -25,19 +25,11 @@ class AuthFilter implements FilterInterface
      */
     public function before(RequestInterface $request, $arguments = null)
     {
-        if (!session()->get('logged_in')) {
-            $currentUrl = current_url();
-            session()->set('intended_url', $currentUrl);
-
-            $response = redirect()->to('/');
-            $response->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-            return $response->with('info', 'Please login to access this page.');
-        }
-
-        if (session()->get('logged_in') && session()->get('auth_page_accessed')) {
-            session()->remove('auth_page_accessed');
+        if (session()->get('logged_in')) {
             $response = redirect()->to('/home');
             $response->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            $response->setHeader('Pragma', 'no-cache');
+            $response->setHeader('Expires', '0');
             return $response;
         }
     }
@@ -56,16 +48,10 @@ class AuthFilter implements FilterInterface
      */
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        if (session()->get('logged_in')) {
-            $response->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0, private');
-            $response->setHeader('Pragma', 'no-cache');
-            $response->setHeader('Expires', 'Thu, 01 Jan 1970 00:00:00 GMT');
-            $response->setHeader('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
-
-            $response->setHeader('X-Frame-Options', 'DENY');
-            $response->setHeader('X-Content-Type-Options', 'nosniff');
-            $response->setHeader('Referrer-Policy', 'no-referrer');
-        }
+        $response->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+        $response->setHeader('Pragma', 'no-cache');
+        $response->setHeader('Expires', 'Thu, 01 Jan 1970 00:00:00 GMT');
+        $response->setHeader('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
 
         return $response;
     }

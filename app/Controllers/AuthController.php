@@ -21,14 +21,15 @@ class AuthController extends BaseController
 
     public function index()
     {
-        if (auth()->check()) {
-            return redirect()->to('/home');
+        if (session()->get('logged_in')) {
+            $response = redirect()->to('/home');
+            $response->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            $response->setHeader('Pragma', 'no-cache');
+            $response->setHeader('Expires', '0');
+            return $response;
         }
 
-        $intendedUrl = $this->request->getGet('redirect');
-        if ($intendedUrl) {
-            $this->session->set('intended_url', $intendedUrl);
-        }
+        session()->set('auth_page_accessed', true);
 
         $data['title'] = 'Login';
         return view('auth/login', $data);
@@ -43,7 +44,6 @@ class AuthController extends BaseController
         $user = $this->userModel->getUserWithRolesAndBuyers($username);
 
         if ($user && password_verify($password, $user['password'])) {
-            // Check if user is verified
             if (!$user['verified']) {
                 return redirect()->back()->with('error', 'Your account is pending verification. Please contact administrator.');
             }
@@ -52,26 +52,39 @@ class AuthController extends BaseController
                 'last_login' => date('Y-m-d H:i:s')
             ]);
 
-            $this->session->set([
+            session()->remove(['auth_page_accessed', 'intended_url']);
+            session()->regenerate(true);
+
+            $sessionData = [
                 'user_id'   => $user['user_id'],
                 'name'      => $user['name'],
                 'email'     => $user['email'],
                 'verified'  => $user['verified'],
                 'logged_in' => true,
-            ]);
+                'login_time' => time(),
+                'auth_page_accessed' => false
+            ];
+
+            session()->set($sessionData);
 
             if ($remember) {
                 set_cookie('remember_username', $username, 604800);
                 set_cookie('remember_token', hash('sha256', $user['password']), 604800);
             }
 
-            $intendedUrl = $this->session->get('intended_url');
+            $intendedUrl = session()->get('intended_url');
             if ($intendedUrl) {
-                $this->session->remove('intended_url');
-                return redirect()->to($intendedUrl);
+                session()->remove('intended_url');
+                $response = redirect()->to($intendedUrl);
+            } else {
+                $response = redirect()->to('/home');
             }
 
-            return redirect()->to('/home');
+            $response->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            $response->setHeader('Pragma', 'no-cache');
+            $response->setHeader('Expires', '0');
+
+            return $response->with('success', 'Login successful!');
         } else {
             return redirect()->back()->with('error', 'Incorrect Email or Password.');
         }
@@ -79,9 +92,13 @@ class AuthController extends BaseController
 
     public function register()
     {
-        if (auth()->check()) {
-            return redirect()->to('/home');
+        if (session()->get('logged_in')) {
+            $response = redirect()->to('/home');
+            $response->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            return $response;
         }
+
+        session()->set('auth_page_accessed', true);
 
         $buyerModel = new BuyerModel();
         $data['title'] = 'Register';
@@ -107,15 +124,14 @@ class AuthController extends BaseController
             'name'     => $this->request->getPost('name'),
             'email'    => $this->request->getPost('email'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-            'verified' => 0 // Default not verified
+            'verified' => 0
         ];
 
         $userId = $this->userModel->insert($userData);
 
         if ($userId) {
             $db = \Config\Database::connect();
-            
-            // Insert buyer relations
+
             $buyerIds = $this->request->getPost('buyer_ids');
             if (!empty($buyerIds)) {
                 foreach ($buyerIds as $buyerId) {
@@ -126,7 +142,6 @@ class AuthController extends BaseController
                 }
             }
 
-            // Assign default "User" role
             $userRole = $db->table('roles')->where('role_name', 'User')->get()->getRow();
             if ($userRole) {
                 $db->table('user_has_roles')->insert([
@@ -143,9 +158,13 @@ class AuthController extends BaseController
 
     public function forgotPassword()
     {
-        if (auth()->check()) {
-            return redirect()->to('/home');
+        if (session()->get('logged_in')) {
+            $response = redirect()->to('/home');
+            $response->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            return $response;
         }
+
+        session()->set('auth_page_accessed', true);
 
         $data['title'] = 'Forgot Password';
         return view('auth/forgot-password', $data);
@@ -185,9 +204,17 @@ class AuthController extends BaseController
 
     public function logout()
     {
-        $this->session->destroy();
         delete_cookie('remember_username');
         delete_cookie('remember_token');
-        return redirect()->to('/');
+
+        session()->destroy();
+
+        $response = redirect()->to('/');
+        $response->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+        $response->setHeader('Pragma', 'no-cache');
+        $response->setHeader('Expires', 'Thu, 01 Jan 1970 00:00:00 GMT');
+        $response->setHeader('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
+
+        return $response->with('success', 'You have been logged out successfully.');
     }
 }

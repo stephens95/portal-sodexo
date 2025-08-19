@@ -9,6 +9,9 @@ class HomeController extends BaseController
 {
     public function index()
     {
-        return view('home');
+        $data['title'] = 'Home';
+        $data['showBreadcrumb'] = false;
+        
+        return view('home', $data);
     }
 }
