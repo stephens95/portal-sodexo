@@ -8,23 +8,23 @@
         <div class="navbar-content">
             <ul class="pc-navbar">
 
-            <!-- Cara Cara implementasi Roles & Buyers -->
-            <!-- Roles --> <?php if (auth()->isAdmin()): ?> <?php endif; ?>
-            <!-- Roles --> <?php if (auth()->hasRoles(['Admin', 'Test'])): ?><?php endif; ?>
-            <!-- Buyers --> <?php if (auth()->hasBuyers(['1000000038', '1000002046'])): ?><?php endif; ?>
+                <!-- Cara Cara implementasi Roles & Buyers -->
+                <!-- Roles --> <?php if (auth()->isAdmin()): ?> <?php endif; ?>
+                <!-- Roles --> <?php if (auth()->hasRoles(['Admin', 'Test'])): ?><?php endif; ?>
+                <!-- Buyers --> <?php if (auth()->hasBuyers(['1000000038', '1000002046'])): ?><?php endif; ?>
 
                 <!-- Administrator Section - Only for Admin -->
                 <?php if (auth()->isAdmin()): ?>
-                <li class="pc-item pc-caption">
-                    <label>Administrator</label>
-                    <i class="ti ti-settings"></i>
-                </li>
-                <li class="pc-item">
-                    <a href="<?= base_url('/users') ?>" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-users"></i></span>
-                        <span class="pc-mtext">Users</span>
-                    </a>
-                </li>
+                    <li class="pc-item pc-caption">
+                        <label>Administrator</label>
+                        <i class="ti ti-settings"></i>
+                    </li>
+                    <li class="pc-item">
+                        <a href="<?= base_url('/users') ?>" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-users"></i></span>
+                            <span class="pc-mtext">Users</span>
+                        </a>
+                    </li>
                 <?php endif; ?>
 
                 <li class="pc-item pc-caption">
@@ -51,9 +51,7 @@
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="#!">Selling</a></li>
-                        <li class="pc-item"><a class="pc-link" href="#!">Shipment</a></li>
-                        <li class="pc-item"><a class="pc-link" href="#!">Billing</a></li>
+                        <li class="pc-item"><a class="pc-link" href="#!">Tracebility Sales Order</a></li>
                     </ul>
                 </li>
 
@@ -68,19 +66,6 @@
                         <li class="pc-item">
                             <a class="pc-link" href="<?= base_url('/report-inventory') ?>">Inventory</a>
                         </li>
-                    </ul>
-                </li>
-
-                <!-- Finance -->
-                <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-database-export"></i></span>
-                        <span class="pc-mtext">Finance</span>
-                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
-                    </a>
-                    <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="#!">Payment</a></li>
-                        <li class="pc-item"><a class="pc-link" href="#!">Settlement Payment</a></li>
                     </ul>
                 </li>
 
