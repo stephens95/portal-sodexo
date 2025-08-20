@@ -33,8 +33,14 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('/roles/listAll', 'Role::listAll');
     $routes->get('/buyers/listAll', 'Buyer::listAll');
     $routes->get('/users/delete/(:num)', 'UserController::delete/$1');
+    
     // Report Inventory
     $routes->get('/report-inventory', 'InventoryController::index');
+    $routes->post('/report-inventory/data', 'InventoryController::getInventoryData');
+    $routes->post('/report-inventory/refresh-cache', 'InventoryController::refreshCache');
+    $routes->post('/report-inventory/all-data', 'InventoryController::getAllInventoryData');
+    $routes->get('/report-inventory/export-excel', 'InventoryController::exportExcel');
+    $routes->get('/report-inventory/export-csv', 'InventoryController::exportCsv');
 });
 
 // API Routes
