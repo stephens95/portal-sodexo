@@ -19957,8 +19957,8 @@ body {
   position: relative;
   display: block;
   height: 100%;
-  width: auto;
-  max-width: 100%;
+  width: 115%;
+  max-width: 105%;
   max-height: 100%;
   scrollbar-width: none;
   -ms-overflow-style: none;

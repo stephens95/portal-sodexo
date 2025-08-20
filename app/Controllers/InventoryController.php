@@ -82,14 +82,14 @@ class InventoryController extends BaseController
         if (empty($grDate) || strlen($grDate) !== 8) {
             return '';
         }
-        
+
         $grDateTime = \DateTime::createFromFormat('Ymd', $grDate);
         if ($grDateTime) {
             $today = new \DateTime();
             $interval = $today->diff($grDateTime);
             return $interval->days . ' days';
         }
-        
+
         return '';
     }
 
@@ -105,15 +105,19 @@ class InventoryController extends BaseController
 
             $filteredData = $data;
             if (!empty($searchValue)) {
-                $filteredData = array_filter($data, function($item) use ($searchValue) {
+                $filteredData = array_filter($data, function ($item) use ($searchValue) {
                     $searchFields = [
-                        $item['CUSTOMER_NAME'] ?? '',
-                        $item['STYLE'] ?? '',
-                        $item['MATERIAL'] ?? '',
                         $item['FORECAST_QUOTATION'] ?? '',
-                        $item['BATCH'] ?? '',
+                        $item['SO_FORECAST'] ?? '',
+                        $item['SO_ACTUAL'] ?? '',
+                        $item['CUSTOMER_NAME'] ?? '',
+                        $item['QUOT_ACTUAL'] ?? '',
+                        $item['PO_BUYER'] ?? '',
+                        $item['STYLE'] ?? '',
                         $item['COLOR'] ?? '',
-                        $item['SIZE'] ?? ''
+                        $item['SIZE'] ?? '',
+                        $item['QTY'] ?? '',
+                        $item['PROD_YEAR'] ?? '',
                     ];
 
                     foreach ($searchFields as $field) {
@@ -130,7 +134,7 @@ class InventoryController extends BaseController
             $pagedData = array_slice($filteredData, $start, $length);
             $processedData = [];
             $counter = $start + 1;
-            
+
             foreach ($pagedData as $item) {
                 $processedData[] = [
                     $counter++,
@@ -155,7 +159,6 @@ class InventoryController extends BaseController
                 'recordsFiltered' => $filteredRecords,
                 'data' => $processedData
             ]);
-            
         } catch (\Exception $e) {
             return $this->response->setJSON([
                 'draw' => intval($this->request->getPost('draw')),
@@ -172,7 +175,7 @@ class InventoryController extends BaseController
         try {
             $data = $this->getData();
 
-            $data = array_filter($data, function($item) {
+            $data = array_filter($data, function ($item) {
                 return !empty($item) && isset($item['PROD_YEAR']);
             });
 
@@ -188,7 +191,7 @@ class InventoryController extends BaseController
             $headers = [
                 '#',
                 'Forecast Quotation',
-                'SO Forecast', 
+                'SO Forecast',
                 'SO Actual (Allocated)',
                 'Customer',
                 'Actual Quotation',
@@ -293,7 +296,6 @@ class InventoryController extends BaseController
             unset($spreadsheet);
 
             exit;
-
         } catch (\Exception $e) {
             log_message('error', 'Export Excel error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Failed to export Excel file: ' . $e->getMessage());
@@ -305,7 +307,7 @@ class InventoryController extends BaseController
         try {
             $data = $this->getData();
 
-            $data = array_filter($data, function($item) {
+            $data = array_filter($data, function ($item) {
                 return !empty($item) && isset($item['PROD_YEAR']);
             });
 
@@ -317,12 +319,22 @@ class InventoryController extends BaseController
 
             $output = fopen('php://output', 'w');
 
-            fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+            fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
             $headers = [
-                '#', 'Forecast Quotation', 'SO Forecast', 'SO Actual (Allocated)',
-                'Customer', 'Actual Quotation', 'PO Buyer', 'Style', 'Color',
-                'Size', 'Qty', 'Production Year', 'Aging (days)'
+                '#',
+                'Forecast Quotation',
+                'SO Forecast',
+                'SO Actual (Allocated)',
+                'Customer',
+                'Actual Quotation',
+                'PO Buyer',
+                'Style',
+                'Color',
+                'Size',
+                'Qty',
+                'Production Year',
+                'Aging (days)'
             ];
 
             fputcsv($output, $headers);
@@ -346,10 +358,9 @@ class InventoryController extends BaseController
                 ];
                 fputcsv($output, $row);
             }
-            
+
             fclose($output);
             exit;
-            
         } catch (\Exception $e) {
             log_message('error', 'Export CSV error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Failed to export CSV file: ' . $e->getMessage());
@@ -360,7 +371,7 @@ class InventoryController extends BaseController
     {
         $cacheKey = 'inventory_data';
         $this->cache->delete($cacheKey);
-        
+
         return $this->response->setJSON([
             'status' => 'success',
             'message' => 'Cache refreshed successfully'
