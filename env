@@ -20,7 +20,8 @@
 # APP
 #--------------------------------------------------------------------
 
-app.baseURL = 'http://localhost:8080/'
+# app.baseURL = 'http://localhost:8080'
+app.baseURL = 'http://192.168.50.91:8080/'
 
 # If you have trouble with `.`, you could also use `_`.
 # app_baseURL = ''
@@ -31,9 +32,17 @@ app.baseURL = 'http://localhost:8080/'
 # DATABASE
 #--------------------------------------------------------------------
 
-database.default.hostname = localhost
-database.default.database = database.sqlite
-database.default.DBDriver = SQLite3
+# database.default.hostname = localhost
+# database.default.database = database.sqlite
+# database.default.DBDriver = SQLite3
+
+database.default.hostname = STEPHEN-AMT
+database.default.database = portal_sodexo
+database.default.username = sa
+database.default.password = amg2022
+database.default.DBDriver = SQLSRV
+# database.default.DBPrefix =
+database.default.port = 1433
 
 # database.default.hostname = localhost
 # database.default.database = portal-sodexo
@@ -58,8 +67,7 @@ database.default.DBDriver = SQLite3
 # ENCRYPTION
 #--------------------------------------------------------------------
 
-# encryption.key =
-
+encryption.key = 
 #--------------------------------------------------------------------
 # SESSION
 #--------------------------------------------------------------------
@@ -72,3 +80,7 @@ database.default.DBDriver = SQLite3
 #--------------------------------------------------------------------
 
 # logger.threshold = 4
+
+#Tambahan:
+sap.api.inventory.url="http://10.2.38.143:8000/zapi_sth/zapi_sodexo/zstock?sap-client=180" #Client D180
+#  sap.api.inventory.url="http://10.2.38.138:8000/zapi_sth/zapi_sodexo/zstock?sap-client=250" #Client Q250

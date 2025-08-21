@@ -12,11 +12,13 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 class InventoryController extends BaseController
 {
     protected $cache;
-    protected $apiUrl = 'http://10.2.38.143:8000/zapi_sth/zapi_sodexo/zstock?sap-client=180';
+    protected $apiUrl;
+    // protected $apiUrl = 'http://10.2.38.143:8000/zapi_sth/zapi_sodexo/zstock?sap-client=180';
 
     public function __construct()
     {
         $this->cache = \Config\Services::cache();
+        $this->apiUrl = env('sap.api.inventory.url');
     }
 
     public function index()
