@@ -51,7 +51,7 @@
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="#!">Tracebility Sales Order</a></li>
+                        <li class="pc-item"><a class="pc-link" href="<?= base_url('/sales-order') ?>">Tracebility Sales Order</a></li>
                     </ul>
                 </li>
 
@@ -74,7 +74,7 @@
                     <i class="ti ti-news"></i>
                 </li>
                 <li class="pc-item">
-                    <a class="pc-link" target="_blank" href="../pages/login-v3.html">
+                    <a class="pc-link" target="_blank" href="<?= base_url('/api-inventory') ?>">
                         <span class="pc-micon"><i class="ti ti-screen-share"></i></span>
                         <span class="pc-mtext">Inventory</span>
                     </a>

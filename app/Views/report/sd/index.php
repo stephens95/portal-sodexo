@@ -52,14 +52,14 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Inventory Report</h5>
+                <h5 class="mb-0">Tracebility Sales Order</h5>
                 <div>
                     <button type="button" class="btn btn-outline-primary btn-sm" id="refreshCache">
-                        <i class="fas fa-sync-alt"></i> Refresh Data
+                        <i class="fas fa-sync-alt"></i> Refresh Cache
                     </button>
-                    <!-- <button type="button" class="btn btn-outline-secondary btn-sm" id="refreshTable">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="refreshTable">
                         <i class="fas fa-redo"></i> Reload Table
-                    </button> -->
+                    </button>
                 </div>
             </div>
 
@@ -104,22 +104,28 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table id="inventoryTable" class="table table-sm table-bordered table-striped table-hover w-100">
+                        <table id="tracibilityTable" class="table table-sm table-bordered table-striped table-hover w-100">
                             <thead class="table-dark">
                                 <tr>
                                     <th width="5%">#</th>
-                                    <th>Forecast Quotation</th>
-                                    <th>SO Forecast</th>
-                                    <th>SO Actual (Allocated)</th>
-                                    <th>Customer</th>
-                                    <th>Actual Quotation</th>
+                                    <th>QO SSA</th>
+                                    <th>PO SSA</th>
                                     <th>PO Buyer</th>
-                                    <th>Style</th>
-                                    <th>Color</th>
-                                    <th>Size</th>
-                                    <th>Qty</th>
-                                    <th>Production Year</th>
-                                    <th>Aging (days)</th>
+                                    <th>End Customer</th>
+                                    <th>Sales Order (AMT)</th>
+                                    <th>Buyer Style</th>
+                                    <th>SSA Style</th>
+                                    <th>Colour</th>
+                                    <th>Order Qty</th>
+                                    <th>Delivery Note</th>
+                                    <th>Shipment Qty</th>
+                                    <th>Outstanding PO Qty</th>
+                                    <th>Invoice Number</th>
+                                    <th>Due Date</th>
+                                    <th>Broker Fee</th>
+                                    <th>Management Fee</th>
+                                    <th>Payment Receive Date</th>
+                                    <th>Attachment</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -174,7 +180,7 @@
                     $('#loadingOverlay').addClass('d-none');
                 },
                 error: function(xhr, error, code) {
-                    // console.error('DataTables error:', error);
+                    console.error('DataTables error:', error);
                     if (typeof toastr !== 'undefined') {
                         toastr.error('Failed to load inventory data. Please try again.');
                     } else {

@@ -136,21 +136,24 @@ class InventoryController extends BaseController
             $counter = $start + 1;
 
             foreach ($pagedData as $item) {
-                $processedData[] = [
-                    $counter++,
-                    $item['FORECAST_QUOTATION'] ?? '',
-                    $item['SO_FORECAST'] ?? '',
-                    $item['SO_ACTUAL'] ?? '',
-                    $item['CUSTOMER_NAME'] ?? '',
-                    $item['QUOT_ACTUAL'] ?? '',
-                    $item['PO_BUYER'] ?? '',
-                    $item['STYLE'] ?? '',
-                    $item['COLOR'] ?? '',
-                    $item['SIZE'] ?? '',
-                    number_format($item['QTY'] ?? 0, 0),
-                    $item['PROD_YEAR'] ?? '',
-                    $this->calculateAging($item['GR_DATE'] ?? '')
-                ];
+                if ($item['PROD_YEAR'] != 0) {
+                    $processedData[] = [
+                        $counter++,
+                        $item['FORECAST_QUOTATION'] ?? '',
+                        $item['SO_FORECAST'] ?? '',
+                        $item['SO_ACTUAL'] ?? '',
+                        $item['CUSTOMER_NAME'] ?? '',
+                        $item['QUOT_ACTUAL'] ?? '',
+                        $item['PO_BUYER'] ?? '',
+                        // $item['STYLE'] ?? '',
+                        !empty($item['STYLE']) ? explode(' ', $item['STYLE'])[0] : '',
+                        $item['COLOR'] ?? '',
+                        $item['SIZE'] ?? '',
+                        number_format($item['QTY'] ?? 0, 0),
+                        $item['PROD_YEAR'] ?? '',
+                        $this->calculateAging($item['GR_DATE'] ?? '')
+                    ];
+                }
             }
 
             return $this->response->setJSON([

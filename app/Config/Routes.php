@@ -16,7 +16,7 @@ $routes->post('/forgot-password', 'AuthController::processForgotPassword');
 $routes->get('/logout', 'AuthController::logout');
 
 // --------- Protected Routes ---------
-$routes->group('', ['filter' => 'auth'], function($routes) {
+$routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('/home', 'HomeController::index');
     $routes->get('/news-updates', 'ProgramUpdateController::index');
 
@@ -33,7 +33,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('/roles/listAll', 'Role::listAll');
     $routes->get('/buyers/listAll', 'Buyer::listAll');
     $routes->get('/users/delete/(:num)', 'UserController::delete/$1');
-    
+
     // Report Inventory
     $routes->get('/report-inventory', 'InventoryController::index');
     $routes->post('/report-inventory/data', 'InventoryController::getInventoryData');
@@ -41,6 +41,12 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/report-inventory/all-data', 'InventoryController::getAllInventoryData');
     $routes->get('/report-inventory/export-excel', 'InventoryController::exportExcel');
     $routes->get('/report-inventory/export-csv', 'InventoryController::exportCsv');
+
+    // Sales Order Routes
+    $routes->get('/sales-order', 'SalesOrderController::index');
+
+    // Documentation API
+    $routes->get('/api-inventory', 'ApiController::inventory');
 });
 
 // API Routes

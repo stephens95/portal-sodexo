@@ -16,6 +16,12 @@ class ProgramUpdatesSeeder extends Seeder
                 'description' => 'The first release of the system with basic core features implemented.',
                 'created_at'  => date('Y-m-d H:i:s'),
             ],
+            [
+                'version'     => 'v1.0.1',
+                'title'       => 'Inventory Release',
+                'description' => 'View Stock Inventory',
+                'created_at'  => date('Y-m-d H:i:s'),
+            ],
         ];
 
         // Insert ke tabel
