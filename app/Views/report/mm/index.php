@@ -158,7 +158,7 @@
 <script>
     $(document).ready(function() {
         const table = $('#inventoryTable').DataTable({
-            processing: true,
+            // processing: true,
             serverSide: true,
             responsive: true,
             ajax: {
@@ -258,22 +258,22 @@
                     title: 'Inventory Report (Current Page)'
                 }
             ],
-            language: {
-                processing: "Loading inventory data...",
-                search: "Search inventory:",
-                lengthMenu: "Show _MENU_ entries per page",
-                info: "Showing _START_ to _END_ of _TOTAL_ inventory items",
-                infoEmpty: "No inventory data available",
-                infoFiltered: "(filtered from _MAX_ total entries)",
-                zeroRecords: "No matching inventory records found",
-                emptyTable: "No inventory data available",
-                paginate: {
-                    first: "First",
-                    previous: "Previous",
-                    next: "Next",
-                    last: "Last"
-                }
-            }
+            // language: {
+            //     processing: "Loading inventory datas...",
+            //     search: "Search inventory:",
+            //     lengthMenu: "Show _MENU_ entries per page",
+            //     info: "Showing _START_ to _END_ of _TOTAL_ inventory items",
+            //     infoEmpty: "No inventory data available",
+            //     infoFiltered: "(filtered from _MAX_ total entries)",
+            //     zeroRecords: "No matching inventory records found",
+            //     emptyTable: "No inventory data available",
+            //     paginate: {
+            //         first: "First",
+            //         previous: "Previous",
+            //         next: "Next",
+            //         last: "Last"
+            //     }
+            // }
         });
 
         $('#refreshCache').click(function() {
