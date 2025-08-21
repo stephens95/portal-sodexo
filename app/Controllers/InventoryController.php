@@ -13,7 +13,6 @@ class InventoryController extends BaseController
 {
     protected $cache;
     protected $apiUrl;
-    // protected $apiUrl = 'http://10.2.38.143:8000/zapi_sth/zapi_sodexo/zstock?sap-client=180';
 
     public function __construct()
     {
@@ -28,9 +27,19 @@ class InventoryController extends BaseController
         return view('report/mm/index', $data);
     }
 
+    private function getCacheKey()
+    {
+        return 'inventory_data_' . md5($this->apiUrl);
+    }
+
+    private function getInventoryFilePath()
+    {
+        return WRITEPATH . 'cache/inventory.json';
+    }
+
     private function getData()
     {
-        $cacheKey = 'inventory_data';
+        $cacheKey = $this->getCacheKey();
         $data = $this->cache->get($cacheKey);
 
         if ($data === null) {
@@ -45,15 +54,14 @@ class InventoryController extends BaseController
                     $data = json_decode($response->getBody(), true);
 
                     $this->cache->save($cacheKey, $data, 1800);
-
-                    $this->saveBackup($data);
+                    $this->saveInventoryData($data);
                 } else {
                     throw new \Exception('API returned status: ' . $response->getStatusCode());
                 }
             } catch (\Exception $e) {
-                $data = $this->loadFromBackup();
+                $data = $this->loadInventoryData();
                 if (!$data) {
-                    throw new \Exception('API unavailable and no backup data found');
+                    throw new \Exception('API unavailable and no inventory data found');
                 }
             }
         }
@@ -61,20 +69,32 @@ class InventoryController extends BaseController
         return $data;
     }
 
-    private function saveBackup($data)
+    private function saveInventoryData($data)
     {
-        $backupFile = WRITEPATH . 'cache/inventory_backup.json';
-        if (!is_dir(dirname($backupFile))) {
-            mkdir(dirname($backupFile), 0777, true);
+        $inventoryFile = $this->getInventoryFilePath();
+        if (!is_dir(dirname($inventoryFile))) {
+            mkdir(dirname($inventoryFile), 0777, true);
         }
-        file_put_contents($backupFile, json_encode($data));
+
+        $inventoryData = [
+            'api_url' => $this->apiUrl,
+            'updated_at' => date('Y-m-d H:i:s'),
+            'data' => $data
+        ];
+        
+        file_put_contents($inventoryFile, json_encode($inventoryData));
     }
 
-    private function loadFromBackup()
+    private function loadInventoryData()
     {
-        $backupFile = WRITEPATH . 'cache/inventory_backup.json';
-        if (file_exists($backupFile)) {
-            return json_decode(file_get_contents($backupFile), true);
+        $inventoryFile = $this->getInventoryFilePath();
+        if (file_exists($inventoryFile)) {
+            $inventoryData = json_decode(file_get_contents($inventoryFile), true);
+            
+            // Check if the API URL matches current configuration
+            if (isset($inventoryData['api_url']) && $inventoryData['api_url'] === $this->apiUrl) {
+                return $inventoryData['data'] ?? null;
+            }
         }
         return null;
     }
@@ -147,7 +167,6 @@ class InventoryController extends BaseController
                         $item['CUSTOMER_NAME'] ?? '',
                         $item['QUOT_ACTUAL'] ?? '',
                         $item['PO_BUYER'] ?? '',
-                        // $item['STYLE'] ?? '',
                         !empty($item['STYLE']) ? explode(' ', $item['STYLE'])[0] : '',
                         $item['COLOR'] ?? '',
                         $item['SIZE'] ?? '',
@@ -281,12 +300,10 @@ class InventoryController extends BaseController
                 ]);
             }
 
-            $sheet->getStyle('A2:A' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // No
-            $sheet->getStyle('B2:B' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Year
-            $sheet->getStyle('H2:H' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT); // Qty
-            $sheet->getStyle('J2:J' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Line Item
-            $sheet->getStyle('U2:U' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // GR Date
-            $sheet->getStyle('V2:V' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Aging
+            $sheet->getStyle('A2:A' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('B2:B' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('H2:H' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+            $sheet->getStyle('J2:J' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
             $filename = 'Inventory_Report_' . date('Y-m-d_H-i-s') . '.xlsx';
 
@@ -374,12 +391,25 @@ class InventoryController extends BaseController
 
     public function refreshCache()
     {
-        $cacheKey = 'inventory_data';
+        $cacheKey = $this->getCacheKey();
         $this->cache->delete($cacheKey);
 
-        return $this->response->setJSON([
-            'status' => 'success',
-            'message' => 'Cache refreshed successfully'
-        ]);
+        $inventoryFile = $this->getInventoryFilePath();
+        if (file_exists($inventoryFile)) {
+            unlink($inventoryFile);
+        }
+
+        try {
+            $this->getData();
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Cache refreshed successfully and new data loaded'
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Failed to refresh cache: ' . $e->getMessage()
+            ]);
+        }
     }
 }
