@@ -57,9 +57,9 @@
                     <button type="button" class="btn btn-outline-primary btn-sm" id="refreshCache">
                         <i class="fas fa-sync-alt"></i> Refresh Data
                     </button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id="refreshTable">
+                    <!-- <button type="button" class="btn btn-outline-secondary btn-sm" id="refreshTable">
                         <i class="fas fa-redo"></i> Reload Table
-                    </button>
+                    </button> -->
                 </div>
             </div>
 

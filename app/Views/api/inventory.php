@@ -1,152 +1,162 @@
-<!-- app/Views/api_documentation.php -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Documentation - Inventory</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            background: #f4f6f9;
-            color: #333;
+            padding: 0;
+            background: #f9fafb;
+            color: #111;
         }
 
         header {
-            background: #2c3e50;
-            color: white;
-            padding: 20px;
-            text-align: center;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+            padding: 15px 30px;
+            position: sticky;
+            top: 0;
         }
 
         header h1 {
             margin: 0;
-            font-size: 28px;
+            font-size: 20px;
         }
 
         .container {
-            max-width: 900px;
-            margin: 20px auto;
-            background: white;
+            max-width: 1100px;
+            margin: auto;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         h2 {
-            color: #2c3e50;
-            margin-top: 30px;
+            margin-top: 40px;
+            font-size: 24px;
         }
 
-        .endpoint {
-            background: #ecf0f1;
-            border-left: 5px solid #3498db;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-
-        .method {
-            display: inline-block;
-            font-weight: bold;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-right: 10px;
-            font-size: 13px;
-        }
-
-        .get {
-            background: #27ae60;
-        }
-
-        .post {
-            background: #2980b9;
-        }
-
-        .put {
-            background: #f39c12;
-        }
-
-        .delete {
-            background: #c0392b;
+        h3 {
+            margin-top: 20px;
+            font-size: 18px;
         }
 
         pre {
-            background: #2c3e50;
-            color: #ecf0f1;
+            background: #111827;
+            /* tetap gelap */
+            color: #ffffff;
+            /* putih jelas */
             padding: 15px;
-            border-radius: 5px;
+            border-radius: 8px;
             overflow-x: auto;
+            font-size: 14px;
+        }
+
+        pre code {
+            color: #ffffff;
+            /* pastikan code juga putih */
+            font-family: monospace;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f1f1f1;
+            text-align: left;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #e5e7eb;
         }
 
         footer {
+            background: #fff;
+            border-top: 1px solid #ddd;
+            padding: 15px 30px;
             text-align: center;
-            padding: 20px;
-            margin-top: 30px;
             font-size: 14px;
-            background: #ecf0f1;
-            color: #555;
         }
     </style>
 </head>
 
 <body>
+
     <header>
-        <h1>Inventory - API Documentation</h1>
-        <p>Example usage and endpoint guide</p>
+        <h1>📘 API Documentation</h1>
     </header>
 
     <div class="container">
-        <h2>Base URL</h2>
-        <p><code>http://yourdomain.com/api/</code></p>
+        <section>
+            <h2>Quick Start</h2>
+            <p>Gunakan perintah berikut untuk menguji koneksi API:</p>
+            <pre><code>curl -X GET "https://api.yourdomain.com/v1/health" -H "Accept: application/json"</code></pre>
+            <p>Jika berhasil akan mengembalikan:</p>
+            <pre><code>{"status": "ok"}</code></pre>
+        </section>
 
-        <h2>Endpoints</h2>
+        <section>
+            <h2>Autentikasi</h2>
+            <p>Gunakan header <code>Authorization: Bearer &lt;API_KEY&gt;</code> untuk setiap request.</p>
+            <p>Contoh:</p>
+            <pre><code>Authorization: Bearer 123456abcdef</code></pre>
+        </section>
 
-        <div class="endpoint">
-            <span class="method get">GET</span>
-            <strong>/inventory</strong>
-            <p>Retrieve all inventory data.</p>
-            <h4>Example Request (PHP cURL)</h4>
-            <pre>
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "http://yourdomain.com/api/inventory");
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$response = curl_exec($ch);
-curl_close($ch);
-echo $response;
-      </pre>
-        </div>
+        <section>
+            <h2>Endpoints</h2>
 
-        <!-- <div class="endpoint">
-            <span class="method post">POST</span>
-            <strong>/inventory/add</strong>
-            <p>Create a new inventory record.</p>
-            <h4>Parameters</h4>
-            <ul>
-                <li><strong>material</strong> (string) – Material code</li>
-                <li><strong>qty</strong> (int) – Quantity</li>
-            </ul>
-            <h4>Example Request (PHP cURL)</h4>
-            <pre>
-$data = [
-    "material" => "MAT001",
-    "qty" => 10
-];
-$ch = curl_init("http://yourdomain.com/api/inventory/add");
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$response = curl_exec($ch);
-curl_close($ch);
-echo $response;
-      </pre>
-        </div> -->
+            <h3><span class="badge">GET</span> /inventory</h3>
+            <p>Ambil daftar stok dengan pagination.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Tipe</th>
+                        <th>Wajib</th>
+                        <th>Deskripsi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>page</td>
+                        <td>number</td>
+                        <td>Tidak</td>
+                        <td>Nomor halaman (default 1)</td>
+                    </tr>
+                    <tr>
+                        <td>limit</td>
+                        <td>number</td>
+                        <td>Tidak</td>
+                        <td>Jumlah data per halaman (default 10)</td>
+                    </tr>
+                    <tr>
+                        <td>search</td>
+                        <td>string</td>
+                        <td>Tidak</td>
+                        <td>Kata kunci pencarian</td>
+                    </tr>
+                </tbody>
+            </table>
 
-        <h2>Response Format</h2>
-        <pre>
-[
+            <p><b>Contoh Response:</b></p>
+            <pre><code>[
     {
         "PROD_YEAR": 2023,
         "BATCH": "G3230807M1",
@@ -168,14 +178,67 @@ echo $response;
         "STYLE": "SDX2140XWH Short Sleeved Polo Shirt (Laundry), White",
         "SIZE": "2XL",
         "GR_DATE": "20230824"
-    }
-]
-    </pre>
+    },
+]</code></pre>
+
+            <h3><span class="badge">POST</span> /orders</h3>
+            <p>Membuat sales order baru.</p>
+            <p><b>Request Body:</b></p>
+            <pre><code>{
+  "customer_code": "2000000002",
+  "items": [
+    { "material": "SDX2140XWH", "qty": 10, "uom": "PCS" },
+    { "material": "SDX9999BLK", "qty": 5, "uom": "PCS" }
+  ],
+  "notes": "Urgent order"
+}</code></pre>
+
+            <p><b>Contoh Request (PHP - CodeIgniter 4):</b></p>
+            <pre><code>&lt;?php
+$client = \Config\Services::curlrequest();
+$response = $client->post('https://api.yourdomain.com/v1/orders', [
+  'headers' => [
+    'Authorization' => 'Bearer YOUR_API_KEY',
+    'Content-Type'  => 'application/json'
+  ],
+  'json' => [
+    'customer_code' => '2000000002',
+    'items' => [
+      [ 'material' => 'SDX2140XWH', 'qty' => 10, 'uom' => 'PCS' ],
+      [ 'material' => 'SDX9999BLK', 'qty' => 5, 'uom' => 'PCS' ]
+    ],
+    'notes' => 'Urgent order'
+  ]
+]);
+
+echo $response->getBody();
+?&gt;</code></pre>
+
+            <p><b>Contoh Response:</b></p>
+            <pre><code>{
+  "success": true,
+  "so_no": "SO-20250821-0001",
+  "created_at": "2025-08-21T02:00:00Z"
+}</code></pre>
+        </section>
+
+        <section>
+            <h2>Format Error</h2>
+            <pre><code>{
+  "success": false,
+  "error": {
+    "code": "ERR_CODE",
+    "message": "Deskripsi error",
+    "details": {}
+  }
+}</code></pre>
+        </section>
     </div>
 
     <footer>
-        &copy; <?= date('Y'); ?> Argo Manunggal Triasta - API Documentation
+        © <?php echo date('Y'); ?> Your Company. Hubungi: <a href="mailto:dev@yourdomain.com">dev@yourdomain.com</a>
     </footer>
+
 </body>
 
 </html>
