@@ -42,6 +42,49 @@
     .btn-export {
         margin: 0.25rem;
     }
+
+    /* Custom styles for export buttons */
+    .dt-buttons .btn-success {
+        background-color: #198754 !important;
+        border-color: #198754 !important;
+        color: #fff !important;
+    }
+
+    .dt-buttons .btn-success:hover {
+        background-color: #157347 !important;
+        border-color: #146c43 !important;
+    }
+
+    .dt-buttons .btn-danger {
+        background-color: #dc3545 !important;
+        border-color: #dc3545 !important;
+        color: #fff !important;
+    }
+
+    .dt-buttons .btn-danger:hover {
+        background-color: #bb2d3b !important;
+        border-color: #b02a37 !important;
+    }
+
+    .dt-buttons .btn-info {
+        background-color: #0dcaf0 !important;
+        border-color: #0dcaf0 !important;
+        color: #fff !important;
+    }
+
+    .dt-buttons .btn-info:hover {
+        background-color: #31d2f2 !important;
+        border-color: #25cff2 !important;
+    }
+
+    /* Add some spacing between buttons */
+    .dt-buttons .btn {
+        margin-right: 0.5rem;
+    }
+
+    .dt-buttons .btn:last-child {
+        margin-right: 0;
+    }
 </style>
 <?= $this->endSection() ?>
 
@@ -84,7 +127,7 @@
                     </div>
                     <div class="d-flex flex-wrap align-items-center">
                         <small class="text-muted me-3">Download complete inventory data:</small>
-                        <button type="button" class="btn btn-success btn-sm btn-export" id="exportExcel">
+                        <button type="button" class="btn btn-success btn-sm btn-export" id="exportExcel" style="background-color: #198754; border-color: #198754;">
                             <i class="fas fa-file-excel"></i> Excel (.xlsx)
                         </button>
                         <button type="button" class="btn btn-primary btn-sm btn-export" id="exportCsv">
@@ -248,22 +291,31 @@
             buttons: [{
                     extend: 'excel',
                     text: '<i class="fas fa-file-excel"></i> Excel (Current Page)',
-                    className: 'btn btn-success btn-sm',
-                    title: 'Inventory Report (Current Page)'
+                    className: 'btn btn-success btn-sm me-2', // tambah margin end
+                    title: 'Inventory Report (Current Page)',
+                    exportOptions: {
+                        columns: ':visible' // hanya export kolom yang visible
+                    }
                 },
                 {
                     extend: 'pdf',
                     text: '<i class="fas fa-file-pdf"></i> PDF (Current Page)',
-                    className: 'btn btn-danger btn-sm',
+                    className: 'btn btn-danger btn-sm me-2', // tambah margin end
                     title: 'Inventory Report (Current Page)',
                     orientation: 'landscape',
-                    pageSize: 'A4'
+                    pageSize: 'A4',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
                 },
                 {
                     extend: 'print',
                     text: '<i class="fas fa-print"></i> Print (Current Page)',
-                    className: 'btn btn-info btn-sm',
-                    title: 'Inventory Report (Current Page)'
+                    className: 'btn btn-info btn-sm', // tidak perlu margin di tombol terakhir
+                    title: 'Inventory Report (Current Page)',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
                 }
             ],
             // language: {

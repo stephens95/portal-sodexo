@@ -173,7 +173,7 @@ class InventoryController extends BaseController
                     $item['PO_BUYER'] ?? '',
                     $item['SO'] . '/' . $item['LINE_ITEM'] ?? '',
                     $item['MATERIAL'] ?? '',
-                    !empty($item['STYLE']) ? explode(' ', $item['STYLE'])[0] : '',
+                    !empty($item['STYLE']) ? explode(' ', ltrim($item['STYLE']))[0] : '',
                     $item['COLOR'] ?? '',
                     $item['SIZE'] ?? '',
                     number_format($item['QTY'] ?? 0, 0),
@@ -277,7 +277,8 @@ class InventoryController extends BaseController
                 // $sheet->setCellValue('H' . $row, $item['STYLE'] ?? '');
                 $sheet->setCellValue('H' . $row, $item['SO'] . '/' . $item['LINE_ITEM'] ?? '');
                 $sheet->setCellValue('I' . $row, $item['MATERIAL'] ?? '');
-                $sheet->setCellValue('J' . $row, !empty($item['STYLE']) ? explode(' ', $item['STYLE'])[0] : '' ?? '');
+                $sheet->setCellValue('J' . $row, !empty($item['STYLE']) ? explode(' ', ltrim($item['STYLE']))[0] : '' ?? '');
+                // $sheet->setCellValue('J' . $row, $item['STYLE'] ?? '');
                 $sheet->setCellValue('K' . $row, $item['COLOR'] ?? '');
                 $sheet->setCellValue('L' . $row, $item['SIZE'] ?? '');
                 $sheet->setCellValue('M' . $row, $item['QTY'] ?? 0);
