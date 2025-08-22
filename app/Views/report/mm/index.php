@@ -209,10 +209,10 @@
                     data: 6
                 },
                 {
-                    data: 7
+                    data: 7 // Special Stock
                 },
                 {
-                    data: 8
+                    data: 8 // Kode Material
                 },
                 {
                     data: 9

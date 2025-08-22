@@ -222,6 +222,8 @@ class InventoryController extends BaseController
                 'Customer',
                 'Actual Quotation',
                 'PO Buyer',
+                'Special Stock',
+                'Kode Material',
                 'Style',
                 'Color',
                 'Size',
@@ -269,12 +271,15 @@ class InventoryController extends BaseController
                 $sheet->setCellValue('E' . $row, $item['CUSTOMER_NAME'] ?? '');
                 $sheet->setCellValue('F' . $row, $item['QUOT_ACTUAL'] ?? '');
                 $sheet->setCellValue('G' . $row, $item['PO_BUYER'] ?? '');
-                $sheet->setCellValue('H' . $row, $item['STYLE'] ?? '');
-                $sheet->setCellValue('I' . $row, $item['COLOR'] ?? '');
-                $sheet->setCellValue('J' . $row, $item['SIZE'] ?? '');
-                $sheet->setCellValue('K' . $row, $item['QTY'] ?? 0);
-                $sheet->setCellValue('L' . $row, $item['PROD_YEAR'] ?? '');
-                $sheet->setCellValue('M' . $row, $this->calculateAging($item['GR_DATE'] ?? ''));
+                // $sheet->setCellValue('H' . $row, $item['STYLE'] ?? '');
+                $sheet->setCellValue('H' . $row, $item['SO'] . '/' . $item['LINE_ITEM'] ?? '');
+                $sheet->setCellValue('I' . $row, $item['MATERIAL'] ?? '');
+                $sheet->setCellValue('J' . $row, !empty($item['STYLE']) ? explode(' ', $item['STYLE'])[0] : '' ?? '');
+                $sheet->setCellValue('K' . $row, $item['COLOR'] ?? '');
+                $sheet->setCellValue('L' . $row, $item['SIZE'] ?? '');
+                $sheet->setCellValue('M' . $row, $item['QTY'] ?? 0);
+                $sheet->setCellValue('N' . $row, $item['PROD_YEAR'] ?? '');
+                $sheet->setCellValue('O' . $row, $this->calculateAging($item['GR_DATE'] ?? ''));
                 $row++;
             }
 
