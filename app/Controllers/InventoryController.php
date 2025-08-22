@@ -81,7 +81,7 @@ class InventoryController extends BaseController
             'updated_at' => date('Y-m-d H:i:s'),
             'data' => $data
         ];
-        
+
         file_put_contents($inventoryFile, json_encode($inventoryData));
     }
 
@@ -90,7 +90,7 @@ class InventoryController extends BaseController
         $inventoryFile = $this->getInventoryFilePath();
         if (file_exists($inventoryFile)) {
             $inventoryData = json_decode(file_get_contents($inventoryFile), true);
-            
+
             // Check if the API URL matches current configuration
             if (isset($inventoryData['api_url']) && $inventoryData['api_url'] === $this->apiUrl) {
                 return $inventoryData['data'] ?? null;
@@ -167,6 +167,8 @@ class InventoryController extends BaseController
                         $item['CUSTOMER_NAME'] ?? '',
                         $item['QUOT_ACTUAL'] ?? '',
                         $item['PO_BUYER'] ?? '',
+                        $item['SO'] . '/' . $item['LINE_ITEM'] ?? '',
+                        $item['MATERIAL'] ?? '',
                         !empty($item['STYLE']) ? explode(' ', $item['STYLE'])[0] : '',
                         $item['COLOR'] ?? '',
                         $item['SIZE'] ?? '',

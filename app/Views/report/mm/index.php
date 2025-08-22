@@ -104,7 +104,7 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table id="inventoryTable" class="table table-sm table-bordered table-striped table-hover w-100">
+                        <table id="inventoryTable" class="table table-sm table-bordered table-striped table-hover w-100" style="white-space: nowrap;">
                             <thead class="table-dark">
                                 <tr>
                                     <th width="5%">#</th>
@@ -114,6 +114,8 @@
                                     <th>Customer</th>
                                     <th>Actual Quotation</th>
                                     <th>PO Buyer</th>
+                                    <th>Special Stock</th>
+                                    <th>Kode Material</th>
                                     <th>Style</th>
                                     <th>Color</th>
                                     <th>Size</th>
@@ -216,15 +218,21 @@
                     data: 9
                 },
                 {
-                    data: 10,
-                    className: 'text-end'
+                    data: 10
                 },
                 {
-                    data: 11,
-                    className: 'text-center'
+                    data: 11
                 },
                 {
                     data: 12,
+                    className: 'text-end'
+                },
+                {
+                    data: 13,
+                    className: 'text-center'
+                },
+                {
+                    data: 14,
                     className: 'text-center'
                 }
             ],
