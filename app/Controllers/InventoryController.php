@@ -120,6 +120,10 @@ class InventoryController extends BaseController
         try {
             $data = $this->getData();
 
+            $data = array_filter($data, function ($item) {
+                return !empty($item) && isset($item['PROD_YEAR']);
+            });
+
             $draw = intval($this->request->getPost('draw'));
             $start = intval($this->request->getPost('start'));
             $length = intval($this->request->getPost('length'));
@@ -135,6 +139,7 @@ class InventoryController extends BaseController
                         $item['CUSTOMER_NAME'] ?? '',
                         $item['QUOT_ACTUAL'] ?? '',
                         $item['PO_BUYER'] ?? '',
+                        $item['MATERIAL'] ?? '',
                         $item['STYLE'] ?? '',
                         $item['COLOR'] ?? '',
                         $item['SIZE'] ?? '',
@@ -158,25 +163,23 @@ class InventoryController extends BaseController
             $counter = $start + 1;
 
             foreach ($pagedData as $item) {
-                if ($item['PROD_YEAR'] != 0) {
-                    $processedData[] = [
-                        $counter++,
-                        $item['FORECAST_QUOTATION'] ?? '',
-                        $item['SO_FORECAST'] ?? '',
-                        $item['SO_ACTUAL'] ?? '',
-                        $item['CUSTOMER_NAME'] ?? '',
-                        $item['QUOT_ACTUAL'] ?? '',
-                        $item['PO_BUYER'] ?? '',
-                        $item['SO'] . '/' . $item['LINE_ITEM'] ?? '',
-                        $item['MATERIAL'] ?? '',
-                        !empty($item['STYLE']) ? explode(' ', $item['STYLE'])[0] : '',
-                        $item['COLOR'] ?? '',
-                        $item['SIZE'] ?? '',
-                        number_format($item['QTY'] ?? 0, 0),
-                        $item['PROD_YEAR'] ?? '',
-                        $this->calculateAging($item['GR_DATE'] ?? '')
-                    ];
-                }
+                $processedData[] = [
+                    $counter++,
+                    $item['FORECAST_QUOTATION'] ?? '',
+                    $item['SO_FORECAST'] ?? '',
+                    $item['SO_ACTUAL'] ?? '',
+                    $item['CUSTOMER_NAME'] ?? '',
+                    $item['QUOT_ACTUAL'] ?? '',
+                    $item['PO_BUYER'] ?? '',
+                    $item['SO'] . '/' . $item['LINE_ITEM'] ?? '',
+                    $item['MATERIAL'] ?? '',
+                    !empty($item['STYLE']) ? explode(' ', $item['STYLE'])[0] : '',
+                    $item['COLOR'] ?? '',
+                    $item['SIZE'] ?? '',
+                    number_format($item['QTY'] ?? 0, 0),
+                    $item['PROD_YEAR'] ?? '',
+                    $this->calculateAging($item['GR_DATE'] ?? '')
+                ];
             }
 
             return $this->response->setJSON([
