@@ -20,6 +20,11 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('/home', 'HomeController::index');
     $routes->get('/news-updates', 'ProgramUpdateController::index');
 
+    // Buyers page & API
+    $routes->get('/buyers', 'BuyerController::index');
+    $routes->get('/buyers/listAll', 'BuyerController::listAll');
+    $routes->match(['get','post'], '/buyers/refresh', 'BuyerController::refreshFromSap');
+
     // Account Settings Routes
     $routes->get('/account-settings', 'AccountController::index');
     $routes->post('/account/update', 'AccountController::update');
@@ -30,8 +35,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->post('/users/update', 'UserController::update');
     $routes->post('/users/create', 'UserController::create');
     $routes->post('/users/toggle-verification', 'UserController::toggleVerification');
-    $routes->get('/roles/listAll', 'Role::listAll');
-    $routes->get('/buyers/listAll', 'Buyer::listAll');
+    $routes->get('/roles/listAll', 'Role::listAll');;
     $routes->get('/users/delete/(:num)', 'UserController::delete/$1');
 
     // Report Inventory
@@ -46,7 +50,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('/sales-order', 'SalesOrderController::index');
 
     // Documentation API
-    $routes->get('/api-inventory', 'ApiController::inventory');
+    $routes->get('/api-inventory', 'Api\DocumentationController::inventory');
 });
 
 // API Routes

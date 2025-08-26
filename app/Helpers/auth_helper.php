@@ -16,6 +16,16 @@ if (!function_exists('auth')) {
     }
 }
 
+if (!function_exists('isAdmin')) {
+    /**
+     * Check if user is admin
+     */
+    function isAdmin()
+    {
+        return auth()->isAdmin();
+    }
+}
+
 if (!function_exists('hasRole')) {
     /**
      * Check if user has specific role
@@ -33,16 +43,6 @@ if (!function_exists('hasRoles')) {
     function hasRoles($roleNames)
     {
         return auth()->hasRoles($roleNames);
-    }
-}
-
-if (!function_exists('isAdmin')) {
-    /**
-     * Check if user is admin
-     */
-    function isAdmin()
-    {
-        return auth()->isAdmin();
     }
 }
 

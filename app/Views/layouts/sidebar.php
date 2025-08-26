@@ -25,6 +25,12 @@
                             <span class="pc-mtext">Users</span>
                         </a>
                     </li>
+                    <li class="pc-item">
+                        <a href="<?= base_url('/buyers') ?>" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-building"></i></span>
+                            <span class="pc-mtext">Buyers</span>
+                        </a>
+                    </li>
                 <?php endif; ?>
 
                 <li class="pc-item pc-caption">

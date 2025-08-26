@@ -71,6 +71,8 @@ class UserModel extends Model
             $user['role_ids'] = implode(',', array_column($roles, 'role_id'));
             $user['buyer_name'] = implode(', ', array_column($buyers, 'buyer_name'));
             $user['buyer_ids'] = implode(',', array_column($buyers, 'buyer_id'));
+            $user['country'] = implode(',', array_column($buyers, 'country'));
+            $user['country_name'] = implode(',', array_column($buyers, 'country_name'));
             $user['group_name'] = implode(', ', array_unique(array_column($buyers, 'group_name')));
         }
 
@@ -103,6 +105,8 @@ class UserModel extends Model
         // Format data
         $user['role_name'] = implode(', ', array_column($roles, 'role_name'));
         $user['buyer_name'] = implode(', ', array_column($buyers, 'buyer_name'));
+        $user['country'] = implode(',', array_column($buyers, 'country'));
+        $user['country_name'] = implode(',', array_column($buyers, 'country_name'));
         $user['group_name'] = implode(', ', array_unique(array_column($buyers, 'group_name')));
 
         return $user;

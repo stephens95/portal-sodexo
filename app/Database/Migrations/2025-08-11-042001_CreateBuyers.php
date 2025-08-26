@@ -12,15 +12,33 @@ class CreateBuyers extends Migration
             'buyer_id' => [
                 'type' => 'VARCHAR',
                 'constraint' => 50,
-                // 'unsigned' => true,
             ],
             'buyer_name' => [
                 'type' => 'VARCHAR',
+                'constraint' => 255,
+            ],
+            'country' => [
+                'type' => 'VARCHAR',
+                'constraint' => 10,
+                'null' => true,
+            ],
+            'country_name' => [
+                'type' => 'VARCHAR',
                 'constraint' => 100,
+                'null' => true,
             ],
             'group_name' => [
                 'type' => 'VARCHAR',
                 'constraint' => 100,
+                'default' => 'Sodexo Global',
+            ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
             ],
         ]);
         $this->forge->addKey('buyer_id', true);

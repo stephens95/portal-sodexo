@@ -26,8 +26,8 @@ class UserController extends BaseController
         $data['users']    = $userModel->getUser();
         $data['buyers']   = $buyerModel->findAll();
         $data['roles']    = $roleModel->findAll();
-        
-        return view('users/index', $data);
+
+        return view(name: 'master/users', data: $data);
     }
 
     public function getUserById($id)

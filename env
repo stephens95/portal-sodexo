@@ -83,4 +83,7 @@ encryption.key =
 
 #Tambahan:
 sap.api.inventory.url="http://10.2.38.143:8000/zapi_sth/zapi_sodexo/zstock?sap-client=180" #Client D180
+sap.api.country.url="http://10.2.38.143:8000/zapi_sth/zapi_sodexo/zcountry?sap-client=180" #Client D180
+sap.api.buyer.url="http://10.2.38.138:8000/zapi_sth/zapi_sodexo/zbuyer?sap-client=250" #Client Q250
+
 #  sap.api.inventory.url="http://10.2.38.138:8000/zapi_sth/zapi_sodexo/zstock?sap-client=250" #Client Q250

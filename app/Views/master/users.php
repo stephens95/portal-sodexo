@@ -182,11 +182,6 @@ $(document).ready(function() {
     $('#usersTable').DataTable({
         responsive: true,
         pageLength: 10,
-        language: {
-            search: "Search users:",
-            lengthMenu: "Show _MENU_ users per page",
-            info: "Showing _START_ to _END_ of _TOTAL_ users"
-        }
     });
 
     $('#buyer_ids, #role_ids').select2({

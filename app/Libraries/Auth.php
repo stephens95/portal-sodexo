@@ -49,7 +49,8 @@ class Auth
         if ($this->user && !$this->buyers) {
             $db = \Config\Database::connect();
             $this->buyers = $db->table('user_has_buyers uhb')
-                              ->select('b.buyer_id, b.buyer_name, b.group_name')
+                            //   ->select('b.buyer_id, b.buyer_name, b.group_name')
+                              ->select('b.*')
                               ->join('buyers b', 'b.buyer_id = uhb.buyer_id')
                               ->where('uhb.user_id', $this->user['user_id'])
                               ->get()
