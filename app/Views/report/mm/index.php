@@ -152,14 +152,14 @@
                                 <tr>
                                     <th width="5%">#</th>
                                     <th>Country</th>
-                                    <th>Forecast Quotation</th>
+                                    <th>Quotation Forecast</th>
                                     <th>SO Forecast</th>
                                     <th>SO Actual (Allocated)</th>
                                     <th>Customer</th>
-                                    <th>Actual Quotation</th>
-                                    <th>PO Buyer</th>
+                                    <th>Quotation Actual</th>
+                                    <th>PO Customer</th>
                                     <th>Special Stock</th>
-                                    <th>Kode Material</th>
+                                    <th>Material Code</th>
                                     <th>Style</th>
                                     <th>Color</th>
                                     <th>Size</th>

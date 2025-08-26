@@ -22,7 +22,7 @@ class InventoryController extends BaseController
 
     public function index()
     {
-        $data['title'] = 'Report Inventory';
+        $data['title'] = 'Inventory Report';
         $data['segment1'] = 'Report';
         return view('report/mm/index', $data);
     }
