@@ -151,6 +151,7 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th width="5%">#</th>
+                                    <th>Country</th>
                                     <th>Forecast Quotation</th>
                                     <th>SO Forecast</th>
                                     <th>SO Actual (Allocated)</th>
@@ -162,7 +163,7 @@
                                     <th>Style</th>
                                     <th>Color</th>
                                     <th>Size</th>
-                                    <th>Qty</th>
+                                    <th class="text-end">Qty</th>
                                     <th>Production Year</th>
                                     <th>Aging (days)</th>
                                 </tr>
@@ -177,7 +178,7 @@
                 <div class="mt-3">
                     <small class="text-muted">
                         <i class="fas fa-info-circle"></i>
-                        Data is cached for 30 minutes. Use "Refresh Cache" to get the latest data.
+                        Data is cached for 30 minutes. Use "Refresh Data" to get the latest data.
                     </small>
                 </div>
             </div>
@@ -252,13 +253,13 @@
                     data: 6
                 },
                 {
-                    data: 7 // Special Stock
+                    data: 7
                 },
                 {
-                    data: 8 // Kode Material
+                    data: 8 // Special Stock
                 },
                 {
-                    data: 9
+                    data: 9 // Kode Material
                 },
                 {
                     data: 10
@@ -267,15 +268,18 @@
                     data: 11
                 },
                 {
-                    data: 12,
-                    className: 'text-end'
+                    data: 12
                 },
                 {
                     data: 13,
-                    className: 'text-center'
+                    className: 'text-end'
                 },
                 {
                     data: 14,
+                    className: 'text-center'
+                },
+                {
+                    data: 15,
                     className: 'text-center'
                 }
             ],

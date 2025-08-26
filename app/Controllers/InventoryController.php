@@ -133,6 +133,7 @@ class InventoryController extends BaseController
             if (!empty($searchValue)) {
                 $filteredData = array_filter($data, function ($item) use ($searchValue) {
                     $searchFields = [
+                        '',
                         $item['FORECAST_QUOTATION'] ?? '',
                         $item['SO_FORECAST'] ?? '',
                         $item['SO_ACTUAL'] ?? '',
@@ -165,6 +166,7 @@ class InventoryController extends BaseController
             foreach ($pagedData as $item) {
                 $processedData[] = [
                     $counter++,
+                    '',
                     $item['FORECAST_QUOTATION'] ?? '',
                     $item['SO_FORECAST'] ?? '',
                     $item['SO_ACTUAL'] ?? '',
@@ -219,6 +221,7 @@ class InventoryController extends BaseController
 
             $headers = [
                 '#',
+                'Country',
                 'Forecast Quotation',
                 'SO Forecast',
                 'SO Actual (Allocated)',
@@ -268,22 +271,23 @@ class InventoryController extends BaseController
             $counter = 1;
             foreach ($data as $item) {
                 $sheet->setCellValue('A' . $row, $counter++);
-                $sheet->setCellValue('B' . $row, $item['FORECAST_QUOTATION'] ?? '');
-                $sheet->setCellValue('C' . $row, $item['SO_FORECAST'] ?? '');
-                $sheet->setCellValue('D' . $row, $item['SO_ACTUAL'] ?? '');
-                $sheet->setCellValue('E' . $row, $item['CUSTOMER_NAME'] ?? '');
-                $sheet->setCellValue('F' . $row, $item['QUOT_ACTUAL'] ?? '');
-                $sheet->setCellValue('G' . $row, $item['PO_BUYER'] ?? '');
+                $sheet->setCellValue('B' . $row, '');
+                $sheet->setCellValue('C' . $row, $item['FORECAST_QUOTATION'] ?? '');
+                $sheet->setCellValue('D' . $row, $item['SO_FORECAST'] ?? '');
+                $sheet->setCellValue('E' . $row, $item['SO_ACTUAL'] ?? '');
+                $sheet->setCellValue('F' . $row, $item['CUSTOMER_NAME'] ?? '');
+                $sheet->setCellValue('G' . $row, $item['QUOT_ACTUAL'] ?? '');
+                $sheet->setCellValue('H' . $row, $item['PO_BUYER'] ?? '');
                 // $sheet->setCellValue('H' . $row, $item['STYLE'] ?? '');
-                $sheet->setCellValue('H' . $row, $item['SO'] . '/' . $item['LINE_ITEM'] ?? '');
-                $sheet->setCellValue('I' . $row, $item['MATERIAL'] ?? '');
-                $sheet->setCellValue('J' . $row, !empty($item['STYLE']) ? explode(' ', ltrim($item['STYLE']))[0] : '' ?? '');
+                $sheet->setCellValue('I' . $row, $item['SO'] . '/' . $item['LINE_ITEM'] ?? '');
+                $sheet->setCellValue('J' . $row, $item['MATERIAL'] ?? '');
+                $sheet->setCellValue('K' . $row, !empty($item['STYLE']) ? explode(' ', ltrim($item['STYLE']))[0] : '' ?? '');
                 // $sheet->setCellValue('J' . $row, $item['STYLE'] ?? '');
-                $sheet->setCellValue('K' . $row, $item['COLOR'] ?? '');
-                $sheet->setCellValue('L' . $row, $item['SIZE'] ?? '');
-                $sheet->setCellValue('M' . $row, $item['QTY'] ?? 0);
-                $sheet->setCellValue('N' . $row, $item['PROD_YEAR'] ?? '');
-                $sheet->setCellValue('O' . $row, $this->calculateAging($item['GR_DATE'] ?? ''));
+                $sheet->setCellValue('L' . $row, $item['COLOR'] ?? '');
+                $sheet->setCellValue('M' . $row, $item['SIZE'] ?? '');
+                $sheet->setCellValue('N' . $row, $item['QTY'] ?? 0);
+                $sheet->setCellValue('O' . $row, $item['PROD_YEAR'] ?? '');
+                $sheet->setCellValue('P' . $row, $this->calculateAging($item['GR_DATE'] ?? ''));
                 $row++;
             }
 
