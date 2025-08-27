@@ -121,9 +121,25 @@ class InventoryController extends BaseController
         try {
             $data = $this->getData();
 
-            $data = array_filter($data, function ($item) {
-                return !empty($item) && isset($item['PROD_YEAR']);
-            });
+            $buyerCountries = array_map('strtoupper', array_column(auth()->buyers(), 'country') ?: []);
+            $hasOtherCountry = false;
+            foreach ($buyerCountries as $bc) {
+                if ($bc !== 'SG' && $bc !== 'MY') {
+                    $hasOtherCountry = true;
+                    break;
+                }
+            }
+
+            if ($hasOtherCountry && is_array($data)) {
+                $data = array_filter($data, function ($item) {
+                    $country = strtoupper(trim($item['COUNTRY'] ?? ''));
+                    return $country !== 'SG' && $country !== 'MY';
+                });
+            }
+
+            // $data = array_filter($data, function ($item) {
+            //     return !empty($item) && isset($item['PROD_YEAR']);
+            // });
 
             $draw = intval($this->request->getPost('draw'));
             $start = intval($this->request->getPost('start'));
@@ -166,8 +182,18 @@ class InventoryController extends BaseController
             $processedData = [];
             $counter = $start + 1;
 
+            // $buyerCountries = array_column(auth()->buyers(), 'country');
+            // $canSeeAll = in_array('SG', $buyerCountries, true) || in_array('MY', $buyerCountries, true);
+
             foreach ($pagedData as $item) {
                 // $country = $this->getCountryByCustomer($item['CUSTOMER'] ?? '');
+
+                // if (!$canSeeAll) {
+                //     $country = strtoupper(trim($item['COUNTRY'] ?? ''));
+                //     if ($country === 'SG' || $country === 'MY') {
+                //         continue;
+                //     }
+                // }
 
                 $processedData[] = [
                     $counter++,
