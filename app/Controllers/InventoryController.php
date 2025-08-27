@@ -124,7 +124,7 @@ class InventoryController extends BaseController
             $buyerCountries = array_map('strtoupper', array_column(auth()->buyers(), 'country') ?: []);
             $hasOtherCountry = false;
             foreach ($buyerCountries as $bc) {
-                if ($bc !== 'SG' && $bc !== 'MY') {
+                if ($bc !== 'SG' && $bc !== 'MY' && !auth()->isAdmin()) {
                     $hasOtherCountry = true;
                     break;
                 }
