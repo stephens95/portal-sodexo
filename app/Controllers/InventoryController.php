@@ -37,44 +37,6 @@ class InventoryController extends BaseController
         return WRITEPATH . 'cache/inventory.json';
     }
 
-    public function getAPICountry()
-    {
-        // URL API
-        $url = env('sap.api.buyer.url');
-
-        // Panggil service HTTP Client
-        $client = \Config\Services::curlrequest();
-
-        // Request GET
-        $response = $client->get($url);
-
-        // Ambil isi body (JSON string)
-        $body = $response->getBody();
-
-        // Decode ke array PHP
-        $data = json_decode($body, true);
-        return $data;
-    }
-
-    public function getCountryByCustomer($customerId)
-    {
-        $data = $this->getAPICountry();
-
-        $result = null;
-
-        foreach ($data as $row) {
-            if ($row['CUSTOMER'] == $customerId) {
-                $result = [
-                    'COUNTRY' => $row['COUNTRY'],
-                    'COUNTRY_NAME' => $row['COUNTRY_NAME']
-                ];
-                break;
-            }
-        }
-
-        return $result;
-    }
-
     private function getData()
     {
         $cacheKey = $this->getCacheKey();
@@ -169,18 +131,6 @@ class InventoryController extends BaseController
 
             $filteredData = $data;
             if (!empty($searchValue)) {
-                // foreach ($data as &$item) {
-                //     $country = $this->getCountryByCustomer($item['CUSTOMER']);
-                //     if ($country) {
-                //         $item['COUNTRY'] = $country['COUNTRY'];
-                //         $item['COUNTRY_NAME'] = $country['COUNTRY_NAME'];
-                //     } else {
-                //         $item['COUNTRY'] = '';
-                //         $item['COUNTRY_NAME'] = '';
-                //     }
-                // }
-                // unset($item);
-
                 $filteredData = array_filter($data, function ($item) use ($searchValue) {
                     $searchFields = [
                         $item['FORECAST_QUOTATION'] ?? '',
@@ -195,8 +145,8 @@ class InventoryController extends BaseController
                         $item['SIZE'] ?? '',
                         $item['QTY'] ?? '',
                         $item['PROD_YEAR'] ?? '',
-                        // $item['COUNTRY'] ?? '',
-                        // $item['COUNTRY_NAME'] ?? '',
+                        $item['COUNTRY'] ?? '',
+                        $item['COUNTRY_NAME'] ?? '',
                     ];
 
                     // return stripos(implode(' ', $searchFields), $searchValue) !== false;
@@ -216,7 +166,7 @@ class InventoryController extends BaseController
             $counter = $start + 1;
 
             foreach ($pagedData as $item) {
-                $country = $this->getCountryByCustomer($item['CUSTOMER'] ?? '');
+                // $country = $this->getCountryByCustomer($item['CUSTOMER'] ?? '');
 
                 $processedData[] = [
                     $counter++,
@@ -234,7 +184,7 @@ class InventoryController extends BaseController
                     number_format($item['QTY'] ?? 0, 0),
                     $item['PROD_YEAR'] ?? '',
                     $this->calculateAging($item['GR_DATE'] ?? ''),
-                    '<small>' . $country['COUNTRY'] . '</small><br>' . $country['COUNTRY_NAME']
+                    '<small>' . $item['COUNTRY'] . '</small><br>' . $item['COUNTRY_NAME']
                 ];
             }
 
@@ -275,7 +225,6 @@ class InventoryController extends BaseController
 
             $headers = [
                 '#',
-                'Country',
                 'Forecast Quotation',
                 'SO Forecast',
                 'SO Actual (Allocated)',
@@ -289,7 +238,8 @@ class InventoryController extends BaseController
                 'Size',
                 'Qty',
                 'Production Year',
-                'Aging (days)'
+                'Aging (days)',
+                'Country'
             ];
 
             $col = 'A';
@@ -324,7 +274,7 @@ class InventoryController extends BaseController
             $row = 2;
             $counter = 1;
             foreach ($data as $item) {
-                $country = $this->getCountryByCustomer($item['CUSTOMER'] ?? '');
+                // $country = $this->getCountryByCustomer($item['CUSTOMER'] ?? '');
 
                 $sheet->setCellValue('A' . $row, $counter++);
                 $sheet->setCellValue('B' . $row, $item['FORECAST_QUOTATION'] ?? '');
@@ -342,8 +292,8 @@ class InventoryController extends BaseController
                 $sheet->setCellValue('L' . $row, $item['SIZE'] ?? '');
                 $sheet->setCellValue('M' . $row, $item['QTY'] ?? 0);
                 $sheet->setCellValue('N' . $row, $item['PROD_YEAR'] ?? '');
-                $sheet->setCellValue('O ' . $row, $this->calculateAging($item['GR_DATE'] ?? ''));
-                $sheet->setCellValue('P' . $row, $country['COUNTRY'] ?? '' . '-' . $country['COUNTRY_NAME'] ?? '');
+                $sheet->setCellValue('O' . $row, $this->calculateAging($item['GR_DATE'] ?? ''));
+                $sheet->setCellValue('P' . $row, $item['COUNTRY'] . '-' . $item['COUNTRY_NAME'] ?? '');
                 $row++;
             }
 
