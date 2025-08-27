@@ -151,7 +151,6 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th width="5%">#</th>
-                                    <th>Country</th>
                                     <th>Quotation Forecast</th>
                                     <th>SO Forecast</th>
                                     <th>SO Actual (Allocated)</th>
@@ -166,6 +165,7 @@
                                     <th class="text-end">Qty</th>
                                     <th>Production Year</th>
                                     <th>Aging (days)</th>
+                                    <th>Country</th>
                                 </tr>
                             </thead>
                             <tbody>

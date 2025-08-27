@@ -37,6 +37,44 @@ class InventoryController extends BaseController
         return WRITEPATH . 'cache/inventory.json';
     }
 
+    public function getAPICountry()
+    {
+        // URL API
+        $url = env('sap.api.buyer.url');
+
+        // Panggil service HTTP Client
+        $client = \Config\Services::curlrequest();
+
+        // Request GET
+        $response = $client->get($url);
+
+        // Ambil isi body (JSON string)
+        $body = $response->getBody();
+
+        // Decode ke array PHP
+        $data = json_decode($body, true);
+        return $data;
+    }
+
+    public function getCountryByCustomer($customerId)
+    {
+        $data = $this->getAPICountry();
+
+        $result = null;
+
+        foreach ($data as $row) {
+            if ($row['CUSTOMER'] == $customerId) {
+                $result = [
+                    'COUNTRY' => $row['COUNTRY'],
+                    'COUNTRY_NAME' => $row['COUNTRY_NAME']
+                ];
+                break;
+            }
+        }
+
+        return $result;
+    }
+
     private function getData()
     {
         $cacheKey = $this->getCacheKey();
@@ -131,9 +169,20 @@ class InventoryController extends BaseController
 
             $filteredData = $data;
             if (!empty($searchValue)) {
+                // foreach ($data as &$item) {
+                //     $country = $this->getCountryByCustomer($item['CUSTOMER']);
+                //     if ($country) {
+                //         $item['COUNTRY'] = $country['COUNTRY'];
+                //         $item['COUNTRY_NAME'] = $country['COUNTRY_NAME'];
+                //     } else {
+                //         $item['COUNTRY'] = '';
+                //         $item['COUNTRY_NAME'] = '';
+                //     }
+                // }
+                // unset($item);
+
                 $filteredData = array_filter($data, function ($item) use ($searchValue) {
                     $searchFields = [
-                        '',
                         $item['FORECAST_QUOTATION'] ?? '',
                         $item['SO_FORECAST'] ?? '',
                         $item['SO_ACTUAL'] ?? '',
@@ -146,8 +195,11 @@ class InventoryController extends BaseController
                         $item['SIZE'] ?? '',
                         $item['QTY'] ?? '',
                         $item['PROD_YEAR'] ?? '',
+                        // $item['COUNTRY'] ?? '',
+                        // $item['COUNTRY_NAME'] ?? '',
                     ];
 
+                    // return stripos(implode(' ', $searchFields), $searchValue) !== false;
                     foreach ($searchFields as $field) {
                         if (stripos($field, $searchValue) !== false) {
                             return true;
@@ -164,9 +216,10 @@ class InventoryController extends BaseController
             $counter = $start + 1;
 
             foreach ($pagedData as $item) {
+                $country = $this->getCountryByCustomer($item['CUSTOMER'] ?? '');
+
                 $processedData[] = [
                     $counter++,
-                    '',
                     $item['FORECAST_QUOTATION'] ?? '',
                     $item['SO_FORECAST'] ?? '',
                     $item['SO_ACTUAL'] ?? '',
@@ -180,7 +233,8 @@ class InventoryController extends BaseController
                     $item['SIZE'] ?? '',
                     number_format($item['QTY'] ?? 0, 0),
                     $item['PROD_YEAR'] ?? '',
-                    $this->calculateAging($item['GR_DATE'] ?? '')
+                    $this->calculateAging($item['GR_DATE'] ?? ''),
+                    '<small>' . $country['COUNTRY'] . '</small><br>' . $country['COUNTRY_NAME']
                 ];
             }
 
@@ -270,24 +324,26 @@ class InventoryController extends BaseController
             $row = 2;
             $counter = 1;
             foreach ($data as $item) {
+                $country = $this->getCountryByCustomer($item['CUSTOMER'] ?? '');
+
                 $sheet->setCellValue('A' . $row, $counter++);
-                $sheet->setCellValue('B' . $row, '');
-                $sheet->setCellValue('C' . $row, $item['FORECAST_QUOTATION'] ?? '');
-                $sheet->setCellValue('D' . $row, $item['SO_FORECAST'] ?? '');
-                $sheet->setCellValue('E' . $row, $item['SO_ACTUAL'] ?? '');
-                $sheet->setCellValue('F' . $row, $item['CUSTOMER_NAME'] ?? '');
-                $sheet->setCellValue('G' . $row, $item['QUOT_ACTUAL'] ?? '');
-                $sheet->setCellValue('H' . $row, $item['PO_BUYER'] ?? '');
+                $sheet->setCellValue('B' . $row, $item['FORECAST_QUOTATION'] ?? '');
+                $sheet->setCellValue('C' . $row, $item['SO_FORECAST'] ?? '');
+                $sheet->setCellValue('D' . $row, $item['SO_ACTUAL'] ?? '');
+                $sheet->setCellValue('E' . $row, $item['CUSTOMER_NAME'] ?? '');
+                $sheet->setCellValue('F' . $row, $item['QUOT_ACTUAL'] ?? '');
+                $sheet->setCellValue('G' . $row, $item['PO_BUYER'] ?? '');
                 // $sheet->setCellValue('H' . $row, $item['STYLE'] ?? '');
-                $sheet->setCellValue('I' . $row, $item['SO'] . '/' . $item['LINE_ITEM'] ?? '');
-                $sheet->setCellValue('J' . $row, $item['MATERIAL'] ?? '');
-                $sheet->setCellValue('K' . $row, !empty($item['STYLE']) ? explode(' ', ltrim($item['STYLE']))[0] : '' ?? '');
+                $sheet->setCellValue('H' . $row, $item['SO'] . '/' . $item['LINE_ITEM'] ?? '');
+                $sheet->setCellValue('I' . $row, $item['MATERIAL'] ?? '');
+                $sheet->setCellValue('J' . $row, !empty($item['STYLE']) ? explode(' ', ltrim($item['STYLE']))[0] : '' ?? '');
                 // $sheet->setCellValue('J' . $row, $item['STYLE'] ?? '');
-                $sheet->setCellValue('L' . $row, $item['COLOR'] ?? '');
-                $sheet->setCellValue('M' . $row, $item['SIZE'] ?? '');
-                $sheet->setCellValue('N' . $row, $item['QTY'] ?? 0);
-                $sheet->setCellValue('O' . $row, $item['PROD_YEAR'] ?? '');
-                $sheet->setCellValue('P' . $row, $this->calculateAging($item['GR_DATE'] ?? ''));
+                $sheet->setCellValue('K' . $row, $item['COLOR'] ?? '');
+                $sheet->setCellValue('L' . $row, $item['SIZE'] ?? '');
+                $sheet->setCellValue('M' . $row, $item['QTY'] ?? 0);
+                $sheet->setCellValue('N' . $row, $item['PROD_YEAR'] ?? '');
+                $sheet->setCellValue('O ' . $row, $this->calculateAging($item['GR_DATE'] ?? ''));
+                $sheet->setCellValue('P' . $row, $country['COUNTRY'] ?? '' . '-' . $country['COUNTRY_NAME'] ?? '');
                 $row++;
             }
 
