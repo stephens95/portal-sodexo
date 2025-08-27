@@ -109,7 +109,8 @@ class InventoryController extends BaseController
         if ($grDateTime) {
             $today = new \DateTime();
             $interval = $today->diff($grDateTime);
-            return $interval->days . ' days';
+            // return $interval->days . ' days';
+            return $interval->days;
         }
 
         return '';
@@ -170,21 +171,21 @@ class InventoryController extends BaseController
 
                 $processedData[] = [
                     $counter++,
-                    $item['FORECAST_QUOTATION'] ?? '',
-                    $item['SO_FORECAST'] ?? '',
+                    $item['FORECAST_QUOTATION'] . '<br><small>' . $item['SO_FORECAST'] . '</small>',
+                    // $item['SO_FORECAST'] ?? '',
                     $item['SO_ACTUAL'] ?? '',
                     $item['CUSTOMER_NAME'] ?? '',
                     $item['QUOT_ACTUAL'] ?? '',
                     $item['PO_BUYER'] ?? '',
-                    $item['SO'] . '/' . $item['LINE_ITEM'] ?? '',
-                    $item['MATERIAL'] ?? '',
                     !empty($item['STYLE']) ? explode(' ', ltrim($item['STYLE']))[0] : '',
                     $item['COLOR'] ?? '',
                     $item['SIZE'] ?? '',
                     number_format($item['QTY'] ?? 0, 0),
                     $item['PROD_YEAR'] ?? '',
                     $this->calculateAging($item['GR_DATE'] ?? ''),
-                    '<small>' . $item['COUNTRY'] . '</small><br>' . $item['COUNTRY_NAME']
+                    '<small>' . $item['COUNTRY'] . '</small><br>' . $item['COUNTRY_NAME'],
+                    $item['MATERIAL'] ?? '',
+                    $item['SO'] . '<br>' . $item['LINE_ITEM'] ?? ''
                 ];
             }
 

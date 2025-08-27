@@ -85,6 +85,30 @@
     .dt-buttons .btn:last-child {
         margin-right: 0;
     }
+
+    /* ========== Sticky header for the table ========== */
+    /* Limit the table viewport height so body can scroll while thead stays sticky */
+    .table-responsive {
+        max-height: 60vh;
+        /* sesuaikan tinggi sesuai kebutuhan */
+        overflow: auto;
+    }
+
+    /* Make the header cells sticky */
+    .table-responsive thead th {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1020 !important;
+        background-color: #343a40 !important;
+        color: #fff !important;
+        background-clip: padding-box;
+        /* hindari border bleed */
+    }
+
+    /* pastikan kolom pertama tetap di atas (jika ada masalah overlap) */
+    .table-responsive thead th:first-child {
+        z-index: 1030 !important;
+    }
 </style>
 <?= $this->endSection() ?>
 
@@ -147,25 +171,25 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table id="inventoryTable" class="table table-sm table-bordered table-striped table-hover w-100" style="white-space: nowrap;">
+                        <table id="inventoryTable" class="table table-sm table-bordered table-striped table-hover w-100" style="white-space: nowrap; font-size: 11px;">
                             <thead class="table-dark">
                                 <tr>
-                                    <th width="5%">#</th>
-                                    <th>Quotation Forecast</th>
-                                    <th>SO Forecast</th>
-                                    <th>SO Actual (Allocated)</th>
-                                    <th>Customer</th>
+                                    <th width="3%">#</th>
+                                    <th>Quotation Forecast<br>SO Forecast</th>
+                                    <!-- <th>SO Forecast</th> -->
+                                    <th>SO Actual<br>(Allocated)</th>
+                                    <th>Customer Name</th>
                                     <th>Quotation Actual</th>
                                     <th>PO Customer</th>
-                                    <th>Special Stock</th>
-                                    <th>Material Code</th>
                                     <th>Style</th>
                                     <th>Colour</th>
-                                    <th>Size</th>
+                                    <th width="3%">Size</th>
                                     <th class="text-end">Qty</th>
-                                    <th>Production Year</th>
-                                    <th>Aging (days)</th>
+                                    <th>Production<br>Year</th>
+                                    <th>Aging<br>(days)</th>
                                     <th>Country</th>
+                                    <th>Material Code</th>
+                                    <th>Special Stock</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -237,6 +261,9 @@
                 {
                     data: 1
                 },
+                // {
+                //     data: 2
+                // },
                 {
                     data: 2
                 },
@@ -253,33 +280,32 @@
                     data: 6
                 },
                 {
-                    data: 7
+                    data: 7 // Special Stock
                 },
                 {
-                    data: 8 // Special Stock
+                    data: 8 // Kode Material
                 },
                 {
-                    data: 9 // Kode Material
+                    data: 9,
+                    className: 'text-end'
                 },
                 {
                     data: 10
                 },
                 {
-                    data: 11
-                },
-                {
-                    data: 12
-                },
-                {
-                    data: 13,
-                    className: 'text-end'
-                },
-                {
-                    data: 14,
+                    data: 11,
                     className: 'text-center'
                 },
                 {
-                    data: 15,
+                    data: 12,
+                    className: 'text-end'
+                },
+                {
+                    data: 13,
+                    // className: 'text-center'
+                },
+                {
+                    data: 14,
                     // className: 'text-center'
                 }
             ],
