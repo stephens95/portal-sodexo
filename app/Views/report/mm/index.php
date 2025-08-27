@@ -83,15 +83,11 @@
         margin-right: 0;
     }
 
-    /* ========== Sticky header for the table ========== */
-    /* Limit the table viewport height so body can scroll while thead stays sticky */
     .table-responsive {
         max-height: 60vh;
-        /* sesuaikan tinggi sesuai kebutuhan */
         overflow: auto;
     }
 
-    /* Make the header cells sticky */
     .table-responsive thead th {
         position: sticky !important;
         top: 0 !important;
@@ -99,10 +95,8 @@
         background-color: #343a40 !important;
         color: #fff !important;
         background-clip: padding-box;
-        /* hindari border bleed */
     }
 
-    /* pastikan kolom pertama tetap di atas (jika ada masalah overlap) */
     .table-responsive thead th:first-child {
         z-index: 1030 !important;
     }
@@ -173,7 +167,6 @@
                                 <tr>
                                     <th width="3%">#</th>
                                     <th>Quotation Forecast<br>SO Forecast</th>
-                                    <!-- <th>SO Forecast</th> -->
                                     <th>SO Actual<br>(Allocated)</th>
                                     <th>Customer Name</th>
                                     <th>Quotation Actual</th>
@@ -247,9 +240,6 @@
                 {
                     data: 1
                 },
-                // {
-                //     data: 2
-                // },
                 {
                     data: 2
                 },
@@ -266,10 +256,10 @@
                     data: 6
                 },
                 {
-                    data: 7 // Special Stock
+                    data: 7
                 },
                 {
-                    data: 8 // Kode Material
+                    data: 8
                 },
                 {
                     data: 9,
@@ -288,11 +278,9 @@
                 },
                 {
                     data: 13,
-                    // className: 'text-center'
                 },
                 {
                     data: 14,
-                    // className: 'text-center'
                 }
             ],
             pageLength: 25,
@@ -307,16 +295,16 @@
             buttons: [{
                     extend: 'excel',
                     text: '<i class="fas fa-file-excel"></i> Excel (Current Page)',
-                    className: 'btn btn-success btn-sm me-2', // tambah margin end
+                    className: 'btn btn-success btn-sm me-2',
                     title: 'Inventory Report (Current Page)',
                     exportOptions: {
-                        columns: ':visible' // hanya export kolom yang visible
+                        columns: ':visible'
                     }
                 },
                 {
                     extend: 'pdf',
                     text: '<i class="fas fa-file-pdf"></i> PDF (Current Page)',
-                    className: 'btn btn-danger btn-sm me-2', // tambah margin end
+                    className: 'btn btn-danger btn-sm me-2',
                     title: 'Inventory Report (Current Page)',
                     orientation: 'landscape',
                     pageSize: 'A4',
@@ -327,7 +315,7 @@
                 {
                     extend: 'print',
                     text: '<i class="fas fa-print"></i> Print (Current Page)',
-                    className: 'btn btn-info btn-sm', // tidak perlu margin di tombol terakhir
+                    className: 'btn btn-info btn-sm',
                     title: 'Inventory Report (Current Page)',
                     exportOptions: {
                         columns: ':visible'
