@@ -280,7 +280,7 @@
                 },
                 {
                     data: 15,
-                    className: 'text-center'
+                    // className: 'text-center'
                 }
             ],
             pageLength: 25,
