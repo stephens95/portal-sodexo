@@ -160,7 +160,7 @@
                                     <th>Special Stock</th>
                                     <th>Material Code</th>
                                     <th>Style</th>
-                                    <th>Color</th>
+                                    <th>Colour</th>
                                     <th>Size</th>
                                     <th class="text-end">Qty</th>
                                     <th>Production Year</th>
