@@ -121,30 +121,20 @@ class InventoryController extends BaseController
         try {
             $data = $this->getData();
 
-            // jika user admin -> skip filter
-            $roles = auth()->roleNames() ?? [];
-            if (!is_array($roles)) {
-                $roles = [$roles];
+            $buyerCountries = array_map('strtoupper', array_column(auth()->buyers(), 'country') ?: []);
+            $hasOtherCountry = false;
+            foreach ($buyerCountries as $bc) {
+                if ($bc !== 'SG' && $bc !== 'MY' && !auth()->isAdmin()) {
+                    $hasOtherCountry = true;
+                    break;
+                }
             }
-            $roles = array_map('strtoupper', $roles);
-            $isAdmin = in_array('ADMIN', $roles, true);
 
-            if (!$isAdmin) {
-                $buyerCountries = array_map('strtoupper', array_column(auth()->buyers(), 'country') ?: []);
-                $hasOtherCountry = false;
-                foreach ($buyerCountries as $bc) {
-                    if ($bc !== 'SG' && $bc !== 'MY') {
-                        $hasOtherCountry = true;
-                        break;
-                    }
-                }
-
-                if ($hasOtherCountry && is_array($data)) {
-                    $data = array_filter($data, function ($item) {
-                        $country = strtoupper(trim($item['COUNTRY'] ?? ''));
-                        return $country !== 'SG' && $country !== 'MY';
-                    });
-                }
+            if ($hasOtherCountry && is_array($data)) {
+                $data = array_filter($data, function ($item) {
+                    $country = strtoupper(trim($item['COUNTRY'] ?? ''));
+                    return $country !== 'SG' && $country !== 'MY';
+                });
             }
 
             // $data = array_filter($data, function ($item) {
