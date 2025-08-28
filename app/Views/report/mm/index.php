@@ -181,6 +181,7 @@
                                     <?php if (auth()->isAdmin()): ?>
                                         <th>Material Code</th>
                                         <th>Special Stock</th>
+                                        <th>Batch</th>
                                     <?php endif; ?>
                                 </tr>
                             </thead>
@@ -283,6 +284,9 @@
                     },
                     {
                         data: 14,
+                    },
+                    {
+                        data: 15,
                     }
                 <?php endif; ?>
             ],

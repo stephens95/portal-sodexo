@@ -166,6 +166,7 @@ class InventoryController extends BaseController
                         $item['COUNTRY_NAME'] ?? '',
                         $item['SO'],
                         $item['LINE_ITEM'],
+                        $item['BATCH'] ?? '',
                     ];
 
                     // return stripos(implode(' ', $searchFields), $searchValue) !== false;
@@ -213,7 +214,8 @@ class InventoryController extends BaseController
                     $this->calculateAging($item['GR_DATE'] ?? ''),
                     '<small>' . $item['COUNTRY'] . '</small><br>' . $item['COUNTRY_NAME'],
                     $item['MATERIAL'] ?? '',
-                    $item['SO'] . '<br>' . $item['LINE_ITEM'] ?? ''
+                    $item['SO'] . '<br>' . $item['LINE_ITEM'] ?? '',
+                    $item['BATCH'] ?? '',
                 ];
             }
 
@@ -254,22 +256,29 @@ class InventoryController extends BaseController
 
             $headers = [
                 '#',
-                'Forecast Quotation',
-                'SO Forecast',
-                'SO Actual (Allocated)',
-                'Customer',
-                'Actual Quotation',
-                'PO Buyer',
-                'Special Stock',
-                'Kode Material',
+                'Forecast Quotation No.',
+                'Forecast SO No.',
+                'Allocated to SO No.',
+                'Customer Name',
+                'Allocated to Quotation No',
+                'Allocated to Customer PO No.',
                 'Style',
-                'Color',
-                'Size',
-                'Qty',
+                'Colour',
+                'Universal Size',
+                'Qty (Pcs)',
                 'Production Year',
                 'Aging (days)',
-                'Country'
+                'Country',
+                'Country Name',
             ];
+
+            if (auth()->isAdmin()) {
+                $headers = array_merge($headers, [
+                    'Material Code',
+                    'Special Stock',
+                    'Batch',
+                ]);
+            }
 
             $col = 'A';
             foreach ($headers as $header) {
@@ -312,17 +321,18 @@ class InventoryController extends BaseController
                 $sheet->setCellValue('E' . $row, $item['CUSTOMER_NAME'] ?? '');
                 $sheet->setCellValue('F' . $row, $item['QUOT_ACTUAL'] ?? '');
                 $sheet->setCellValue('G' . $row, $item['PO_BUYER'] ?? '');
-                // $sheet->setCellValue('H' . $row, $item['STYLE'] ?? '');
-                $sheet->setCellValue('H' . $row, $item['SO'] . '/' . $item['LINE_ITEM'] ?? '');
-                $sheet->setCellValue('I' . $row, $item['MATERIAL'] ?? '');
-                $sheet->setCellValue('J' . $row, !empty($item['STYLE']) ? explode(' ', ltrim($item['STYLE']))[0] : '' ?? '');
-                // $sheet->setCellValue('J' . $row, $item['STYLE'] ?? '');
-                $sheet->setCellValue('K' . $row, $item['COLOR'] ?? '');
-                $sheet->setCellValue('L' . $row, $item['SIZE'] ?? '');
-                $sheet->setCellValue('M' . $row, $item['QTY'] ?? 0);
-                $sheet->setCellValue('N' . $row, $item['PROD_YEAR'] ?? '');
-                $sheet->setCellValue('O' . $row, $this->calculateAging($item['GR_DATE'] ?? ''));
-                $sheet->setCellValue('P' . $row, $item['COUNTRY'] . '-' . $item['COUNTRY_NAME'] ?? '');
+                $sheet->setCellValue('H' . $row, !empty($item['STYLE']) ? explode(' ', ltrim($item['STYLE']))[0] : '' ?? '');
+                $sheet->setCellValue('I' . $row, $item['COLOR'] ?? '');
+                $sheet->setCellValue('J' . $row, $item['SIZE'] ?? '');
+                $sheet->setCellValue('K' . $row, $item['QTY'] ?? 0);
+                $sheet->setCellValue('L' . $row, $item['PROD_YEAR'] ?? '');
+                $sheet->setCellValue('M' . $row, $this->calculateAging($item['GR_DATE'] ?? ''));
+                $sheet->setCellValue('N' . $row, $item['COUNTRY'] . '-' . $item['COUNTRY_NAME'] ?? '');
+                if (auth()->isAdmin()) {
+                    $sheet->setCellValue('O' . $row, $item['MATERIAL'] ?? '');
+                    $sheet->setCellValue('P' . $row, $item['SO'] . '/' . $item['LINE_ITEM'] ?? '');
+                    $sheet->setCellValue('Q' . $row, $item['BATCH'] ?? '');
+                }
                 $row++;
             }
 
