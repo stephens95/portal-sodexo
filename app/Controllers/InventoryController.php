@@ -269,7 +269,6 @@ class InventoryController extends BaseController
                 'Production Year',
                 'Aging (days)',
                 'Country',
-                'Country Name',
             ];
 
             if (auth()->isAdmin()) {
