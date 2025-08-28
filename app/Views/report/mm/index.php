@@ -166,20 +166,22 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th width="3%">#</th>
-                                    <th>Quotation Forecast<br>SO Forecast</th>
-                                    <th>SO Actual<br>(Allocated)</th>
+                                    <th>Forecast Quotation No.<br>Forecast SO No.</th>
+                                    <th>Allocated to SO No.</th>
                                     <th>Customer Name</th>
-                                    <th>Quotation Actual</th>
-                                    <th>PO Customer</th>
+                                    <th>Allocated to Quotation No.</th>
+                                    <th>Allocated to Customer PO No.</th>
                                     <th>Style</th>
                                     <th>Colour</th>
-                                    <th width="3%">Size</th>
-                                    <th class="text-end">Qty</th>
+                                    <th width="3%">Universal Size</th>
+                                    <th class="text-end">Qty<br>(Pcs)</th>
                                     <th>Production<br>Year</th>
                                     <th>Aging<br>(days)</th>
                                     <th>Country</th>
-                                    <th>Material Code</th>
-                                    <th>Special Stock</th>
+                                    <?php if (auth()->isAdmin()): ?>
+                                        <th>Material Code</th>
+                                        <th>Special Stock</th>
+                                    <?php endif; ?>
                                 </tr>
                             </thead>
                             <tbody>
@@ -274,14 +276,15 @@
                 },
                 {
                     data: 12,
-                    className: 'text-end'
+                    // className: 'text-end'
                 },
-                {
-                    data: 13,
-                },
-                {
-                    data: 14,
-                }
+                <?php if (auth()->isAdmin()): ?> {
+                        data: 13,
+                    },
+                    {
+                        data: 14,
+                    }
+                <?php endif; ?>
             ],
             pageLength: 25,
             lengthMenu: [

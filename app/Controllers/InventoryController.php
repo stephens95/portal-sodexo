@@ -164,6 +164,8 @@ class InventoryController extends BaseController
                         $item['PROD_YEAR'] ?? '',
                         $item['COUNTRY'] ?? '',
                         $item['COUNTRY_NAME'] ?? '',
+                        $item['SO'],
+                        $item['LINE_ITEM'],
                     ];
 
                     // return stripos(implode(' ', $searchFields), $searchValue) !== false;
