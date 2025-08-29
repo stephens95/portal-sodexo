@@ -167,10 +167,10 @@
                                 <tr>
                                     <th width="3%">#</th>
                                     <th>Forecast Quotation No.<br>Forecast SO No.</th>
-                                    <th>Allocated to SO No.</th>
+                                    <th>Allocated to<br>SO No.</th>
                                     <th>Customer Name</th>
-                                    <th>Allocated to Quotation No.</th>
-                                    <th>Allocated to Customer PO No.</th>
+                                    <th>Allocated to<br>Quotation No.</th>
+                                    <th>Allocated to<br>Customer PO No.</th>
                                     <th>Style</th>
                                     <th>Colour</th>
                                     <th width="3%">Universal Size</th>
