@@ -34,5 +34,14 @@ class UsersSeeder extends Seeder
             'verified'    => 1,
             'created_at'  => date('Y-m-d H:i:s')
         ]);
+
+        $userModel->insert([
+            'email'       => 'it10@amt.co.id',
+            'password'    => password_hash('1234', PASSWORD_DEFAULT),
+            'name'        => 'Riadi',
+            'last_login'  => date('Y-m-d H:i:s'),
+            'verified'    => 1,
+            'created_at'  => date('Y-m-d H:i:s')
+        ]);
     }
 }
