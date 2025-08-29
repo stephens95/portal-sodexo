@@ -102,24 +102,24 @@ class InventoryController extends BaseController
     private function calculateAging($grDate)
     {
         if (empty($grDate) || strlen($grDate) !== 8) {
-            return '';
+            return 0;
         }
 
         $grDateTime = \DateTime::createFromFormat('Ymd', $grDate);
         if ($grDateTime) {
             $today = new \DateTime();
             $interval = $today->diff($grDateTime);
-            // return $interval->days . ' days';
             return $interval->days;
         }
 
-        return '';
+        return 0;
     }
 
     public function getInventoryData()
     {
         try {
             $data = $this->getData();
+            $filter = $this->request->getPost('filter') ?? 'all';
 
             $buyerCountries = array_map('strtoupper', array_column(auth()->buyers(), 'country') ?: []);
             $hasOtherCountry = false;
@@ -137,14 +137,45 @@ class InventoryController extends BaseController
                 });
             }
 
-            // $data = array_filter($data, function ($item) {
-            //     return !empty($item) && isset($item['PROD_YEAR']);
-            // });
+            // Filter berdasarkan tab
+            if ($filter === 'free-stock') {
+                $data = array_filter($data, function ($item) {
+                    return empty($item['SO_ACTUAL']) && empty($item['QUOT_ACTUAL']) && empty($item['PO_BUYER']);
+                });
+            } elseif ($filter === 'stock-allocated') {
+                $data = array_filter($data, function ($item) {
+                    return !empty($item['SO_ACTUAL']) || !empty($item['QUOT_ACTUAL']) || !empty($item['PO_BUYER']);
+                });
+            }
 
             $draw = intval($this->request->getPost('draw'));
             $start = intval($this->request->getPost('start'));
             $length = intval($this->request->getPost('length'));
             $searchValue = $this->request->getPost('search')['value'] ?? '';
+
+            // Handle sorting
+            $orderColumnIndex = intval($this->request->getPost('order')[0]['column'] ?? 0);
+            $orderDirection = $this->request->getPost('order')[0]['dir'] ?? 'asc';
+
+            // Map column index to data field
+            $sortableColumns = [
+                0 => null, // # column - not sortable
+                1 => 'FORECAST_QUOTATION',
+                2 => 'SO_ACTUAL',
+                3 => 'CUSTOMER_NAME',
+                4 => 'QUOT_ACTUAL',
+                5 => 'PO_BUYER',
+                6 => 'STYLE',
+                7 => 'COLOR',
+                8 => 'SIZE',
+                9 => 'QTY',
+                10 => 'PROD_YEAR',
+                11 => 'GR_DATE',
+                12 => 'COUNTRY',
+                13 => 'MATERIAL',
+                14 => 'SO',
+                15 => 'BATCH'
+            ];
 
             $filteredData = $data;
             if (!empty($searchValue)) {
@@ -164,12 +195,11 @@ class InventoryController extends BaseController
                         $item['PROD_YEAR'] ?? '',
                         $item['COUNTRY'] ?? '',
                         $item['COUNTRY_NAME'] ?? '',
-                        $item['SO'],
-                        $item['LINE_ITEM'],
+                        $item['SO'] ?? '',
+                        $item['LINE_ITEM'] ?? '',
                         $item['BATCH'] ?? '',
                     ];
 
-                    // return stripos(implode(' ', $searchFields), $searchValue) !== false;
                     foreach ($searchFields as $field) {
                         if (stripos($field, $searchValue) !== false) {
                             return true;
@@ -179,29 +209,50 @@ class InventoryController extends BaseController
                 });
             }
 
+            // Apply sorting
+            if (isset($sortableColumns[$orderColumnIndex]) && $sortableColumns[$orderColumnIndex] !== null) {
+                $sortField = $sortableColumns[$orderColumnIndex];
+                
+                usort($filteredData, function ($a, $b) use ($sortField, $orderDirection) {
+                    $valueA = $a[$sortField] ?? '';
+                    $valueB = $b[$sortField] ?? '';
+                    
+                    // Handle numeric sorting for QTY and aging
+                    if ($sortField === 'QTY') {
+                        $valueA = intval($valueA);
+                        $valueB = intval($valueB);
+                    } elseif ($sortField === 'GR_DATE') {
+                        // For aging, we need to calculate it
+                        $valueA = $this->calculateAging($valueA);
+                        $valueB = $this->calculateAging($valueB);
+                    } else {
+                        // String comparison
+                        $valueA = strtolower($valueA);
+                        $valueB = strtolower($valueB);
+                    }
+                    
+                    if ($orderDirection === 'asc') {
+                        return $valueA <=> $valueB;
+                    } else {
+                        return $valueB <=> $valueA;
+                    }
+                });
+            }
+
             $totalRecords = count($data);
             $filteredRecords = count($filteredData);
+            
+            // Reset array keys after filtering and sorting
+            $filteredData = array_values($filteredData);
+            
             $pagedData = array_slice($filteredData, $start, $length);
             $processedData = [];
             $counter = $start + 1;
 
-            // $buyerCountries = array_column(auth()->buyers(), 'country');
-            // $canSeeAll = in_array('SG', $buyerCountries, true) || in_array('MY', $buyerCountries, true);
-
             foreach ($pagedData as $item) {
-                // $country = $this->getCountryByCustomer($item['CUSTOMER'] ?? '');
-
-                // if (!$canSeeAll) {
-                //     $country = strtoupper(trim($item['COUNTRY'] ?? ''));
-                //     if ($country === 'SG' || $country === 'MY') {
-                //         continue;
-                //     }
-                // }
-
                 $processedData[] = [
                     $counter++,
                     $item['FORECAST_QUOTATION'] . '<br><small>' . $item['SO_FORECAST'] . '</small>',
-                    // $item['SO_FORECAST'] ?? '',
                     $item['SO_ACTUAL'] ?? '',
                     $item['CUSTOMER_NAME'] ?? '',
                     $item['QUOT_ACTUAL'] ?? '',

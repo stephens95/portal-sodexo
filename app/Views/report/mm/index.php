@@ -1,7 +1,6 @@
 <?= $this->extend('layouts/template') ?>
 
 <?= $this->section('css') ?>
-
 <style>
     .table-container {
         background: white;
@@ -36,12 +35,7 @@
         margin-bottom: 0.5rem;
     }
 
-    .btn-export {
-        margin: 0.25rem;
-    }
-
-    /* Custom styles for export buttons */
-    .dt-buttons .btn-success {
+        .dt-buttons .btn-success {
         background-color: #198754 !important;
         border-color: #198754 !important;
         color: #fff !important;
@@ -74,15 +68,6 @@
         border-color: #25cff2 !important;
     }
 
-    /* Add some spacing between buttons */
-    .dt-buttons .btn {
-        margin-right: 0.5rem;
-    }
-
-    .dt-buttons .btn:last-child {
-        margin-right: 0;
-    }
-
     .table-responsive {
         max-height: 60vh;
         overflow: auto;
@@ -95,10 +80,28 @@
         background-color: #343a40 !important;
         color: #fff !important;
         background-clip: padding-box;
+        cursor: pointer;
     }
 
-    .table-responsive thead th:first-child {
-        z-index: 1030 !important;
+    .nav-tabs .nav-link.active {
+        background-color: #fff;
+        border-color: #dee2e6 #dee2e6 #fff;
+    }
+
+    .tab-content {
+        border: 1px solid #dee2e6;
+        border-top: none;
+        border-radius: 0 0 0.375rem 0.375rem;
+        padding: 1rem;
+        background-color: #fff;
+    }
+
+    .dt-buttons .btn {
+        margin-right: 0.5rem;
+    }
+
+    .dt-buttons .btn:last-child {
+        margin-right: 0;
     }
 </style>
 <?= $this->endSection() ?>
@@ -111,85 +114,130 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Inventory Report</h5>
-                <div>
-                    <button type="button" class="btn btn-outline-primary btn-sm" id="refreshCache">
-                        <i class="fas fa-sync-alt"></i> Refresh Data
-                    </button>
-                    <!-- <button type="button" class="btn btn-outline-secondary btn-sm" id="refreshTable">
-                        <i class="fas fa-redo"></i> Reload Table
-                    </button> -->
-                </div>
+                <button type="button" class="btn btn-outline-primary btn-sm" id="refreshCache">
+                    <i class="fas fa-sync-alt"></i> Refresh Data
+                </button>
             </div>
 
             <div class="card-body">
-                <?php if (session()->getFlashdata('success')) : ?>
+                <!-- Flash Messages -->
+                <?php if ($message = session()->getFlashdata('success')): ?>
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <?= session()->getFlashdata('success') ?>
+                        <?= $message ?>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 <?php endif; ?>
 
-                <?php if (session()->getFlashdata('error')) : ?>
+                <?php if ($message = session()->getFlashdata('error')): ?>
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <?= session()->getFlashdata('error') ?>
+                        <?= $message ?>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 <?php endif; ?>
 
-                <div class="export-container">
-                    <div class="export-title">
-                        <i class="fas fa-download"></i> Export All Data
-                    </div>
-                    <div class="d-flex flex-wrap align-items-center">
-                        <small class="text-muted me-3">Download complete inventory data:</small>
-                        <button type="button" class="btn btn-success btn-sm btn-export" id="exportExcel" style="background-color: #198754; border-color: #198754;">
-                            <i class="fas fa-file-excel"></i> Excel (.xlsx)
-                        </button>
-                        <button type="button" class="btn btn-primary btn-sm btn-export" id="exportCsv">
-                            <i class="fas fa-file-csv"></i> CSV
-                        </button>
-                    </div>
-                </div>
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-tabs" id="inventoryTabs" role="tablist">
+                    <?php
+                    $tabs = [
+                        ['id' => 'all-inventory', 'icon' => 'boxes', 'label' => 'All Inventory', 'active' => true],
+                        ['id' => 'free-stock', 'icon' => 'unlock', 'label' => 'Free Stock', 'active' => false],
+                        ['id' => 'stock-allocated', 'icon' => 'lock', 'label' => 'Stock Allocated', 'active' => false]
+                    ];
+                    foreach ($tabs as $tab): ?>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link <?= $tab['active'] ? 'active' : '' ?>"
+                                    id="<?= $tab['id'] ?>-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#<?= $tab['id'] ?>"
+                                    type="button" role="tab">
+                                <i class="fas fa-<?= $tab['icon'] ?>"></i> <?= $tab['label'] ?>
+                            </button>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
 
-                <div class="table-container position-relative">
-                    <div class="loading-overlay d-none" id="loadingOverlay">
-                        <div class="text-center">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                <!-- Tab Content -->
+                <div class="tab-content" id="inventoryTabContent">
+                    <?php
+                    $tabContents = [
+                        ['id' => 'all-inventory', 'tableId' => 'inventoryTable', 'overlayId' => 'loadingOverlay1', 'filter' => 'all', 'title' => 'All Data', 'active' => true],
+                        ['id' => 'free-stock', 'tableId' => 'freeStockTable', 'overlayId' => 'loadingOverlay2', 'filter' => 'free-stock', 'title' => 'Free Stock', 'active' => false],
+                        ['id' => 'stock-allocated', 'tableId' => 'stockAllocatedTable', 'overlayId' => 'loadingOverlay3', 'filter' => 'stock-allocated', 'title' => 'Stock Allocated', 'active' => false]
+                    ];
+                    foreach ($tabContents as $content): ?>
+                        <div class="tab-pane fade <?= $content['active'] ? 'show active' : '' ?>" 
+                             id="<?= $content['id'] ?>" role="tabpanel">
+
+                            <!-- Export Section -->
+                            <div class="export-container">
+                                <div class="export-title">
+                                    <i class="fas fa-download"></i> Export <?= $content['title'] ?>
+                                </div>
+                                <div class="d-flex flex-wrap align-items-center">
+                                    <small class="text-muted me-3">Download inventory data:</small>
+                                    <button type="button" class="btn btn-success btn-sm btn-export me-2" data-table="<?= $content['filter'] ?>" data-type="excel">
+                                        <i class="fas fa-file-excel"></i> Excel (.xlsx)
+                                    </button>
+                                    <button type="button" class="btn btn-primary btn-sm btn-export" data-table="<?= $content['filter'] ?>" data-type="csv">
+                                        <i class="fas fa-file-csv"></i> CSV
+                                    </button>
+                                </div>
                             </div>
-                            <div class="mt-2">Loading inventory data...</div>
+
+                            <!-- Table Section -->
+                            <div class="table-container position-relative">
+                                <div class="loading-overlay d-none" id="<?= $content['overlayId'] ?>">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <div class="mt-2">Loading data...</div>
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table id="<?= $content['tableId'] ?>" class="table table-sm table-bordered table-striped table-hover w-100" style="white-space: nowrap; font-size: 11px;">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <?php
+                                                $headers = [
+                                                    ['text' => '#', 'width' => '3%'],
+                                                    ['text' => 'Forecast Quotation No.<br>Forecast SO No.'],
+                                                    ['text' => 'Allocated to<br>SO No.'],
+                                                    ['text' => 'Customer Name'],
+                                                    ['text' => 'Allocated to<br>Quotation No.'],
+                                                    ['text' => 'Allocated to<br>Customer PO No.'],
+                                                    ['text' => 'Style'],
+                                                    ['text' => 'Colour'],
+                                                    ['text' => 'Universal Size', 'width' => '3%'],
+                                                    ['text' => 'Qty<br>(Pcs)', 'class' => 'text-end'],
+                                                    ['text' => 'Production<br>Year'],
+                                                    ['text' => 'Aging<br>(days)'],
+                                                    ['text' => 'Country']
+                                                ];
+
+                                                if (auth()->isAdmin()) {
+                                                    $headers = array_merge($headers, [
+                                                        ['text' => 'Material Code'],
+                                                        ['text' => 'Special Stock'],
+                                                        ['text' => 'Batch']
+                                                    ]);
+                                                }
+
+                                                foreach ($headers as $header): ?>
+                                                    <th <?= isset($header['width']) ? 'width="' . $header['width'] . '"' : '' ?>
+                                                        <?= isset($header['class']) ? 'class="' . $header['class'] . '"' : '' ?>>
+                                                        <?= $header['text'] ?>
+                                                    </th>
+                                                <?php endforeach; ?>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table id="inventoryTable" class="table table-sm table-bordered table-striped table-hover w-100" style="white-space: nowrap; font-size: 11px;">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th width="3%">#</th>
-                                    <th>Forecast Quotation No.<br>Forecast SO No.</th>
-                                    <th>Allocated to<br>SO No.</th>
-                                    <th>Customer Name</th>
-                                    <th>Allocated to<br>Quotation No.</th>
-                                    <th>Allocated to<br>Customer PO No.</th>
-                                    <th>Style</th>
-                                    <th>Colour</th>
-                                    <th width="3%">Universal Size</th>
-                                    <th class="text-end">Qty<br>(Pcs)</th>
-                                    <th>Production<br>Year</th>
-                                    <th>Aging<br>(days)</th>
-                                    <th>Country</th>
-                                    <?php if (auth()->isAdmin()): ?>
-                                        <th>Material Code</th>
-                                        <th>Special Stock</th>
-                                        <th>Batch</th>
-                                    <?php endif; ?>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
 
                 <div class="mt-3">
@@ -206,107 +254,70 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('js') ?>
-
 <script>
-    $(document).ready(function() {
-        const table = $('#inventoryTable').DataTable({
-            // processing: true,
+class InventoryReport {
+    constructor() {
+        this.tables = {};
+        this.baseUrl = '<?= base_url() ?>';
+        this.csrfToken = '<?= csrf_token() ?>';
+        this.csrfHash = '<?= csrf_hash() ?>';
+        this.isAdmin = <?= auth()->isAdmin() ? 'true' : 'false' ?>;
+
+        this.init();
+    }
+
+    init() {
+        this.initTables();
+        this.bindEvents();
+    }
+
+    getTableConfig() {
+        const columns = [
+            { data: 0, orderable: false },
+            { data: 1, orderable: true },
+            { data: 2, orderable: true },
+            { data: 3, orderable: true },
+            { data: 4, orderable: true },
+            { data: 5, orderable: true },
+            { data: 6, orderable: true },
+            { data: 7, orderable: true },
+            { data: 8, orderable: true },
+            { data: 9, orderable: true, type: 'num' },
+            { data: 10, orderable: true },
+            { data: 11, orderable: true, type: 'num' },
+            { data: 12, orderable: true }
+        ];
+
+        if (this.isAdmin) {
+            columns.push(
+                { data: 13, orderable: true },
+                { data: 14, orderable: true },
+                { data: 15, orderable: true }
+            );
+        }
+
+        return {
+            processing: true,
             serverSide: true,
             responsive: true,
-            ajax: {
-                url: '<?= base_url('report-inventory/data') ?>',
-                type: 'POST',
-                data: function(d) {
-                    d.<?= csrf_token() ?> = '<?= csrf_hash() ?>';
-                },
-                beforeSend: function() {
-                    $('#loadingOverlay').removeClass('d-none');
-                },
-                complete: function() {
-                    $('#loadingOverlay').addClass('d-none');
-                },
-                error: function(xhr, error, code) {
-                    // console.error('DataTables error:', error);
-                    if (typeof toastr !== 'undefined') {
-                        toastr.error('Failed to load inventory data. Please try again.');
-                    } else {
-                        alert('Failed to load inventory data. Please try again.');
-                    }
-                    $('#loadingOverlay').addClass('d-none');
-                }
-            },
-            columns: [{
-                    data: 0,
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 1
-                },
-                {
-                    data: 2
-                },
-                {
-                    data: 3
-                },
-                {
-                    data: 4
-                },
-                {
-                    data: 5
-                },
-                {
-                    data: 6
-                },
-                {
-                    data: 7
-                },
-                {
-                    data: 8
-                },
-                {
-                    data: 9,
-                    className: 'text-end'
-                },
-                {
-                    data: 10
-                },
-                {
-                    data: 11,
-                    className: 'text-center'
-                },
-                {
-                    data: 12,
-                    // className: 'text-end'
-                },
-                <?php if (auth()->isAdmin()): ?> {
-                        data: 13,
-                    },
-                    {
-                        data: 14,
-                    },
-                    {
-                        data: 15,
-                    }
-                <?php endif; ?>
+            ordering: true,
+            order: [[1, 'asc']],
+            columnDefs: [
+                { targets: 0, orderable: false, searchable: false },
+                { targets: '_all', className: 'text-start' },
+                { targets: [9, 11], className: 'text-end' },
+                ...(this.isAdmin ? [{ targets: [13, 14, 15], className: 'text-center' }] : [])
             ],
             pageLength: 25,
-            lengthMenu: [
-                [10, 25, 50, 100, -1],
-                [10, 25, 50, 100, "All"]
-            ],
-            order: [
-                [11, 'desc']
-            ],
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
             dom: 'Bfrtip',
-            buttons: [{
+            buttons: [
+                {
                     extend: 'excel',
                     text: '<i class="fas fa-file-excel"></i> Excel (Current Page)',
                     className: 'btn btn-success btn-sm me-2',
                     title: 'Inventory Report (Current Page)',
-                    exportOptions: {
-                        columns: ':visible'
-                    }
+                    exportOptions: { columns: ':visible' }
                 },
                 {
                     extend: 'pdf',
@@ -315,121 +326,122 @@
                     title: 'Inventory Report (Current Page)',
                     orientation: 'landscape',
                     pageSize: 'A4',
-                    exportOptions: {
-                        columns: ':visible'
-                    }
+                    exportOptions: { columns: ':visible' }
                 },
                 {
                     extend: 'print',
                     text: '<i class="fas fa-print"></i> Print (Current Page)',
                     className: 'btn btn-info btn-sm',
                     title: 'Inventory Report (Current Page)',
-                    exportOptions: {
-                        columns: ':visible'
-                    }
+                    exportOptions: { columns: ':visible' }
                 }
             ],
-            // language: {
-            //     processing: "Loading inventory datas...",
-            //     search: "Search inventory:",
-            //     lengthMenu: "Show _MENU_ entries per page",
-            //     info: "Showing _START_ to _END_ of _TOTAL_ inventory items",
-            //     infoEmpty: "No inventory data available",
-            //     infoFiltered: "(filtered from _MAX_ total entries)",
-            //     zeroRecords: "No matching inventory records found",
-            //     emptyTable: "No inventory data available",
-            //     paginate: {
-            //         first: "First",
-            //         previous: "Previous",
-            //         next: "Next",
-            //         last: "Last"
-            //     }
-            // }
-        });
+            columns
+        };
+    }
 
-        $('#refreshCache').click(function() {
-            const button = $(this);
-            const originalText = button.html();
-
-            button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Refreshing...');
-
-            $.ajax({
-                url: '<?= base_url('report-inventory/refresh-cache') ?>',
+    createTable(tableId, filter, overlayId) {
+        return $(`#${tableId}`).DataTable({
+            ...this.getTableConfig(),
+            ajax: {
+                url: `${this.baseUrl}/report-inventory/data`,
                 type: 'POST',
-                data: {
-                    <?= csrf_token() ?>: '<?= csrf_hash() ?>'
+                data: (d) => {
+                    d[this.csrfToken] = this.csrfHash;
+                    d.filter = filter;
                 },
-                success: function(response) {
-                    if (typeof toastr !== 'undefined') {
-                        toastr.success('Cache refreshed successfully');
-                    } else {
-                        alert('Cache refreshed successfully');
-                    }
-                    table.ajax.reload();
-                },
-                error: function() {
-                    if (typeof toastr !== 'undefined') {
-                        toastr.error('Failed to refresh cache');
-                    } else {
-                        alert('Failed to refresh cache');
-                    }
-                },
-                complete: function() {
-                    button.prop('disabled', false).html(originalText);
+                beforeSend: () => $(`#${overlayId}`).removeClass('d-none'),
+                complete: () => $(`#${overlayId}`).addClass('d-none'),
+                error: () => {
+                    this.showNotification('error', 'Failed to load data. Please try again.');
+                    $(`#${overlayId}`).addClass('d-none');
                 }
-            });
+            }
         });
+    }
 
-        $('#refreshTable').click(function() {
-            table.ajax.reload();
-            if (typeof toastr !== 'undefined') {
-                toastr.info('Table reloaded');
+    initTables() {
+        const tableConfigs = [
+            { id: 'inventoryTable', filter: 'all', overlay: 'loadingOverlay1' },
+            { id: 'freeStockTable', filter: 'free-stock', overlay: 'loadingOverlay2' },
+            { id: 'stockAllocatedTable', filter: 'stock-allocated', overlay: 'loadingOverlay3' }
+        ];
+
+        tableConfigs.forEach(config => {
+            this.tables[config.filter] = this.createTable(config.id, config.filter, config.overlay);
+        });
+    }
+
+    bindEvents() {
+        $('button[data-bs-toggle="tab"]').on('shown.bs.tab', (e) => {
+            const target = $(e.target).attr('data-bs-target').replace('#', '').replace('-', '');
+            const tableMap = { 
+                allinventory: 'all', 
+                freestock: 'free-stock', 
+                stockallocated: 'stock-allocated' 
+            };
+            const tableKey = tableMap[target];
+
+            if (this.tables[tableKey]) {
+                this.tables[tableKey].columns.adjust().responsive.recalc();
             }
         });
 
-        $('#exportExcel').click(function() {
-            const button = $(this);
-            const originalText = button.html();
+        $('#refreshCache').on('click', () => this.refreshCache());
+        $('.btn-export').on('click', (e) => this.handleExport(e));
+        setInterval(() => this.autoRefresh(), 600000);
+    }
 
-            button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Preparing...');
+    refreshCache() {
+        const $button = $('#refreshCache');
+        const originalText = $button.html();
 
-            if (typeof toastr !== 'undefined') {
-                toastr.info('Preparing Excel file with all data. This may take a moment...');
-            }
+        $button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Refreshing...');
 
-            window.location.href = '<?= base_url('report-inventory/export-excel') ?>';
-
-            setTimeout(function() {
-                button.prop('disabled', false).html(originalText);
-                if (typeof toastr !== 'undefined') {
-                    toastr.success('Excel file download started');
-                }
-            }, 2000);
+        $.ajax({
+            url: `${this.baseUrl}/report-inventory/refresh-cache`,
+            type: 'POST',
+            data: { [this.csrfToken]: this.csrfHash },
+            success: () => {
+                this.showNotification('success', 'Cache refreshed successfully');
+                Object.values(this.tables).forEach(table => table.ajax.reload());
+            },
+            error: () => this.showNotification('error', 'Failed to refresh cache'),
+            complete: () => $button.prop('disabled', false).html(originalText)
         });
+    }
 
-        $('#exportCsv').click(function() {
-            const button = $(this);
-            const originalText = button.html();
+    handleExport(e) {
+        const $button = $(e.currentTarget);
+        const originalText = $button.html();
+        const tableType = $button.data('table');
+        const exportType = $button.data('type');
 
-            button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Preparing...');
+        $button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Preparing...');
 
-            if (typeof toastr !== 'undefined') {
-                toastr.info('Preparing CSV file with all data. This may take a moment...');
-            }
+        this.showNotification('info', `Preparing ${exportType.toUpperCase()} file. This may take a moment...`);
 
-            window.location.href = '<?= base_url('report-inventory/export-csv') ?>';
+        window.location.href = `${this.baseUrl}/report-inventory/export-${exportType}?filter=${tableType}`;
 
-            setTimeout(function() {
-                button.prop('disabled', false).html(originalText);
-                if (typeof toastr !== 'undefined') {
-                    toastr.success('CSV file download started');
-                }
-            }, 2000);
-        });
+        setTimeout(() => {
+            $button.prop('disabled', false).html(originalText);
+            this.showNotification('success', `${exportType.toUpperCase()} file download started`);
+        }, 2000);
+    }
 
-        setInterval(function() {
-            table.ajax.reload(null, false);
-        }, 600000);
-    });
+    autoRefresh() {
+        Object.values(this.tables).forEach(table => table.ajax.reload(null, false));
+    }
+
+    showNotification(type, message) {
+        if (typeof toastr !== 'undefined') {
+            toastr[type](message);
+        } else {
+            alert(message);
+        }
+    }
+}
+
+$(document).ready(() => new InventoryReport());
 </script>
 <?= $this->endSection() ?>

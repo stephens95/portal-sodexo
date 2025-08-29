@@ -28,7 +28,7 @@
         <select class="form-select" id="buyer_ids" name="buyer_ids[]" multiple required>
             <?php foreach ($buyers as $buyer): ?>
                 <option value="<?= $buyer['buyer_id'] ?>" <?= in_array($buyer['buyer_id'], old('buyer_ids') ?: []) ? 'selected' : '' ?>>
-                    <?= esc($buyer['buyer_name']) ?> (<?= esc($buyer['group_name']) ?>)
+                    <?= esc($buyer['buyer_name']) ?><?= ($buyer['group_name'] === 'SSA') ? ' (' . esc($buyer['group_name']) . ')' : '' ?>
                 </option>
             <?php endforeach; ?>
         </select>
