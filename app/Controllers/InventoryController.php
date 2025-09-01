@@ -212,11 +212,11 @@ class InventoryController extends BaseController
             // Apply sorting
             if (isset($sortableColumns[$orderColumnIndex]) && $sortableColumns[$orderColumnIndex] !== null) {
                 $sortField = $sortableColumns[$orderColumnIndex];
-                
+
                 usort($filteredData, function ($a, $b) use ($sortField, $orderDirection) {
                     $valueA = $a[$sortField] ?? '';
                     $valueB = $b[$sortField] ?? '';
-                    
+
                     // Handle numeric sorting for QTY and aging
                     if ($sortField === 'QTY') {
                         $valueA = intval($valueA);
@@ -230,7 +230,7 @@ class InventoryController extends BaseController
                         $valueA = strtolower($valueA);
                         $valueB = strtolower($valueB);
                     }
-                    
+
                     if ($orderDirection === 'asc') {
                         return $valueA <=> $valueB;
                     } else {
@@ -241,10 +241,10 @@ class InventoryController extends BaseController
 
             $totalRecords = count($data);
             $filteredRecords = count($filteredData);
-            
+
             // Reset array keys after filtering and sorting
             $filteredData = array_values($filteredData);
-            
+
             $pagedData = array_slice($filteredData, $start, $length);
             $processedData = [];
             $counter = $start + 1;
@@ -291,10 +291,38 @@ class InventoryController extends BaseController
     {
         try {
             $data = $this->getData();
+            $filter = $this->request->getGet('filter') ?? 'all';
 
-            $data = array_filter($data, function ($item) {
-                return !empty($item) && isset($item['PROD_YEAR']);
-            });
+            $buyerCountries = array_map('strtoupper', array_column(auth()->buyers(), 'country') ?: []);
+            $hasOtherCountry = false;
+            foreach ($buyerCountries as $bc) {
+                if ($bc !== 'SG' && $bc !== 'MY' && !auth()->isAdmin()) {
+                    $hasOtherCountry = true;
+                    break;
+                }
+            }
+
+            if ($hasOtherCountry && is_array($data)) {
+                $data = array_filter($data, function ($item) {
+                    $country = strtoupper(trim($item['COUNTRY'] ?? ''));
+                    return $country !== 'SG' && $country !== 'MY';
+                });
+            }
+
+            // $data = array_filter($data, function ($item) {
+            //     return !empty($item) && isset($item['PROD_YEAR']);
+            // });
+
+            // Filter berdasarkan tab
+            if ($filter === 'free-stock') {
+                $data = array_filter($data, function ($item) {
+                    return empty($item['SO_ACTUAL']) && empty($item['QUOT_ACTUAL']) && empty($item['PO_BUYER']);
+                });
+            } elseif ($filter === 'stock-allocated') {
+                $data = array_filter($data, function ($item) {
+                    return !empty($item['SO_ACTUAL']) || !empty($item['QUOT_ACTUAL']) || !empty($item['PO_BUYER']);
+                });
+            }
 
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();

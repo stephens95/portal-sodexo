@@ -35,7 +35,7 @@
         margin-bottom: 0.5rem;
     }
 
-        .dt-buttons .btn-success {
+    .dt-buttons .btn-success {
         background-color: #198754 !important;
         border-color: #198754 !important;
         color: #fff !important;
@@ -146,10 +146,10 @@
                     foreach ($tabs as $tab): ?>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link <?= $tab['active'] ? 'active' : '' ?>"
-                                    id="<?= $tab['id'] ?>-tab"
-                                    data-bs-toggle="tab"
-                                    data-bs-target="#<?= $tab['id'] ?>"
-                                    type="button" role="tab">
+                                id="<?= $tab['id'] ?>-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#<?= $tab['id'] ?>"
+                                type="button" role="tab">
                                 <i class="fas fa-<?= $tab['icon'] ?>"></i> <?= $tab['label'] ?>
                             </button>
                         </li>
@@ -165,8 +165,8 @@
                         ['id' => 'stock-allocated', 'tableId' => 'stockAllocatedTable', 'overlayId' => 'loadingOverlay3', 'filter' => 'stock-allocated', 'title' => 'Stock Allocated', 'active' => false]
                     ];
                     foreach ($tabContents as $content): ?>
-                        <div class="tab-pane fade <?= $content['active'] ? 'show active' : '' ?>" 
-                             id="<?= $content['id'] ?>" role="tabpanel">
+                        <div class="tab-pane fade <?= $content['active'] ? 'show active' : '' ?>"
+                            id="<?= $content['id'] ?>" role="tabpanel">
 
                             <!-- Export Section -->
                             <div class="export-container">
@@ -255,193 +255,275 @@
 
 <?= $this->section('js') ?>
 <script>
-class InventoryReport {
-    constructor() {
-        this.tables = {};
-        this.baseUrl = '<?= base_url() ?>';
-        this.csrfToken = '<?= csrf_token() ?>';
-        this.csrfHash = '<?= csrf_hash() ?>';
-        this.isAdmin = <?= auth()->isAdmin() ? 'true' : 'false' ?>;
+    class InventoryReport {
+        constructor() {
+            this.tables = {};
+            this.baseUrl = '<?= base_url() ?>';
+            this.csrfToken = '<?= csrf_token() ?>';
+            this.csrfHash = '<?= csrf_hash() ?>';
+            this.isAdmin = <?= auth()->isAdmin() ? 'true' : 'false' ?>;
 
-        this.init();
-    }
-
-    init() {
-        this.initTables();
-        this.bindEvents();
-    }
-
-    getTableConfig() {
-        const columns = [
-            { data: 0, orderable: false },
-            { data: 1, orderable: true },
-            { data: 2, orderable: true },
-            { data: 3, orderable: true },
-            { data: 4, orderable: true },
-            { data: 5, orderable: true },
-            { data: 6, orderable: true },
-            { data: 7, orderable: true },
-            { data: 8, orderable: true },
-            { data: 9, orderable: true, type: 'num' },
-            { data: 10, orderable: true },
-            { data: 11, orderable: true, type: 'num' },
-            { data: 12, orderable: true }
-        ];
-
-        if (this.isAdmin) {
-            columns.push(
-                { data: 13, orderable: true },
-                { data: 14, orderable: true },
-                { data: 15, orderable: true }
-            );
+            this.init();
         }
 
-        return {
-            processing: true,
-            serverSide: true,
-            responsive: true,
-            ordering: true,
-            order: [[1, 'asc']],
-            columnDefs: [
-                { targets: 0, orderable: false, searchable: false },
-                { targets: '_all', className: 'text-start' },
-                { targets: [9, 11], className: 'text-end' },
-                ...(this.isAdmin ? [{ targets: [13, 14, 15], className: 'text-center' }] : [])
-            ],
-            pageLength: 25,
-            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
-            dom: 'Bfrtip',
-            buttons: [
-                {
-                    extend: 'excel',
-                    text: '<i class="fas fa-file-excel"></i> Excel (Current Page)',
-                    className: 'btn btn-success btn-sm me-2',
-                    title: 'Inventory Report (Current Page)',
-                    exportOptions: { columns: ':visible' }
-                },
-                {
-                    extend: 'pdf',
-                    text: '<i class="fas fa-file-pdf"></i> PDF (Current Page)',
-                    className: 'btn btn-danger btn-sm me-2',
-                    title: 'Inventory Report (Current Page)',
-                    orientation: 'landscape',
-                    pageSize: 'A4',
-                    exportOptions: { columns: ':visible' }
-                },
-                {
-                    extend: 'print',
-                    text: '<i class="fas fa-print"></i> Print (Current Page)',
-                    className: 'btn btn-info btn-sm',
-                    title: 'Inventory Report (Current Page)',
-                    exportOptions: { columns: ':visible' }
-                }
-            ],
-            columns
-        };
-    }
+        init() {
+            this.initTables();
+            this.bindEvents();
+        }
 
-    createTable(tableId, filter, overlayId) {
-        return $(`#${tableId}`).DataTable({
-            ...this.getTableConfig(),
-            ajax: {
-                url: `${this.baseUrl}/report-inventory/data`,
-                type: 'POST',
-                data: (d) => {
-                    d[this.csrfToken] = this.csrfHash;
-                    d.filter = filter;
+        getTableConfig() {
+            const columns = [{
+                    data: 0,
+                    orderable: false
                 },
-                beforeSend: () => $(`#${overlayId}`).removeClass('d-none'),
-                complete: () => $(`#${overlayId}`).addClass('d-none'),
-                error: () => {
-                    this.showNotification('error', 'Failed to load data. Please try again.');
-                    $(`#${overlayId}`).addClass('d-none');
+                {
+                    data: 1,
+                    orderable: true
+                },
+                {
+                    data: 2,
+                    orderable: true
+                },
+                {
+                    data: 3,
+                    orderable: true
+                },
+                {
+                    data: 4,
+                    orderable: true
+                },
+                {
+                    data: 5,
+                    orderable: true
+                },
+                {
+                    data: 6,
+                    orderable: true
+                },
+                {
+                    data: 7,
+                    orderable: true
+                },
+                {
+                    data: 8,
+                    orderable: true
+                },
+                {
+                    data: 9,
+                    orderable: true,
+                    type: 'num'
+                },
+                {
+                    data: 10,
+                    orderable: true
+                },
+                {
+                    data: 11,
+                    orderable: true,
+                    type: 'num'
+                },
+                {
+                    data: 12,
+                    orderable: true
                 }
+            ];
+
+            if (this.isAdmin) {
+                columns.push({
+                    data: 13,
+                    orderable: true
+                }, {
+                    data: 14,
+                    orderable: true
+                }, {
+                    data: 15,
+                    orderable: true
+                });
             }
-        });
-    }
 
-    initTables() {
-        const tableConfigs = [
-            { id: 'inventoryTable', filter: 'all', overlay: 'loadingOverlay1' },
-            { id: 'freeStockTable', filter: 'free-stock', overlay: 'loadingOverlay2' },
-            { id: 'stockAllocatedTable', filter: 'stock-allocated', overlay: 'loadingOverlay3' }
-        ];
-
-        tableConfigs.forEach(config => {
-            this.tables[config.filter] = this.createTable(config.id, config.filter, config.overlay);
-        });
-    }
-
-    bindEvents() {
-        $('button[data-bs-toggle="tab"]').on('shown.bs.tab', (e) => {
-            const target = $(e.target).attr('data-bs-target').replace('#', '').replace('-', '');
-            const tableMap = { 
-                allinventory: 'all', 
-                freestock: 'free-stock', 
-                stockallocated: 'stock-allocated' 
+            return {
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                ordering: true,
+                order: [
+                    [1, 'asc']
+                ],
+                columnDefs: [{
+                        targets: 0,
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        targets: '_all',
+                        className: 'text-start'
+                    },
+                    {
+                        targets: [9, 11],
+                        className: 'text-end'
+                    },
+                    ...(this.isAdmin ? [{
+                        targets: [13, 14, 15],
+                        className: 'text-center'
+                    }] : [])
+                ],
+                pageLength: 25,
+                lengthMenu: [
+                    [10, 25, 50, 100, -1],
+                    [10, 25, 50, 100, "All"]
+                ],
+                dom: 'Bfrtip',
+                buttons: [{
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel"></i> Excel (Current Page)',
+                        className: 'btn btn-success btn-sm me-2',
+                        title: 'Inventory Report (Current Page)',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="fas fa-file-pdf"></i> PDF (Current Page)',
+                        className: 'btn btn-danger btn-sm me-2',
+                        title: 'Inventory Report (Current Page)',
+                        orientation: 'landscape',
+                        pageSize: 'A4',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fas fa-print"></i> Print (Current Page)',
+                        className: 'btn btn-info btn-sm',
+                        title: 'Inventory Report (Current Page)',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    }
+                ],
+                columns
             };
-            const tableKey = tableMap[target];
+        }
 
-            if (this.tables[tableKey]) {
-                this.tables[tableKey].columns.adjust().responsive.recalc();
+        createTable(tableId, filter, overlayId) {
+            return $(`#${tableId}`).DataTable({
+                ...this.getTableConfig(),
+                ajax: {
+                    url: `${this.baseUrl}/report-inventory/data`,
+                    type: 'POST',
+                    data: (d) => {
+                        d[this.csrfToken] = this.csrfHash;
+                        d.filter = filter;
+                    },
+                    beforeSend: () => $(`#${overlayId}`).removeClass('d-none'),
+                    complete: () => $(`#${overlayId}`).addClass('d-none'),
+                    error: () => {
+                        this.showNotification('error', 'Failed to load data. Please try again.');
+                        $(`#${overlayId}`).addClass('d-none');
+                    }
+                }
+            });
+        }
+
+        initTables() {
+            const tableConfigs = [{
+                    id: 'inventoryTable',
+                    filter: 'all',
+                    overlay: 'loadingOverlay1'
+                },
+                {
+                    id: 'freeStockTable',
+                    filter: 'free-stock',
+                    overlay: 'loadingOverlay2'
+                },
+                {
+                    id: 'stockAllocatedTable',
+                    filter: 'stock-allocated',
+                    overlay: 'loadingOverlay3'
+                }
+            ];
+
+            tableConfigs.forEach(config => {
+                this.tables[config.filter] = this.createTable(config.id, config.filter, config.overlay);
+            });
+        }
+
+        bindEvents() {
+            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', (e) => {
+                const target = $(e.target).attr('data-bs-target').replace('#', '').replace('-', '');
+                const tableMap = {
+                    allinventory: 'all',
+                    freestock: 'free-stock',
+                    stockallocated: 'stock-allocated'
+                };
+                const tableKey = tableMap[target];
+
+                if (this.tables[tableKey]) {
+                    this.tables[tableKey].columns.adjust().responsive.recalc();
+                }
+            });
+
+            $('#refreshCache').on('click', () => this.refreshCache());
+            $('.btn-export').on('click', (e) => this.handleExport(e));
+            setInterval(() => this.autoRefresh(), 600000);
+        }
+
+        refreshCache() {
+            const $button = $('#refreshCache');
+            const originalText = $button.html();
+
+            $button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Refreshing...');
+
+            $.ajax({
+                url: `${this.baseUrl}/report-inventory/refresh-cache`,
+                type: 'POST',
+                data: {
+                    [this.csrfToken]: this.csrfHash
+                },
+                success: () => {
+                    this.showNotification('success', 'Cache refreshed successfully');
+                    Object.values(this.tables).forEach(table => table.ajax.reload());
+                },
+                error: () => this.showNotification('error', 'Failed to refresh cache'),
+                complete: () => $button.prop('disabled', false).html(originalText)
+            });
+        }
+
+        handleExport(e) {
+            const $button = $(e.currentTarget);
+            const originalText = $button.html();
+            const tableType = $button.data('table');
+            const exportType = $button.data('type');
+            // console.log(tableType);
+            // return false;
+
+            $button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Preparing...');
+
+            this.showNotification('info', `Preparing ${exportType.toUpperCase()} file. This may take a moment...`);
+
+            window.location.href = `${this.baseUrl}/report-inventory/export-${exportType}?filter=${tableType}`;
+
+            setTimeout(() => {
+                $button.prop('disabled', false).html(originalText);
+                this.showNotification('success', `${exportType.toUpperCase()} file download started`);
+            }, 2000);
+        }
+
+        autoRefresh() {
+            Object.values(this.tables).forEach(table => table.ajax.reload(null, false));
+        }
+
+        showNotification(type, message) {
+            if (typeof toastr !== 'undefined') {
+                toastr[type](message);
+            } else {
+                alert(message);
             }
-        });
-
-        $('#refreshCache').on('click', () => this.refreshCache());
-        $('.btn-export').on('click', (e) => this.handleExport(e));
-        setInterval(() => this.autoRefresh(), 600000);
-    }
-
-    refreshCache() {
-        const $button = $('#refreshCache');
-        const originalText = $button.html();
-
-        $button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Refreshing...');
-
-        $.ajax({
-            url: `${this.baseUrl}/report-inventory/refresh-cache`,
-            type: 'POST',
-            data: { [this.csrfToken]: this.csrfHash },
-            success: () => {
-                this.showNotification('success', 'Cache refreshed successfully');
-                Object.values(this.tables).forEach(table => table.ajax.reload());
-            },
-            error: () => this.showNotification('error', 'Failed to refresh cache'),
-            complete: () => $button.prop('disabled', false).html(originalText)
-        });
-    }
-
-    handleExport(e) {
-        const $button = $(e.currentTarget);
-        const originalText = $button.html();
-        const tableType = $button.data('table');
-        const exportType = $button.data('type');
-
-        $button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Preparing...');
-
-        this.showNotification('info', `Preparing ${exportType.toUpperCase()} file. This may take a moment...`);
-
-        window.location.href = `${this.baseUrl}/report-inventory/export-${exportType}?filter=${tableType}`;
-
-        setTimeout(() => {
-            $button.prop('disabled', false).html(originalText);
-            this.showNotification('success', `${exportType.toUpperCase()} file download started`);
-        }, 2000);
-    }
-
-    autoRefresh() {
-        Object.values(this.tables).forEach(table => table.ajax.reload(null, false));
-    }
-
-    showNotification(type, message) {
-        if (typeof toastr !== 'undefined') {
-            toastr[type](message);
-        } else {
-            alert(message);
         }
     }
-}
 
-$(document).ready(() => new InventoryReport());
+    $(document).ready(() => new InventoryReport());
 </script>
 <?= $this->endSection() ?>
