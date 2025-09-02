@@ -21,7 +21,7 @@
                 <?php endif; ?>
 
                 <div class="table-responsive">
-                    <table id="usersTable" class="table table-sm table-bordered table-striped table-hover">
+                    <table id="usersTable" class="table table-sm table-bordered table-striped table-hover w-100">
                         <thead>
                             <tr>
                                 <th width="5%">#</th>
@@ -62,20 +62,20 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="form-check form-switch">
-                                                <input class="form-check-input" 
-                                                       type="checkbox" 
-                                                       id="verify_<?= $user['user_id'] ?>"
-                                                       <?= $user['verified'] ? 'checked' : '' ?>
-                                                       onchange="toggleVerification(<?= $user['user_id'] ?>, this)">
+                                                <input class="form-check-input"
+                                                    type="checkbox"
+                                                    id="verify_<?= $user['user_id'] ?>"
+                                                    <?= $user['verified'] ? 'checked' : '' ?>
+                                                    onchange="toggleVerification(<?= $user['user_id'] ?>, this)">
                                             </div>
                                         </td>
                                         <td>
                                             <button type="button" class="btn btn-warning btn-sm" onclick="editUser(<?= $user['user_id'] ?>)">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <a href="<?= base_url('/users/delete/' . $user['user_id']) ?>" 
-                                               class="btn btn-danger btn-sm"
-                                               onclick="return confirm('Delete this user?')">
+                                            <a href="<?= base_url('/users/delete/' . $user['user_id']) ?>"
+                                                class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Delete this user?')">
                                                 <i class="fas fa-trash"></i>
                                             </a>
                                         </td>
@@ -177,192 +177,192 @@
 
 <?= $this->section('js') ?>
 <script>
-$(document).ready(function() {
-    // Initialize DataTable
-    $('#usersTable').DataTable({
-        responsive: true,
-        pageLength: 10,
-    });
+    $(document).ready(function() {
+        // Initialize DataTable
+        $('#usersTable').DataTable({
+            responsive: true,
+            pageLength: 10,
+        });
 
-    $('#buyer_ids, #role_ids').select2({
-        theme: 'bootstrap-5',
-        placeholder: 'Select options...',
-        allowClear: true,
-        dropdownParent: $('#userModal')
-    });
+        $('#buyer_ids, #role_ids').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Select options...',
+            allowClear: true,
+            dropdownParent: $('#userModal')
+        });
 
-    $('#userForm').on('submit', function(e) {
-        e.preventDefault();
+        $('#userForm').on('submit', function(e) {
+            e.preventDefault();
 
-        // Validate password match
-        if ($('#password').val() !== $('#confirm_password').val()) {
-            $('#confirm_password').addClass('is-invalid');
-            $('#confirm_password').siblings('.invalid-feedback').text('Passwords do not match');
-            return;
-        }
+            // Validate password match
+            if ($('#password').val() !== $('#confirm_password').val()) {
+                $('#confirm_password').addClass('is-invalid');
+                $('#confirm_password').siblings('.invalid-feedback').text('Passwords do not match');
+                return;
+            }
 
-        // Validate buyers selection
-        const buyerIds = $('#buyer_ids').val();
-        if (!buyerIds || buyerIds.length === 0) {
-            $('#buyer_ids').addClass('is-invalid');
-            $('#buyer_ids').siblings('.invalid-feedback').text('Please select at least one buyer');
-            return;
-        } else {
-            $('#buyer_ids').removeClass('is-invalid');
-        }
+            // Validate buyers selection
+            const buyerIds = $('#buyer_ids').val();
+            if (!buyerIds || buyerIds.length === 0) {
+                $('#buyer_ids').addClass('is-invalid');
+                $('#buyer_ids').siblings('.invalid-feedback').text('Please select at least one buyer');
+                return;
+            } else {
+                $('#buyer_ids').removeClass('is-invalid');
+            }
 
-        // Validate roles selection
-        const roleIds = $('#role_ids').val();
-        if (!roleIds || roleIds.length === 0) {
-            $('#role_ids').addClass('is-invalid');
-            $('#role_ids').siblings('.invalid-feedback').text('Please select at least one role');
-            return;
-        } else {
-            $('#role_ids').removeClass('is-invalid');
-        }
+            // Validate roles selection
+            const roleIds = $('#role_ids').val();
+            if (!roleIds || roleIds.length === 0) {
+                $('#role_ids').addClass('is-invalid');
+                $('#role_ids').siblings('.invalid-feedback').text('Please select at least one role');
+                return;
+            } else {
+                $('#role_ids').removeClass('is-invalid');
+            }
 
-        const formData = new FormData(this);
-        const userId = $('#user_id').val();
-        const url = userId ? '<?= base_url('/users/update') ?>' : '<?= base_url('/users/create') ?>';
+            const formData = new FormData(this);
+            const userId = $('#user_id').val();
+            const url = userId ? '<?= base_url('/users/update') ?>' : '<?= base_url('/users/create') ?>';
 
-        $.ajax({
-            url: url,
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            beforeSend: function() {
-                $('#submitBtn').prop('disabled', true).text('Saving...');
-            },
-            success: function(response) {
-                if (response.status === 'success') {
-                    $('#userModal').modal('hide');
-                    location.reload();
-                } else {
-                    alert(response.message || 'Error occurred');
-                    if (response.errors) {
-                        displayErrors(response.errors);
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                beforeSend: function() {
+                    $('#submitBtn').prop('disabled', true).text('Saving...');
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#userModal').modal('hide');
+                        location.reload();
+                    } else {
+                        alert(response.message || 'Error occurred');
+                        if (response.errors) {
+                            displayErrors(response.errors);
+                        }
                     }
+                },
+                error: function() {
+                    alert('Error occurred while saving user');
+                },
+                complete: function() {
+                    $('#submitBtn').prop('disabled', false).text('Save');
                 }
-            },
-            error: function() {
-                alert('Error occurred while saving user');
-            },
-            complete: function() {
-                $('#submitBtn').prop('disabled', false).text('Save');
+            });
+        });
+
+        // Real-time validation
+        $('#confirm_password').on('input', function() {
+            if ($(this).val() !== $('#password').val()) {
+                $(this).addClass('is-invalid');
+                $(this).siblings('.invalid-feedback').text('Passwords do not match');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        $('#buyer_ids').on('change', function() {
+            const buyerIds = $(this).val();
+            if (!buyerIds || buyerIds.length === 0) {
+                $(this).addClass('is-invalid');
+                $(this).siblings('.invalid-feedback').text('Please select at least one buyer');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        $('#role_ids').on('change', function() {
+            const roleIds = $(this).val();
+            if (!roleIds || roleIds.length === 0) {
+                $(this).addClass('is-invalid');
+                $(this).siblings('.invalid-feedback').text('Please select at least one role');
+            } else {
+                $(this).removeClass('is-invalid');
             }
         });
     });
 
-    // Real-time validation
-    $('#confirm_password').on('input', function() {
-        if ($(this).val() !== $('#password').val()) {
-            $(this).addClass('is-invalid');
-            $(this).siblings('.invalid-feedback').text('Passwords do not match');
-        } else {
-            $(this).removeClass('is-invalid');
-        }
-    });
+    function toggleVerification(userId, checkbox) {
+        const verified = checkbox.checked ? 1 : 0;
 
-    $('#buyer_ids').on('change', function() {
-        const buyerIds = $(this).val();
-        if (!buyerIds || buyerIds.length === 0) {
-            $(this).addClass('is-invalid');
-            $(this).siblings('.invalid-feedback').text('Please select at least one buyer');
-        } else {
-            $(this).removeClass('is-invalid');
-        }
-    });
-
-    $('#role_ids').on('change', function() {
-        const roleIds = $(this).val();
-        if (!roleIds || roleIds.length === 0) {
-            $(this).addClass('is-invalid');
-            $(this).siblings('.invalid-feedback').text('Please select at least one role');
-        } else {
-            $(this).removeClass('is-invalid');
-        }
-    });
-});
-
-function toggleVerification(userId, checkbox) {
-    const verified = checkbox.checked ? 1 : 0;
-
-    $.ajax({
-        url: '<?= base_url('/users/toggle-verification') ?>',
-        method: 'POST',
-        data: {
-            user_id: userId,
-            verified: verified
-        },
-        success: function(response) {
-            if (response.status !== 'success') {
+        $.ajax({
+            url: '<?= base_url('/users/toggle-verification') ?>',
+            method: 'POST',
+            data: {
+                user_id: userId,
+                verified: verified
+            },
+            success: function(response) {
+                if (response.status !== 'success') {
+                    checkbox.checked = !checkbox.checked;
+                    alert('Failed to update verification status');
+                }
+            },
+            error: function() {
                 checkbox.checked = !checkbox.checked;
-                alert('Failed to update verification status');
+                alert('Error occurred while updating verification');
             }
-        },
-        error: function() {
-            checkbox.checked = !checkbox.checked;
-            alert('Error occurred while updating verification');
-        }
-    });
-}
-
-function resetForm() {
-    $('#userForm')[0].reset();
-    $('#userModalLabel').text('Create User');
-    $('#user_id').val('');
-    $('#password').prop('required', true);
-    $('#confirm_password').prop('required', true);
-    $('#passwordRequired, #confirmPasswordRequired').show();
-    $('#passwordHint').text('Minimum 6 characters');
-    $('#buyer_ids, #role_ids').val(null).trigger('change');
-    $('#verified').prop('checked', false);
-    $('.form-control, .form-select').removeClass('is-invalid');
-}
-
-function editUser(userId) {
-    $.ajax({
-        url: '<?= base_url('/users/getUserById') ?>/' + userId,
-        method: 'GET',
-        success: function(response) {
-            $('#userModalLabel').text('Edit User');
-            $('#user_id').val(response.user.user_id);
-            $('#name').val(response.user.name);
-            $('#email').val(response.user.email);
-            $('#verified').prop('checked', response.user.verified == 1);
-
-            $('#password').prop('required', false);
-            $('#confirm_password').prop('required', false);
-            $('#passwordRequired, #confirmPasswordRequired').hide();
-            $('#passwordHint').text('Leave blank to keep current password');
-
-            if (response.user.buyer_ids) {
-                const buyerIds = response.user.buyer_ids.split(',');
-                $('#buyer_ids').val(buyerIds).trigger('change');
-            }
-
-            if (response.user.role_ids) {
-                const roleIds = response.user.role_ids.split(',');
-                $('#role_ids').val(roleIds).trigger('change');
-            }
-
-            $('#userModal').modal('show');
-        },
-        error: function() {
-            alert('Error loading user data');
-        }
-    });
-}
-
-function displayErrors(errors) {
-    $('.form-control, .form-select').removeClass('is-invalid');
-
-    for (const field in errors) {
-        const input = $(`#${field}`);
-        input.addClass('is-invalid');
-        input.siblings('.invalid-feedback').text(errors[field]);
+        });
     }
-}
+
+    function resetForm() {
+        $('#userForm')[0].reset();
+        $('#userModalLabel').text('Create User');
+        $('#user_id').val('');
+        $('#password').prop('required', true);
+        $('#confirm_password').prop('required', true);
+        $('#passwordRequired, #confirmPasswordRequired').show();
+        $('#passwordHint').text('Minimum 6 characters');
+        $('#buyer_ids, #role_ids').val(null).trigger('change');
+        $('#verified').prop('checked', false);
+        $('.form-control, .form-select').removeClass('is-invalid');
+    }
+
+    function editUser(userId) {
+        $.ajax({
+            url: '<?= base_url('/users/getUserById') ?>/' + userId,
+            method: 'GET',
+            success: function(response) {
+                $('#userModalLabel').text('Edit User');
+                $('#user_id').val(response.user.user_id);
+                $('#name').val(response.user.name);
+                $('#email').val(response.user.email);
+                $('#verified').prop('checked', response.user.verified == 1);
+
+                $('#password').prop('required', false);
+                $('#confirm_password').prop('required', false);
+                $('#passwordRequired, #confirmPasswordRequired').hide();
+                $('#passwordHint').text('Leave blank to keep current password');
+
+                if (response.user.buyer_ids) {
+                    const buyerIds = response.user.buyer_ids.split(',');
+                    $('#buyer_ids').val(buyerIds).trigger('change');
+                }
+
+                if (response.user.role_ids) {
+                    const roleIds = response.user.role_ids.split(',');
+                    $('#role_ids').val(roleIds).trigger('change');
+                }
+
+                $('#userModal').modal('show');
+            },
+            error: function() {
+                alert('Error loading user data');
+            }
+        });
+    }
+
+    function displayErrors(errors) {
+        $('.form-control, .form-select').removeClass('is-invalid');
+
+        for (const field in errors) {
+            const input = $(`#${field}`);
+            input.addClass('is-invalid');
+            input.siblings('.invalid-feedback').text(errors[field]);
+        }
+    }
 </script>
 <?= $this->endSection() ?>

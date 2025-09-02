@@ -23,7 +23,7 @@
                 <?php endif; ?>
 
                 <div class="table-responsive">
-                    <table id="buyersTable" class="table table-sm table-bordered table-striped table-hover">
+                    <table id="buyersTable" class="table table-sm table-bordered table-striped table-hover w-100">
                         <thead>
                             <tr>
                                 <th>Buyer ID</th>
@@ -45,7 +45,9 @@
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
-                                <tr><td colspan="5">No data</td></tr>
+                                <tr>
+                                    <td colspan="5">No data</td>
+                                </tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
