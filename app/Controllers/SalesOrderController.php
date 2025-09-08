@@ -91,7 +91,7 @@ class SalesOrderController extends BaseController
         try {
             $soFile = $this->getSoTracebilityFilePath();
             $directory = dirname($soFile);
-            
+
             if (!is_dir($directory)) {
                 mkdir($directory, 0755, true);
             }
@@ -163,7 +163,7 @@ class SalesOrderController extends BaseController
                 7 => 'SSA_STYLE',
                 8 => 'COLOR',
                 9 => 'ORDER_QTY',
-                10 => 'DN',
+                10 => 'DO',
                 11 => 'QTY_SHIP',
                 12 => 'OUTS_PO_QTY',
                 13 => 'INV_NO',
@@ -181,10 +181,10 @@ class SalesOrderController extends BaseController
                         $item['PO_BUYER'] ?? '',
                         $item['END_CUSTOMER'] ?? '',
                         $item['SO'] ?? '',
-                        $item['BUYER_STYLE'] ?? '',
-                        $item['SSA_STYLE'] ?? '',
+                        !empty($item['BUYER_STYLE']) ? explode(' ', ltrim($item['BUYER_STYLE']))[0] : '',
+                        !empty($item['SSA_STYLE']) ? explode(' ', ltrim($item['SSA_STYLE']))[0] : '',
                         $item['COLOR'] ?? '',
-                        $item['DN'] ?? '',
+                        $item['DO'] ?? '',
                         $item['INV_NO'] ?? ''
                     ];
 
@@ -237,11 +237,11 @@ class SalesOrderController extends BaseController
                     $item['PO_BUYER'] ?? '',
                     $item['END_CUSTOMER'] ?? '',
                     $item['SO'] ?? '',
-                    $item['BUYER_STYLE'] ?? '',
-                    $item['SSA_STYLE'] ?? '',
+                    !empty($item['BUYER_STYLE']) ? explode(' ', ltrim($item['BUYER_STYLE']))[0] : '',
+                    !empty($item['SSA_STYLE']) ? explode(' ', ltrim($item['SSA_STYLE']))[0] : '',
                     $item['COLOR'] ?? '',
                     number_format(floatval($item['ORDER_QTY'] ?? 0), 0),
-                    $item['DN'] ?? '',
+                    $item['DO'] ?? '',
                     number_format(floatval($item['QTY_SHIP'] ?? 0), 0),
                     number_format(floatval($item['OUTS_PO_QTY'] ?? 0), 0),
                     $item['INV_NO'] ?? '',
@@ -255,7 +255,6 @@ class SalesOrderController extends BaseController
                 'recordsFiltered' => $filteredRecords,
                 'data' => $processedData
             ]);
-
         } catch (\Exception $e) {
             log_message('error', 'Sales Order Data Error: ' . $e->getMessage());
             return $this->response->setJSON([
@@ -296,7 +295,7 @@ class SalesOrderController extends BaseController
                 'SSA Style',
                 'Colour',
                 'Order Qty',
-                'Delivery Note',
+                'Delivery Order',
                 'Shipment Qty',
                 'Outstanding PO Qty',
                 'Invoice Number',
@@ -345,7 +344,7 @@ class SalesOrderController extends BaseController
                 $sheet->setCellValue('H' . $row, $item['SSA_STYLE'] ?? '');
                 $sheet->setCellValue('I' . $row, $item['COLOR'] ?? '');
                 $sheet->setCellValue('J' . $row, floatval($item['ORDER_QTY'] ?? 0));
-                $sheet->setCellValue('K' . $row, $item['DN'] ?? '');
+                $sheet->setCellValue('K' . $row, $item['DO'] ?? '');
                 $sheet->setCellValue('L' . $row, floatval($item['QTY_SHIP'] ?? 0));
                 $sheet->setCellValue('M' . $row, floatval($item['OUTS_PO_QTY'] ?? 0));
                 $sheet->setCellValue('N' . $row, $item['INV_NO'] ?? '');
@@ -405,7 +404,7 @@ class SalesOrderController extends BaseController
                 'SSA Style',
                 'Colour',
                 'Order Qty',
-                'Delivery Note',
+                'Delivery Order',
                 'Shipment Qty',
                 'Outstanding PO Qty',
                 'Invoice Number',
@@ -427,7 +426,7 @@ class SalesOrderController extends BaseController
                     $item['SSA_STYLE'] ?? '',
                     $item['COLOR'] ?? '',
                     floatval($item['ORDER_QTY'] ?? 0),
-                    $item['DN'] ?? '',
+                    $item['DO'] ?? '',
                     floatval($item['QTY_SHIP'] ?? 0),
                     floatval($item['OUTS_PO_QTY'] ?? 0),
                     $item['INV_NO'] ?? '',
