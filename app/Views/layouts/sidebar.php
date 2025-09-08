@@ -57,7 +57,7 @@
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="<?= base_url('/sales-order') ?>">Tracebility Sales Order</a></li>
+                        <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-so') ?>">Tracebility Sales Order</a></li>
                     </ul>
                 </li>
 

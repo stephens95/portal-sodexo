@@ -1,10 +1,6 @@
 <?= $this->extend('layouts/template') ?>
 
 <?= $this->section('css') ?>
-<!-- DataTables CSS -->
-<link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-<link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" rel="stylesheet">
-<link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
 <style>
     .table-container {
         background: white;
@@ -39,11 +35,6 @@
         margin-bottom: 0.5rem;
     }
 
-    .btn-export {
-        margin: 0.25rem;
-    }
-
-    /* Custom styles for export buttons */
     .dt-buttons .btn-success {
         background-color: #198754 !important;
         border-color: #198754 !important;
@@ -77,15 +68,6 @@
         border-color: #25cff2 !important;
     }
 
-    /* Add some spacing between buttons */
-    .dt-buttons .btn {
-        margin-right: 0.5rem;
-    }
-
-    .dt-buttons .btn:last-child {
-        margin-right: 0;
-    }
-
     .table-responsive {
         max-height: 60vh;
         overflow: auto;
@@ -101,49 +83,25 @@
         cursor: pointer;
     }
 
-    .table-responsive thead th:first-child {
-        z-index: 1030 !important;
+    .nav-tabs .nav-link.active {
+        background-color: #fff;
+        border-color: #dee2e6 #dee2e6 #fff;
     }
 
-    /* Tab content styling */
     .tab-content {
-        margin-top: 1rem;
+        border: 1px solid #dee2e6;
+        border-top: none;
+        border-radius: 0 0 0.375rem 0.375rem;
+        padding: 1rem;
+        background-color: #fff;
     }
 
-    /* Ensure DataTables sorting arrows are visible */
-    table.dataTable thead th.sorting,
-    table.dataTable thead th.sorting_asc,
-    table.dataTable thead th.sorting_desc {
-        cursor: pointer;
-        position: relative;
+    .dt-buttons .btn {
+        margin-right: 0.5rem;
     }
 
-    table.dataTable thead th.sorting:after,
-    table.dataTable thead th.sorting_asc:after,
-    table.dataTable thead th.sorting_desc:after {
-        position: absolute;
-        top: 12px;
-        right: 8px;
-        display: block;
-        font-family: 'Font Awesome 5 Free';
-        font-weight: 900;
-    }
-
-    table.dataTable thead th.sorting:after {
-        content: "\f0dc";
-        color: #999;
-        font-size: 0.8em;
-        padding-top: 0.12em;
-    }
-
-    table.dataTable thead th.sorting_asc:after {
-        content: "\f0de";
-        color: #fff;
-    }
-
-    table.dataTable thead th.sorting_desc:after {
-        content: "\f0dd";
-        color: #fff;
+    .dt-buttons .btn:last-child {
+        margin-right: 0;
     }
 </style>
 <?= $this->endSection() ?>
@@ -155,159 +113,121 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Sales Order Reports</h5>
-                <div>
-                    <button type="button" class="btn btn-outline-primary btn-sm" id="refreshCache">
-                        <i class="fas fa-sync-alt"></i> Refresh Data
-                    </button>
-                </div>
+                <h5 class="mb-0">Sales Order Tracebility Report</h5>
+                <button type="button" class="btn btn-outline-primary btn-sm" id="refreshCache">
+                    <i class="fas fa-sync-alt"></i> Refresh Data
+                </button>
             </div>
 
             <div class="card-body">
-                <?php if (session()->getFlashdata('success')) : ?>
+                <!-- Flash Messages -->
+                <?php if ($message = session()->getFlashdata('success')): ?>
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <?= session()->getFlashdata('success') ?>
+                        <?= $message ?>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 <?php endif; ?>
 
-                <?php if (session()->getFlashdata('error')) : ?>
+                <?php if ($message = session()->getFlashdata('error')): ?>
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <?= session()->getFlashdata('error') ?>
+                        <?= $message ?>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 <?php endif; ?>
 
                 <!-- Navigation Tabs -->
-                <ul class="nav nav-tabs" id="reportTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="traceability-tab" data-bs-toggle="tab" data-bs-target="#traceability" type="button" role="tab" aria-controls="traceability" aria-selected="true">
-                            <i class="fas fa-search"></i> Traceability Sales Order
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="inventory-tab" data-bs-toggle="tab" data-bs-target="#inventory" type="button" role="tab" aria-controls="inventory" aria-selected="false">
-                            <i class="fas fa-boxes"></i> Inventory Report
-                        </button>
-                    </li>
+                <ul class="nav nav-tabs" id="soTabs" role="tablist">
+                    <?php
+                    $tabs = [
+                        ['id' => 'all-so', 'icon' => 'boxes', 'label' => 'All SO', 'active' => true],
+                    ];
+                    foreach ($tabs as $tab): ?>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link <?= $tab['active'] ? 'active' : '' ?>"
+                                id="<?= $tab['id'] ?>-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#<?= $tab['id'] ?>"
+                                type="button" role="tab">
+                                <i class="fas fa-<?= $tab['icon'] ?>"></i> <?= $tab['label'] ?>
+                            </button>
+                        </li>
+                    <?php endforeach; ?>
                 </ul>
 
                 <!-- Tab Content -->
-                <div class="tab-content" id="reportTabsContent">
-                    <!-- Traceability Tab -->
-                    <div class="tab-pane fade show active" id="traceability" role="tabpanel" aria-labelledby="traceability-tab">
-                        <div class="export-container">
-                            <div class="export-title">
-                                <i class="fas fa-download"></i> Export Traceability Data
-                            </div>
-                            <div class="d-flex flex-wrap align-items-center">
-                                <small class="text-muted me-3">Download complete traceability data:</small>
-                                <button type="button" class="btn btn-success btn-sm btn-export" id="exportTraceabilityExcel">
-                                    <i class="fas fa-file-excel"></i> Excel (.xlsx)
-                                </button>
-                                <button type="button" class="btn btn-primary btn-sm btn-export" id="exportTraceabilityCsv">
-                                    <i class="fas fa-file-csv"></i> CSV
-                                </button>
-                            </div>
-                        </div>
+                <div class="tab-content" id="soTabContent">
+                    <?php
+                    $tabContents = [
+                        ['id' => 'all-so', 'tableId' => 'soTable', 'overlayId' => 'loadingOverlay1', 'filter' => 'all', 'title' => 'All Data', 'active' => true]
+                    ];
+                    foreach ($tabContents as $content): ?>
+                        <div class="tab-pane fade <?= $content['active'] ? 'show active' : '' ?>"
+                            id="<?= $content['id'] ?>" role="tabpanel">
 
-                        <div class="table-container position-relative">
-                            <div class="loading-overlay d-none" id="loadingOverlayTraceability">
-                                <div class="text-center">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                    <div class="mt-2">Loading traceability data...</div>
+                            <!-- Export Section -->
+                            <div class="export-container">
+                                <div class="export-title">
+                                    <i class="fas fa-download"></i> Export <?= $content['title'] ?>
+                                </div>
+                                <div class="d-flex flex-wrap align-items-center">
+                                    <small class="text-muted me-3">Download SO data:</small>
+                                    <button type="button" class="btn btn-success btn-sm btn-export me-2" data-table="<?= $content['filter'] ?>" data-type="excel">
+                                        <i class="fas fa-file-excel"></i> Excel (.xlsx)
+                                    </button>
+                                    <button type="button" class="btn btn-primary btn-sm btn-export" data-table="<?= $content['filter'] ?>" data-type="csv">
+                                        <i class="fas fa-file-csv"></i> CSV
+                                    </button>
                                 </div>
                             </div>
 
-                            <div class="table-responsive">
-                                <table id="traceabilityTable" class="table table-sm table-bordered table-striped table-hover w-100" style="white-space: nowrap; font-size: 11px;">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th width="5%">#</th>
-                                            <th>QO SSA</th>
-                                            <th>PO SSA</th>
-                                            <th>PO Buyer</th>
-                                            <th>End Customer</th>
-                                            <th>Sales Order (AMT)</th>
-                                            <th>Buyer Style</th>
-                                            <th>SSA Style</th>
-                                            <th>Colour</th>
-                                            <th>Order Qty</th>
-                                            <th>Delivery Note</th>
-                                            <th>Shipment Qty</th>
-                                            <th>Outstanding PO Qty</th>
-                                            <th>Invoice Number</th>
-                                            <th>Due Date</th>
-                                            <th>Broker Fee</th>
-                                            <th>Management Fee</th>
-                                            <th>Payment Receive Date</th>
-                                            <th>Attachment</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Inventory Tab -->
-                    <div class="tab-pane fade" id="inventory" role="tabpanel" aria-labelledby="inventory-tab">
-                        <div class="export-container">
-                            <div class="export-title">
-                                <i class="fas fa-download"></i> Export Inventory Data
-                            </div>
-                            <div class="d-flex flex-wrap align-items-center">
-                                <small class="text-muted me-3">Download complete inventory data:</small>
-                                <button type="button" class="btn btn-success btn-sm btn-export" id="exportInventoryExcel">
-                                    <i class="fas fa-file-excel"></i> Excel (.xlsx)
-                                </button>
-                                <button type="button" class="btn btn-primary btn-sm btn-export" id="exportInventoryCsv">
-                                    <i class="fas fa-file-csv"></i> CSV
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="table-container position-relative">
-                            <div class="loading-overlay d-none" id="loadingOverlayInventory">
-                                <div class="text-center">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Loading...</span>
+                            <!-- Table Section -->
+                            <div class="table-container position-relative">
+                                <div class="loading-overlay d-none" id="<?= $content['overlayId'] ?>">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <div class="mt-2">Loading data...</div>
                                     </div>
-                                    <div class="mt-2">Loading inventory data...</div>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table id="<?= $content['tableId'] ?>" class="table table-sm table-bordered table-striped table-hover w-100" style="white-space: nowrap; font-size: 11px;">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <?php
+                                                $headers = [
+                                                    ['text' => '#', 'width' => '3%'],
+                                                    ['text' => 'QO SSA'],
+                                                    ['text' => 'PO SSA'],
+                                                    ['text' => 'PO Buyer'],
+                                                    ['text' => 'End Customer'],
+                                                    ['text' => 'Sales Order (AMT)'],
+                                                    ['text' => 'Buyer Style'],
+                                                    ['text' => 'SSA Style'],
+                                                    ['text' => 'Colour'],
+                                                    ['text' => 'Order Qty'],
+                                                    ['text' => 'Delivery Note'],
+                                                    ['text' => 'Shipment Qty'],
+                                                    ['text' => 'Outstanding PO Qty'],
+                                                    ['text' => 'Invoice Number'],
+                                                    ['text' => 'Invoice Amount'],
+                                                ];
+
+                                                foreach ($headers as $header): ?>
+                                                    <th <?= isset($header['width']) ? 'width="' . $header['width'] . '"' : '' ?>
+                                                        <?= isset($header['class']) ? 'class="' . $header['class'] . '"' : '' ?>>
+                                                        <?= $header['text'] ?>
+                                                    </th>
+                                                <?php endforeach; ?>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
                                 </div>
                             </div>
-
-                            <div class="table-responsive">
-                                <table id="inventoryTable" class="table table-sm table-bordered table-striped table-hover w-100" style="white-space: nowrap; font-size: 11px;">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th width="3%">#</th>
-                                            <th>Forecast Quotation No.<br>Forecast SO No.</th>
-                                            <th>Allocated to<br>SO No.</th>
-                                            <th>Customer Name</th>
-                                            <th>Allocated to<br>Quotation No.</th>
-                                            <th>Allocated to<br>Customer PO No.</th>
-                                            <th>Style</th>
-                                            <th>Colour</th>
-                                            <th width="3%">Universal Size</th>
-                                            <th class="text-end">Qty<br>(Pcs)</th>
-                                            <th>Production<br>Year</th>
-                                            <th>Aging<br>(days)</th>
-                                            <th>Country</th>
-                                            <?php if (auth()->isAdmin()): ?>
-                                                <th>Material Code</th>
-                                                <th>Special Stock</th>
-                                                <th>Batch</th>
-                                            <?php endif; ?>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                            </div>
                         </div>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
 
                 <div class="mt-3">
@@ -324,86 +244,121 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('js') ?>
-<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
-
 <script>
-    $(document).ready(function() {
-        let traceabilityTable;
-        let inventoryTable;
+    class soReport {
+        constructor() {
+            this.tables = {};
+            this.baseUrl = '<?= base_url() ?>';
+            this.csrfToken = '<?= csrf_token() ?>';
+            this.csrfHash = '<?= csrf_hash() ?>';
+            this.isAdmin = <?= auth()->isAdmin() ? 'true' : 'false' ?>;
 
-        // Initialize Traceability DataTable
-        function initTraceabilityTable() {
-            traceabilityTable = $('#traceabilityTable').DataTable({
+            this.init();
+        }
+
+        init() {
+            this.initTables();
+            this.bindEvents();
+        }
+
+        getTableConfig() {
+            const columns = [{
+                    data: 0,
+                    orderable: false
+                },
+                {
+                    data: 1,
+                    orderable: true
+                },
+                {
+                    data: 2,
+                    orderable: true
+                },
+                {
+                    data: 3,
+                    orderable: true
+                },
+                {
+                    data: 4,
+                    orderable: true
+                },
+                {
+                    data: 5,
+                    orderable: true
+                },
+                {
+                    data: 6,
+                    orderable: true
+                },
+                {
+                    data: 7,
+                    orderable: true
+                },
+                {
+                    data: 8,
+                    orderable: true
+                },
+                {
+                    data: 9,
+                    orderable: true,
+                    type: 'num'
+                },
+                {
+                    data: 10,
+                    orderable: true
+                },
+                {
+                    data: 11,
+                    orderable: true,
+                    type: 'num'
+                },
+                {
+                    data: 12,
+                    orderable: true
+                },
+                {
+                    data: 13,
+                    orderable: true
+                },
+                {
+                    data: 14,
+                    orderable: true
+                }
+            ];
+
+            return {
                 processing: true,
                 serverSide: true,
                 responsive: true,
-                ajax: {
-                    url: '<?= base_url('report-traceability/data') ?>',
-                    type: 'POST',
-                    data: function(d) {
-                        d.<?= csrf_token() ?> = '<?= csrf_hash() ?>';
+                ordering: true,
+                order: [
+                    [1, 'asc']
+                ],
+                columnDefs: [{
+                        targets: 0,
+                        orderable: false,
+                        searchable: false
                     },
-                    beforeSend: function() {
-                        $('#loadingOverlayTraceability').removeClass('d-none');
+                    {
+                        targets: '_all',
+                        className: 'text-start'
                     },
-                    complete: function() {
-                        $('#loadingOverlayTraceability').addClass('d-none');
+                    {
+                        targets: [9, 11],
+                        className: 'text-end'
                     },
-                    error: function(xhr, error, code) {
-                        console.error('DataTables error:', error);
-                        if (typeof toastr !== 'undefined') {
-                            toastr.error('Failed to load traceability data. Please try again.');
-                        } else {
-                            alert('Failed to load traceability data. Please try again.');
-                        }
-                        $('#loadingOverlayTraceability').addClass('d-none');
-                    }
-                },
-                columns: [
-                    { data: 0, orderable: false, searchable: false },  // #
-                    { data: 1, orderable: true, searchable: true }, // QO SSA
-                    { data: 2, orderable: true, searchable: true }, // PO SSA
-                    { data: 3, orderable: true, searchable: true }, // PO Buyer
-                    { data: 4, orderable: true, searchable: true }, // End Customer
-                    { data: 5, orderable: true, searchable: true }, // Sales Order (AMT)
-                    { data: 6, orderable: true, searchable: true }, // Buyer Style
-                    { data: 7, orderable: true, searchable: true }, // SSA Style
-                    { data: 8, orderable: true, searchable: true }, // Colour
-                    { data: 9, className: 'text-end', orderable: true, searchable: true }, // Order Qty
-                    { data: 10, orderable: true, searchable: true }, // Delivery Note
-                    { data: 11, className: 'text-end', orderable: true, searchable: true }, // Shipment Qty
-                    { data: 12, className: 'text-end', orderable: true, searchable: true }, // Outstanding PO Qty
-                    { data: 13, orderable: true, searchable: true }, // Invoice Number
-                    { data: 14, orderable: true, searchable: true }, // Due Date
-                    { data: 15, className: 'text-end', orderable: true, searchable: true }, // Broker Fee
-                    { data: 16, className: 'text-end', orderable: true, searchable: true }, // Management Fee
-                    { data: 17, orderable: true, searchable: true }, // Payment Receive Date
-                    { data: 18, orderable: false, searchable: false } // Attachment
                 ],
                 pageLength: 25,
                 lengthMenu: [
                     [10, 25, 50, 100, -1],
                     [10, 25, 50, 100, "All"]
                 ],
-                order: [
-                    [1, 'asc']
-                ],
                 dom: 'Bfrtip',
                 buttons: [{
                         extend: 'excel',
                         text: '<i class="fas fa-file-excel"></i> Excel (Current Page)',
                         className: 'btn btn-success btn-sm me-2',
-                        title: 'Traceability Report (Current Page)',
+                        title: 'so Report (Current Page)',
                         exportOptions: {
                             columns: ':visible'
                         }
@@ -412,7 +367,7 @@
                         extend: 'pdf',
                         text: '<i class="fas fa-file-pdf"></i> PDF (Current Page)',
                         className: 'btn btn-danger btn-sm me-2',
-                        title: 'Traceability Report (Current Page)',
+                        title: 'so Report (Current Page)',
                         orientation: 'landscape',
                         pageSize: 'A4',
                         exportOptions: {
@@ -423,255 +378,120 @@
                         extend: 'print',
                         text: '<i class="fas fa-print"></i> Print (Current Page)',
                         className: 'btn btn-info btn-sm',
-                        title: 'Traceability Report (Current Page)',
+                        title: 'SO Report (Current Page)',
                         exportOptions: {
                             columns: ':visible'
                         }
                     }
-                ]
-            });
+                ],
+                columns
+            };
         }
 
-        // Initialize Inventory DataTable
-        function initInventoryTable() {
-            inventoryTable = $('#inventoryTable').DataTable({
-                processing: true,
-                serverSide: true,
-                responsive: true,
+        createTable(tableId, filter, overlayId) {
+            return $(`#${tableId}`).DataTable({
+                ...this.getTableConfig(),
                 ajax: {
-                    url: '<?= base_url('report-inventory/data') ?>',
+                    url: `${this.baseUrl}/report-so/data`,
                     type: 'POST',
-                    data: function(d) {
-                        d.<?= csrf_token() ?> = '<?= csrf_hash() ?>';
+                    data: (d) => {
+                        d[this.csrfToken] = this.csrfHash;
+                        d.filter = filter;
                     },
-                    beforeSend: function() {
-                        $('#loadingOverlayInventory').removeClass('d-none');
-                    },
-                    complete: function() {
-                        $('#loadingOverlayInventory').addClass('d-none');
-                    },
-                    error: function(xhr, error, code) {
-                        if (typeof toastr !== 'undefined') {
-                            toastr.error('Failed to load inventory data. Please try again.');
-                        } else {
-                            alert('Failed to load inventory data. Please try again.');
-                        }
-                        $('#loadingOverlayInventory').addClass('d-none');
+                    beforeSend: () => $(`#${overlayId}`).removeClass('d-none'),
+                    complete: () => $(`#${overlayId}`).addClass('d-none'),
+                    error: () => {
+                        this.showNotification('error', 'Failed to load data. Please try again.');
+                        $(`#${overlayId}`).addClass('d-none');
                     }
-                },
-                columns: [
-                    { data: 0, orderable: false, searchable: false }, // #
-                    { data: 1, orderable: true, searchable: true },  // Forecast Quotation No.
-                    { data: 2, orderable: true, searchable: true },  // Allocated to SO No.
-                    { data: 3, orderable: true, searchable: true },  // Customer Name
-                    { data: 4, orderable: true, searchable: true },  // Allocated to Quotation No.
-                    { data: 5, orderable: true, searchable: true },  // Allocated to Customer PO No.
-                    { data: 6, orderable: true, searchable: true },  // Style
-                    { data: 7, orderable: true, searchable: true },  // Colour
-                    { data: 8, orderable: true, searchable: true },  // Universal Size
-                    { data: 9, className: 'text-end', orderable: true, searchable: true }, // Qty
-                    { data: 10, orderable: true, searchable: true }, // Production Year
-                    { data: 11, className: 'text-end', orderable: true, searchable: true }, // Aging days
-                    { data: 12, orderable: true, searchable: true }  // Country
-                    <?php if (auth()->isAdmin()): ?>,
-                    { data: 13, orderable: true, searchable: true }, // Material Code
-                    { data: 14, orderable: true, searchable: true }, // Special Stock
-                    { data: 15, className: 'text-end', orderable: true, searchable: true }  // Batch
-                    <?php endif; ?>
-                ],
-                pageLength: 25,
-                lengthMenu: [
-                    [10, 25, 50, 100, -1],
-                    [10, 25, 50, 100, "All"]
-                ],
-                order: [
-                    [1, 'asc']
-                ],
-                dom: 'Bfrtip',
-                buttons: [{
-                        extend: 'excel',
-                        text: '<i class="fas fa-file-excel"></i> Excel (Current Page)',
-                        className: 'btn btn-success btn-sm me-2',
-                        title: 'Inventory Report (Current Page)',
-                        exportOptions: {
-                            columns: ':visible'
-                        }
-                    },
-                    {
-                        extend: 'pdf',
-                        text: '<i class="fas fa-file-pdf"></i> PDF (Current Page)',
-                        className: 'btn btn-danger btn-sm me-2',
-                        title: 'Inventory Report (Current Page)',
-                        orientation: 'landscape',
-                        pageSize: 'A4',
-                        exportOptions: {
-                            columns: ':visible'
-                        }
-                    },
-                    {
-                        extend: 'print',
-                        text: '<i class="fas fa-print"></i> Print (Current Page)',
-                        className: 'btn btn-info btn-sm',
-                        title: 'Inventory Report (Current Page)',
-                        exportOptions: {
-                            columns: ':visible'
-                        }
-                    }
-                ]
+                }
             });
         }
 
-        // Initialize the first table on page load
-        initTraceabilityTable();
+        initTables() {
+            const tableConfigs = [{
+                id: 'soTable',
+                filter: 'all',
+                overlay: 'loadingOverlay1'
+            }];
 
-        // Handle tab switching
-        $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
-            const target = $(e.target).data('bs-target');
-            
-            if (target === '#inventory' && !inventoryTable) {
-                // Initialize inventory table when tab is first shown
-                initInventoryTable();
-            } else if (target === '#inventory' && inventoryTable) {
-                // Redraw inventory table
-                inventoryTable.columns.adjust().draw();
-            } else if (target === '#traceability' && traceabilityTable) {
-                // Redraw traceability table
-                traceabilityTable.columns.adjust().draw();
-            }
-        });
+            tableConfigs.forEach(config => {
+                this.tables[config.filter] = this.createTable(config.id, config.filter, config.overlay);
+            });
+        }
 
-        // Refresh Cache
-        $('#refreshCache').click(function() {
-            const button = $(this);
-            const originalText = button.html();
+        bindEvents() {
+            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', (e) => {
+                const target = $(e.target).attr('data-bs-target').replace('#', '').replace('-', '');
+                const tableMap = {
+                    allso: 'all'
+                };
+                const tableKey = tableMap[target];
 
-            button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Refreshing...');
+                if (this.tables[tableKey]) {
+                    this.tables[tableKey].columns.adjust().responsive.recalc();
+                }
+            });
+
+            $('#refreshCache').on('click', () => this.refreshCache());
+            $('.btn-export').on('click', (e) => this.handleExport(e));
+            setInterval(() => this.autoRefresh(), 600000);
+        }
+
+        refreshCache() {
+            const $button = $('#refreshCache');
+            const originalText = $button.html();
+
+            $button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Refreshing...');
 
             $.ajax({
-                url: '<?= base_url('report-inventory/refresh-cache') ?>',
+                url: `${this.baseUrl}/report-so/refresh-cache`,
                 type: 'POST',
                 data: {
-                    <?= csrf_token() ?>: '<?= csrf_hash() ?>'
+                    [this.csrfToken]: this.csrfHash
                 },
-                success: function(response) {
-                    if (typeof toastr !== 'undefined') {
-                        toastr.success('Cache refreshed successfully');
-                    } else {
-                        alert('Cache refreshed successfully');
-                    }
-                    
-                    // Reload both tables if they exist
-                    if (traceabilityTable) {
-                        traceabilityTable.ajax.reload();
-                    }
-                    if (inventoryTable) {
-                        inventoryTable.ajax.reload();
-                    }
+                success: () => {
+                    this.showNotification('success', 'Cache refreshed successfully');
+                    Object.values(this.tables).forEach(table => table.ajax.reload());
                 },
-                error: function() {
-                    if (typeof toastr !== 'undefined') {
-                        toastr.error('Failed to refresh cache');
-                    } else {
-                        alert('Failed to refresh cache');
-                    }
-                },
-                complete: function() {
-                    button.prop('disabled', false).html(originalText);
-                }
+                error: () => this.showNotification('error', 'Failed to refresh cache'),
+                complete: () => $button.prop('disabled', false).html(originalText)
             });
-        });
+        }
 
-        // Export functions for Traceability
-        $('#exportTraceabilityExcel').click(function() {
-            const button = $(this);
-            const originalText = button.html();
+        handleExport(e) {
+            const $button = $(e.currentTarget);
+            const originalText = $button.html();
+            const tableType = $button.data('table');
+            const exportType = $button.data('type');
+            // console.log(tableType);
+            // return false;
 
-            button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Preparing...');
+            $button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Preparing...');
 
-            if (typeof toastr !== 'undefined') {
-                toastr.info('Preparing Excel file with all traceability data. This may take a moment...');
-            }
+            this.showNotification('info', `Preparing ${exportType.toUpperCase()} file. This may take a moment...`);
 
-            window.location.href = '<?= base_url('report-traceability/export-excel') ?>';
+            window.location.href = `${this.baseUrl}/report-so/export-${exportType}?filter=${tableType}`;
 
-            setTimeout(function() {
-                button.prop('disabled', false).html(originalText);
-                if (typeof toastr !== 'undefined') {
-                    toastr.success('Excel file download started');
-                }
+            setTimeout(() => {
+                $button.prop('disabled', false).html(originalText);
+                this.showNotification('success', `${exportType.toUpperCase()} file download started`);
             }, 2000);
-        });
+        }
 
-        $('#exportTraceabilityCsv').click(function() {
-            const button = $(this);
-            const originalText = button.html();
+        autoRefresh() {
+            Object.values(this.tables).forEach(table => table.ajax.reload(null, false));
+        }
 
-            button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Preparing...');
-
+        showNotification(type, message) {
             if (typeof toastr !== 'undefined') {
-                toastr.info('Preparing CSV file with all traceability data. This may take a moment...');
+                toastr[type](message);
+            } else {
+                alert(message);
             }
+        }
+    }
 
-            window.location.href = '<?= base_url('report-traceability/export-csv') ?>';
-
-            setTimeout(function() {
-                button.prop('disabled', false).html(originalText);
-                if (typeof toastr !== 'undefined') {
-                    toastr.success('CSV file download started');
-                }
-            }, 2000);
-        });
-
-        // Export functions for Inventory
-        $('#exportInventoryExcel').click(function() {
-            const button = $(this);
-            const originalText = button.html();
-
-            button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Preparing...');
-
-            if (typeof toastr !== 'undefined') {
-                toastr.info('Preparing Excel file with all inventory data. This may take a moment...');
-            }
-
-            window.location.href = '<?= base_url('report-inventory/export-excel') ?>';
-
-            setTimeout(function() {
-                button.prop('disabled', false).html(originalText);
-                if (typeof toastr !== 'undefined') {
-                    toastr.success('Excel file download started');
-                }
-            }, 2000);
-        });
-
-        $('#exportInventoryCsv').click(function() {
-            const button = $(this);
-            const originalText = button.html();
-
-            button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Preparing...');
-
-            if (typeof toastr !== 'undefined') {
-                toastr.info('Preparing CSV file with all inventory data. This may take a moment...');
-            }
-
-            window.location.href = '<?= base_url('report-inventory/export-csv') ?>';
-
-            setTimeout(function() {
-                button.prop('disabled', false).html(originalText);
-                if (typeof toastr !== 'undefined') {
-                    toastr.success('CSV file download started');
-                }
-            }, 2000);
-        });
-
-        // Auto-refresh every 10 minutes
-        setInterval(function() {
-            if (traceabilityTable) {
-                traceabilityTable.ajax.reload(null, false);
-            }
-            if (inventoryTable) {
-                inventoryTable.ajax.reload(null, false);
-            }
-        }, 600000);
-    });
+    $(document).ready(() => new soReport());
 </script>
 <?= $this->endSection() ?>

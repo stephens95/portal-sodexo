@@ -23,7 +23,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     // Buyers page & API
     $routes->get('/buyers', 'BuyerController::index');
     $routes->get('/buyers/listAll', 'BuyerController::listAll');
-    $routes->match(['get','post'], '/buyers/refresh', 'BuyerController::refreshFromSap');
+    $routes->match(['get', 'post'], '/buyers/refresh', 'BuyerController::refreshFromSap');
 
     // Account Settings Routes
     $routes->get('/account-settings', 'AccountController::index');
@@ -46,8 +46,16 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('/report-inventory/export-excel', 'InventoryController::exportExcel');
     $routes->get('/report-inventory/export-csv', 'InventoryController::exportCsv');
 
+    // Report Sales Order Tracebility
+    $routes->get('/report-so', 'SalesOrderController::index');
+    $routes->post('/report-so/data', 'SalesOrderController::getSoTracebilityData');
+    $routes->post('/report-so/refresh-cache', 'SalesOrderController::refreshCache');
+    $routes->post('/report-so/all-data', 'SalesOrderController::getAllInventoryData');
+    $routes->get('/report-so/export-excel', 'SalesOrderController::exportExcel');
+    $routes->get('/report-so/export-csv', 'SalesOrderController::exportCsv');
+
     // Sales Order Routes
-    $routes->get('/sales-order', 'SalesOrderController::index');
+    // $routes->get('/sales-order', 'SalesOrderController::index');
 
     // Documentation API
     $routes->get('/api-inventory', 'Api\DocumentationController::inventory');
