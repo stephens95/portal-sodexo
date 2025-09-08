@@ -58,10 +58,15 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     // $routes->get('/sales-order', 'SalesOrderController::index');
 
     // Documentation API
-    $routes->get('/api-inventory', 'Api\DocumentationController::inventory');
+    // $routes->get('/api-inventory', 'Api\DocumentationController::inventory');
 });
+$routes->get('/api-inventory', 'API\ApiController::getInventory');
+
+// $routes->group('', ['filter' => 'auth', 'namespace' => 'App\Controllers\Api'], function ($routes) {
+//     $routes->get('api-inventory', 'ApiController::getInventory');
+// });
 
 // API Routes
-$routes->group('portal', ['namespace' => 'App\Controllers\Api'], function ($routes) {
-    $routes->get('api-sodexo/inventory/(:num)', 'LineItemAPI::getLineItems/$1');
-});
+// $routes->group('portal', ['namespace' => 'App\Controllers\Api'], function ($routes) {
+//     $routes->get('api-sodexo/inventory/(:num)', 'LineItemAPI::getLineItems/$1');
+// });
