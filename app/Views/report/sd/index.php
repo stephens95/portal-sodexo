@@ -113,7 +113,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Sales Order Tracebility Report</h5>
+                <h5 class="mb-0">Sales Order Traceability Report</h5>
                 <button type="button" class="btn btn-outline-primary btn-sm" id="refreshCache">
                     <i class="fas fa-sync-alt"></i> Refresh Data
                 </button>
@@ -139,7 +139,7 @@
                 <ul class="nav nav-tabs" id="soTabs" role="tablist">
                     <?php
                     $tabs = [
-                        ['id' => 'all-so', 'icon' => 'boxes', 'label' => 'All SO', 'active' => true],
+                        ['id' => 'all-so', 'icon' => 'clipboard-list', 'label' => 'All Sales Orders', 'active' => true],
                     ];
                     foreach ($tabs as $tab): ?>
                         <li class="nav-item" role="presentation">
@@ -206,12 +206,12 @@
                                                     ['text' => 'Buyer Style'],
                                                     ['text' => 'SSA Style'],
                                                     ['text' => 'Colour'],
-                                                    ['text' => 'Order Qty'],
+                                                    ['text' => 'Order Qty', 'class' => 'text-end'],
                                                     ['text' => 'Delivery Note'],
-                                                    ['text' => 'Shipment Qty'],
-                                                    ['text' => 'Outstanding PO Qty'],
+                                                    ['text' => 'Shipment Qty', 'class' => 'text-end'],
+                                                    ['text' => 'Outstanding PO Qty', 'class' => 'text-end'],
                                                     ['text' => 'Invoice Number'],
-                                                    ['text' => 'Invoice Amount'],
+                                                    ['text' => 'Invoice Amount', 'class' => 'text-end']
                                                 ];
 
                                                 foreach ($headers as $header): ?>
@@ -245,13 +245,12 @@
 
 <?= $this->section('js') ?>
 <script>
-    class soReport {
+    class SalesOrderReport {
         constructor() {
             this.tables = {};
             this.baseUrl = '<?= base_url() ?>';
             this.csrfToken = '<?= csrf_token() ?>';
             this.csrfHash = '<?= csrf_hash() ?>';
-            this.isAdmin = <?= auth()->isAdmin() ? 'true' : 'false' ?>;
 
             this.init();
         }
@@ -262,68 +261,22 @@
         }
 
         getTableConfig() {
-            const columns = [{
-                    data: 0,
-                    orderable: false
-                },
-                {
-                    data: 1,
-                    orderable: true
-                },
-                {
-                    data: 2,
-                    orderable: true
-                },
-                {
-                    data: 3,
-                    orderable: true
-                },
-                {
-                    data: 4,
-                    orderable: true
-                },
-                {
-                    data: 5,
-                    orderable: true
-                },
-                {
-                    data: 6,
-                    orderable: true
-                },
-                {
-                    data: 7,
-                    orderable: true
-                },
-                {
-                    data: 8,
-                    orderable: true
-                },
-                {
-                    data: 9,
-                    orderable: true,
-                    type: 'num'
-                },
-                {
-                    data: 10,
-                    orderable: true
-                },
-                {
-                    data: 11,
-                    orderable: true,
-                    type: 'num'
-                },
-                {
-                    data: 12,
-                    orderable: true
-                },
-                {
-                    data: 13,
-                    orderable: true
-                },
-                {
-                    data: 14,
-                    orderable: true
-                }
+            const columns = [
+                { data: 0, orderable: false, searchable: false },
+                { data: 1, orderable: true },
+                { data: 2, orderable: true },
+                { data: 3, orderable: true },
+                { data: 4, orderable: true },
+                { data: 5, orderable: true },
+                { data: 6, orderable: true },
+                { data: 7, orderable: true },
+                { data: 8, orderable: true },
+                { data: 9, orderable: true, type: 'num' },
+                { data: 10, orderable: true },
+                { data: 11, orderable: true, type: 'num' },
+                { data: 12, orderable: true, type: 'num' },
+                { data: 13, orderable: true },
+                { data: 14, orderable: true, type: 'num' }
             ];
 
             return {
@@ -331,60 +284,50 @@
                 serverSide: true,
                 responsive: true,
                 ordering: true,
-                order: [
-                    [1, 'asc']
-                ],
-                columnDefs: [{
-                        targets: 0,
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        targets: '_all',
-                        className: 'text-start'
-                    },
-                    {
-                        targets: [9, 11],
-                        className: 'text-end'
-                    },
+                order: [[1, 'asc']],
+                columnDefs: [
+                    { targets: 0, orderable: false, searchable: false },
+                    { targets: '_all', className: 'text-start' },
+                    { targets: [9, 11, 12, 14], className: 'text-end' }
                 ],
                 pageLength: 25,
-                lengthMenu: [
-                    [10, 25, 50, 100, -1],
-                    [10, 25, 50, 100, "All"]
-                ],
+                lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
                 dom: 'Bfrtip',
-                buttons: [{
+                buttons: [
+                    {
                         extend: 'excel',
                         text: '<i class="fas fa-file-excel"></i> Excel (Current Page)',
                         className: 'btn btn-success btn-sm me-2',
-                        title: 'so Report (Current Page)',
-                        exportOptions: {
-                            columns: ':visible'
-                        }
+                        title: 'Sales Order Report (Current Page)',
+                        exportOptions: { columns: ':visible' }
                     },
                     {
                         extend: 'pdf',
                         text: '<i class="fas fa-file-pdf"></i> PDF (Current Page)',
                         className: 'btn btn-danger btn-sm me-2',
-                        title: 'so Report (Current Page)',
+                        title: 'Sales Order Report (Current Page)',
                         orientation: 'landscape',
                         pageSize: 'A4',
-                        exportOptions: {
-                            columns: ':visible'
-                        }
+                        exportOptions: { columns: ':visible' }
                     },
                     {
                         extend: 'print',
                         text: '<i class="fas fa-print"></i> Print (Current Page)',
                         className: 'btn btn-info btn-sm',
-                        title: 'SO Report (Current Page)',
-                        exportOptions: {
-                            columns: ':visible'
-                        }
+                        title: 'Sales Order Report (Current Page)',
+                        exportOptions: { columns: ':visible' }
                     }
                 ],
-                columns
+                columns,
+                language: {
+                    processing: '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><br>Loading data...</div>',
+                    loadingRecords: 'Loading...',
+                    emptyTable: 'No data available in table',
+                    zeroRecords: 'No matching records found'
+                },
+                drawCallback: function() {
+                    // $('#loadingOverlay1').addClass('d-none');
+                }
             };
         }
 
@@ -394,13 +337,20 @@
                 ajax: {
                     url: `${this.baseUrl}/report-so/data`,
                     type: 'POST',
+                    timeout: 60000,
                     data: (d) => {
                         d[this.csrfToken] = this.csrfHash;
                         d.filter = filter;
+                        return d;
                     },
-                    beforeSend: () => $(`#${overlayId}`).removeClass('d-none'),
-                    complete: () => $(`#${overlayId}`).addClass('d-none'),
-                    error: () => {
+                    beforeSend: () => {
+                        $(`#${overlayId}`).removeClass('d-none');
+                    },
+                    complete: () => {
+                        $(`#${overlayId}`).addClass('d-none');
+                    },
+                    error: (xhr, status, error) => {
+                        console.error('AJAX Error:', status, error);
                         this.showNotification('error', 'Failed to load data. Please try again.');
                         $(`#${overlayId}`).addClass('d-none');
                     }
@@ -409,32 +359,19 @@
         }
 
         initTables() {
-            const tableConfigs = [{
-                id: 'soTable',
-                filter: 'all',
-                overlay: 'loadingOverlay1'
-            }];
-
-            tableConfigs.forEach(config => {
-                this.tables[config.filter] = this.createTable(config.id, config.filter, config.overlay);
-            });
+            try {
+                this.tables['all'] = this.createTable('soTable', 'all', 'loadingOverlay1');
+            } catch (error) {
+                console.error('Error initializing tables:', error);
+                this.showNotification('error', 'Failed to initialize tables');
+            }
         }
 
         bindEvents() {
-            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', (e) => {
-                const target = $(e.target).attr('data-bs-target').replace('#', '').replace('-', '');
-                const tableMap = {
-                    allso: 'all'
-                };
-                const tableKey = tableMap[target];
-
-                if (this.tables[tableKey]) {
-                    this.tables[tableKey].columns.adjust().responsive.recalc();
-                }
-            });
-
             $('#refreshCache').on('click', () => this.refreshCache());
             $('.btn-export').on('click', (e) => this.handleExport(e));
+            
+            // Auto refresh every 10 minutes
             setInterval(() => this.autoRefresh(), 600000);
         }
 
@@ -447,15 +384,27 @@
             $.ajax({
                 url: `${this.baseUrl}/report-so/refresh-cache`,
                 type: 'POST',
-                data: {
-                    [this.csrfToken]: this.csrfHash
+                timeout: 60000,
+                data: { [this.csrfToken]: this.csrfHash },
+                success: (response) => {
+                    if (response.status === 'success') {
+                        this.showNotification('success', 'Cache refreshed successfully');
+                        Object.values(this.tables).forEach(table => {
+                            if (table && typeof table.ajax === 'object') {
+                                table.ajax.reload();
+                            }
+                        });
+                    } else {
+                        this.showNotification('error', response.message || 'Failed to refresh cache');
+                    }
                 },
-                success: () => {
-                    this.showNotification('success', 'Cache refreshed successfully');
-                    Object.values(this.tables).forEach(table => table.ajax.reload());
+                error: (xhr, status, error) => {
+                    console.error('Refresh cache error:', status, error);
+                    this.showNotification('error', 'Failed to refresh cache');
                 },
-                error: () => this.showNotification('error', 'Failed to refresh cache'),
-                complete: () => $button.prop('disabled', false).html(originalText)
+                complete: () => {
+                    $button.prop('disabled', false).html(originalText);
+                }
             });
         }
 
@@ -464,8 +413,6 @@
             const originalText = $button.html();
             const tableType = $button.data('table');
             const exportType = $button.data('type');
-            // console.log(tableType);
-            // return false;
 
             $button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Preparing...');
 
@@ -480,18 +427,29 @@
         }
 
         autoRefresh() {
-            Object.values(this.tables).forEach(table => table.ajax.reload(null, false));
+            Object.values(this.tables).forEach(table => {
+                if (table && typeof table.ajax === 'object') {
+                    table.ajax.reload(null, false);
+                }
+            });
         }
 
         showNotification(type, message) {
             if (typeof toastr !== 'undefined') {
                 toastr[type](message);
             } else {
+                console.log(`${type.toUpperCase()}: ${message}`);
                 alert(message);
             }
         }
     }
 
-    $(document).ready(() => new soReport());
+    $(document).ready(() => {
+        try {
+            new SalesOrderReport();
+        } catch (error) {
+            console.error('Error initializing SalesOrderReport:', error);
+        }
+    });
 </script>
 <?= $this->endSection() ?>

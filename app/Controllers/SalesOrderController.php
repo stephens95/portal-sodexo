@@ -22,19 +22,19 @@ class SalesOrderController extends BaseController
 
     public function index()
     {
-        $data['title'] = 'SoTracebility Report';
+        $data['title'] = 'Sales Order Traceability Report';
         $data['segment1'] = 'Report';
         return view('report/sd/index', $data);
     }
 
     private function getCacheKey()
     {
-        return 'SoTracebility_data_' . md5($this->apiUrl);
+        return 'sotrcb_data_' . md5($this->apiUrl);
     }
 
     private function getSoTracebilityFilePath()
     {
-        return WRITEPATH . 'cache/SoTracebility.json';
+        return WRITEPATH . 'cache/sotrcb.json';
     }
 
     private function getData()
@@ -44,99 +44,135 @@ class SalesOrderController extends BaseController
 
         if ($data === null) {
             try {
+                ini_set('memory_limit', '512M');
+                set_time_limit(120);
+
                 $client = \Config\Services::curlrequest();
                 $response = $client->get($this->apiUrl, [
-                    'timeout' => 30,
-                    'headers' => ['Accept' => 'application/json']
+                    'timeout' => 120,
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Connection' => 'keep-alive'
+                    ]
                 ]);
 
                 if ($response->getStatusCode() === 200) {
-                    $data = json_decode($response->getBody(), true);
+                    $responseBody = $response->getBody();
+                    $data = json_decode($responseBody, true);
 
-                    $this->cache->save($cacheKey, $data, 1800);
-                    $this->saveSoTracebilityData($data);
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        throw new \Exception('Invalid JSON response: ' . json_last_error_msg());
+                    }
+
+                    if (is_array($data)) {
+                        // Cache for 30 minutes
+                        $this->cache->save($cacheKey, $data, 1800);
+                        $this->saveSoTracebilityData($data);
+                    } else {
+                        throw new \Exception('Invalid data format received from API');
+                    }
                 } else {
                     throw new \Exception('API returned status: ' . $response->getStatusCode());
                 }
             } catch (\Exception $e) {
+                log_message('error', 'SO API Error: ' . $e->getMessage());
                 $data = $this->loadSoTracebilityData();
                 if (!$data) {
-                    throw new \Exception('API unavailable and no SoTracebility data found');
+                    throw new \Exception('API unavailable and no SO data found: ' . $e->getMessage());
                 }
             }
         }
 
-        return $data;
+        return is_array($data) ? $data : [];
     }
 
     private function saveSoTracebilityData($data)
     {
-        $SoTracebilityFile = $this->getSoTracebilityFilePath();
-        if (!is_dir(dirname($SoTracebilityFile))) {
-            mkdir(dirname($SoTracebilityFile), 0777, true);
+        try {
+            $soFile = $this->getSoTracebilityFilePath();
+            $directory = dirname($soFile);
+            
+            if (!is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            $soData = [
+                'api_url' => $this->apiUrl,
+                'updated_at' => date('Y-m-d H:i:s'),
+                'total_records' => count($data),
+                'data' => $data
+            ];
+
+            $result = file_put_contents($soFile, json_encode($soData, JSON_UNESCAPED_SLASHES));
+            if ($result === false) {
+                log_message('error', 'Failed to save SO data to file: ' . $soFile);
+            }
+        } catch (\Exception $e) {
+            log_message('error', 'Error saving SO data: ' . $e->getMessage());
         }
-
-        $SoTracebilityData = [
-            'api_url' => $this->apiUrl,
-            'updated_at' => date('Y-m-d H:i:s'),
-            'data' => $data
-        ];
-
-        file_put_contents($SoTracebilityFile, json_encode($SoTracebilityData));
     }
 
     private function loadSoTracebilityData()
     {
-        $SoTracebilityFile = $this->getSoTracebilityFilePath();
-        if (file_exists($SoTracebilityFile)) {
-            $SoTracebilityData = json_decode(file_get_contents($SoTracebilityFile), true);
+        try {
+            $soFile = $this->getSoTracebilityFilePath();
+            if (file_exists($soFile)) {
+                $soData = json_decode(file_get_contents($soFile), true);
 
-            // Check if the API URL matches current configuration
-            if (isset($SoTracebilityData['api_url']) && $SoTracebilityData['api_url'] === $this->apiUrl) {
-                return $SoTracebilityData['data'] ?? null;
+                if (isset($soData['api_url']) && $soData['api_url'] === $this->apiUrl) {
+                    return $soData['data'] ?? [];
+                }
             }
+        } catch (\Exception $e) {
+            log_message('error', 'Error loading SO data: ' . $e->getMessage());
         }
-        return null;
+        return [];
     }
 
-
-    public function getSoTracebilityData()
+    public function getSalesOrderData()
     {
         try {
+            // Increase memory and execution time
+            ini_set('memory_limit', '256M');
+            set_time_limit(60);
+
             $data = $this->getData();
 
-            $draw = intval($this->request->getPost('draw'));
-            $start = intval($this->request->getPost('start'));
-            $length = intval($this->request->getPost('length'));
-            $searchValue = $this->request->getPost('search')['value'] ?? '';
+            if (!is_array($data)) {
+                $data = [];
+            }
+
+            $draw = intval($this->request->getPost('draw') ?? 1);
+            $start = intval($this->request->getPost('start') ?? 0);
+            $length = intval($this->request->getPost('length') ?? 25);
+            $searchValue = trim($this->request->getPost('search')['value'] ?? '');
 
             // Handle sorting
-            $orderColumnIndex = intval($this->request->getPost('order')[0]['column'] ?? 0);
+            $orderColumnIndex = intval($this->request->getPost('order')[0]['column'] ?? 1);
             $orderDirection = $this->request->getPost('order')[0]['dir'] ?? 'asc';
 
             // Map column index to data field
             $sortableColumns = [
-                0 => null, // # column - not sortable
-                1 => 'QO SSA',
-                2 => 'PO SSA',
-                3 => 'PO BUYER',
-                4 => 'END CUSTOMER',
-                5 => 'SALES ORDER (AMT)',
-                6 => 'BUYER STYLE',
-                7 => 'SSA STYLE',
-                8 => 'COLOUR',
-                9 => 'ORDER QTY',
-                10 => 'QO SSA AMOUNT',
-                11 => 'PO SSA AMOUNT',
-                12 => 'DELIVERY NOTE',
-                13 => 'SHIPMENT QTY',
-                14 => 'OUTSTANDING PO QTY',
-                15 => 'INVOICE QTY',
-                16 => 'INVOICE AMOUNT',
-                17 => 'DOC CURR INVOICE',
+                0 => null,
+                1 => 'QO_SSA',
+                2 => 'PO_SSA',
+                3 => 'PO_BUYER',
+                4 => 'END_CUSTOMER',
+                5 => 'SO',
+                6 => 'BUYER_STYLE',
+                7 => 'SSA_STYLE',
+                8 => 'COLOR',
+                9 => 'ORDER_QTY',
+                10 => 'DN',
+                11 => 'QTY_SHIP',
+                12 => 'OUTS_PO_QTY',
+                13 => 'INV_NO',
+                14 => 'INV_AMOUNT'
             ];
 
             $filteredData = $data;
+
+            // Apply search filter
             if (!empty($searchValue)) {
                 $filteredData = array_filter($data, function ($item) use ($searchValue) {
                     $searchFields = [
@@ -148,19 +184,12 @@ class SalesOrderController extends BaseController
                         $item['BUYER_STYLE'] ?? '',
                         $item['SSA_STYLE'] ?? '',
                         $item['COLOR'] ?? '',
-                        $item['ORDER_QTY'] ?? '',
-                        $item['QO_SSA_AMOUNT'] ?? '',
-                        $item['PO_SSA_AMOUNT'] ?? '',
                         $item['DN'] ?? '',
-                        $item['QTY_SHIP'] ?? '',
-                        $item['OUTS_PO_QTY'] ?? '',
-                        $item['INV_NO'] ?? '',
-                        $item['INV_AMOUNT'] ?? '',
-                        $item['DOC_CURR_DN'] ?? '',
+                        $item['INV_NO'] ?? ''
                     ];
 
                     foreach ($searchFields as $field) {
-                        if (stripos($field, $searchValue) !== false) {
+                        if (stripos((string)$field, $searchValue) !== false) {
                             return true;
                         }
                     }
@@ -176,43 +205,47 @@ class SalesOrderController extends BaseController
                     $valueA = $a[$sortField] ?? '';
                     $valueB = $b[$sortField] ?? '';
 
-                    if ($orderDirection === 'asc') {
-                        return $valueA <=> $valueB;
+                    // Handle numeric sorting
+                    if (in_array($sortField, ['ORDER_QTY', 'QTY_SHIP', 'OUTS_PO_QTY', 'INV_AMOUNT'])) {
+                        $valueA = floatval($valueA);
+                        $valueB = floatval($valueB);
                     } else {
-                        return $valueB <=> $valueA;
+                        $valueA = strtolower((string)$valueA);
+                        $valueB = strtolower((string)$valueB);
                     }
+
+                    $result = $valueA <=> $valueB;
+                    return $orderDirection === 'desc' ? -$result : $result;
                 });
             }
 
             $totalRecords = count($data);
             $filteredRecords = count($filteredData);
 
-            // Reset array keys after filtering and sorting
+            // Reset array keys and paginate
             $filteredData = array_values($filteredData);
-
             $pagedData = array_slice($filteredData, $start, $length);
+
             $processedData = [];
             $counter = $start + 1;
 
             foreach ($pagedData as $item) {
                 $processedData[] = [
                     $counter++,
-                    $item['QO_SSA'],
-                    $item['PO_SSA'],
-                    $item['PO_BUYER'],
-                    $item['END_CUSTOMER'],
-                    $item['SO'],
-                    $item['BUYER_STYLE'],
-                    $item['SSA_STYLE'],
-                    $item['COLOR'],
-                    $item['ORDER_QTY'],
-                    $item['QO_SSA_AMOUNT'],
-                    $item['PO_SSA_AMOUNT'],
-                    $item['DN'],
-                    $item['QTY_SHIP'],
-                    $item['OUTS_PO_QTY'],
-                    $item['INV_NO'],
-                    $item['INV_AMOUNT'],
+                    $item['QO_SSA'] ?? '',
+                    $item['PO_SSA'] ?? '',
+                    $item['PO_BUYER'] ?? '',
+                    $item['END_CUSTOMER'] ?? '',
+                    $item['SO'] ?? '',
+                    $item['BUYER_STYLE'] ?? '',
+                    $item['SSA_STYLE'] ?? '',
+                    $item['COLOR'] ?? '',
+                    number_format(floatval($item['ORDER_QTY'] ?? 0), 0),
+                    $item['DN'] ?? '',
+                    number_format(floatval($item['QTY_SHIP'] ?? 0), 0),
+                    number_format(floatval($item['OUTS_PO_QTY'] ?? 0), 0),
+                    $item['INV_NO'] ?? '',
+                    number_format(floatval($item['INV_AMOUNT'] ?? 0), 2),
                 ];
             }
 
@@ -222,13 +255,15 @@ class SalesOrderController extends BaseController
                 'recordsFiltered' => $filteredRecords,
                 'data' => $processedData
             ]);
+
         } catch (\Exception $e) {
+            log_message('error', 'Sales Order Data Error: ' . $e->getMessage());
             return $this->response->setJSON([
-                'draw' => intval($this->request->getPost('draw')),
+                'draw' => intval($this->request->getPost('draw') ?? 1),
                 'recordsTotal' => 0,
                 'recordsFiltered' => 0,
                 'data' => [],
-                'error' => $e->getMessage()
+                'error' => 'Failed to load data: ' . $e->getMessage()
             ]);
         }
     }
@@ -236,73 +271,37 @@ class SalesOrderController extends BaseController
     public function exportExcel()
     {
         try {
+            ini_set('memory_limit', '512M');
+            set_time_limit(300);
+
             $data = $this->getData();
-            $filter = $this->request->getGet('filter') ?? 'all';
-
-            $buyerCountries = array_map('strtoupper', array_column(auth()->buyers(), 'country') ?: []);
-            $hasOtherCountry = false;
-            foreach ($buyerCountries as $bc) {
-                if ($bc !== 'SG' && $bc !== 'MY' && !auth()->isAdmin()) {
-                    $hasOtherCountry = true;
-                    break;
-                }
-            }
-
-            if ($hasOtherCountry && is_array($data)) {
-                $data = array_filter($data, function ($item) {
-                    $country = strtoupper(trim($item['COUNTRY'] ?? ''));
-                    return $country !== 'SG' && $country !== 'MY';
-                });
-            }
-
-            // $data = array_filter($data, function ($item) {
-            //     return !empty($item) && isset($item['PROD_YEAR']);
-            // });
-
-            // Filter berdasarkan tab
-            if ($filter === 'free-stock') {
-                $data = array_filter($data, function ($item) {
-                    return empty($item['SO_ACTUAL']) && empty($item['QUOT_ACTUAL']) && empty($item['PO_BUYER']);
-                });
-            } elseif ($filter === 'stock-allocated') {
-                $data = array_filter($data, function ($item) {
-                    return !empty($item['SO_ACTUAL']) || !empty($item['QUOT_ACTUAL']) || !empty($item['PO_BUYER']);
-                });
-            }
 
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
 
             $spreadsheet->getProperties()
                 ->setCreator('Sodexo Portal')
-                ->setTitle('SoTracebility Report')
-                ->setSubject('SoTracebility Data Export')
-                ->setDescription('Complete SoTracebility data from Sodexo Portal');
+                ->setTitle('Sales Order Traceability Report')
+                ->setSubject('Sales Order Data Export')
+                ->setDescription('Complete Sales Order data from Sodexo Portal');
 
             $headers = [
                 '#',
-                'Forecast Quotation No.',
-                'Forecast SO No.',
-                'Allocated to SO No.',
-                'Customer Name',
-                'Allocated to Quotation No',
-                'Allocated to Customer PO No.',
-                'Style',
+                'QO SSA',
+                'PO SSA',
+                'PO Buyer',
+                'End Customer',
+                'Sales Order (AMT)',
+                'Buyer Style',
+                'SSA Style',
                 'Colour',
-                'Universal Size',
-                'Qty (Pcs)',
-                'Production Year',
-                'Aging (days)',
-                'Country',
+                'Order Qty',
+                'Delivery Note',
+                'Shipment Qty',
+                'Outstanding PO Qty',
+                'Invoice Number',
+                'Invoice Amount'
             ];
-
-            if (auth()->isAdmin()) {
-                $headers = array_merge($headers, [
-                    'Material Code',
-                    'Special Stock',
-                    'Batch',
-                ]);
-            }
 
             $col = 'A';
             foreach ($headers as $header) {
@@ -310,7 +309,7 @@ class SalesOrderController extends BaseController
                 $col++;
             }
 
-            $headerRange = 'A1:' . chr(ord('A') + count($headers) - 1) . '1';
+            $headerRange = 'A1:O1';
             $sheet->getStyle($headerRange)->applyFromArray([
                 'font' => [
                     'bold' => true,
@@ -336,59 +335,29 @@ class SalesOrderController extends BaseController
             $row = 2;
             $counter = 1;
             foreach ($data as $item) {
-                // $country = $this->getCountryByCustomer($item['CUSTOMER'] ?? '');
-
                 $sheet->setCellValue('A' . $row, $counter++);
-                $sheet->setCellValue('B' . $row, $item['FORECAST_QUOTATION'] ?? '');
-                $sheet->setCellValue('C' . $row, $item['SO_FORECAST'] ?? '');
-                $sheet->setCellValue('D' . $row, $item['SO_ACTUAL'] ?? '');
-                $sheet->setCellValue('E' . $row, $item['CUSTOMER_NAME'] ?? '');
-                $sheet->setCellValue('F' . $row, $item['QUOT_ACTUAL'] ?? '');
-                $sheet->setCellValue('G' . $row, $item['PO_BUYER'] ?? '');
-                $sheet->setCellValue('H' . $row, !empty($item['STYLE']) ? explode(' ', ltrim($item['STYLE']))[0] : '' ?? '');
+                $sheet->setCellValue('B' . $row, $item['QO_SSA'] ?? '');
+                $sheet->setCellValue('C' . $row, $item['PO_SSA'] ?? '');
+                $sheet->setCellValue('D' . $row, $item['PO_BUYER'] ?? '');
+                $sheet->setCellValue('E' . $row, $item['END_CUSTOMER'] ?? '');
+                $sheet->setCellValue('F' . $row, $item['SO'] ?? '');
+                $sheet->setCellValue('G' . $row, $item['BUYER_STYLE'] ?? '');
+                $sheet->setCellValue('H' . $row, $item['SSA_STYLE'] ?? '');
                 $sheet->setCellValue('I' . $row, $item['COLOR'] ?? '');
-                $sheet->setCellValue('J' . $row, $item['SIZE'] ?? '');
-                $sheet->setCellValue('K' . $row, $item['QTY'] ?? 0);
-                $sheet->setCellValue('L' . $row, $item['PROD_YEAR'] ?? '');
-                $sheet->setCellValue('N' . $row, $item['COUNTRY'] . '-' . $item['COUNTRY_NAME'] ?? '');
-                if (auth()->isAdmin()) {
-                    $sheet->setCellValue('O' . $row, $item['MATERIAL'] ?? '');
-                    $sheet->setCellValue('P' . $row, $item['SO'] . '/' . $item['LINE_ITEM'] ?? '');
-                    $sheet->setCellValue('Q' . $row, $item['BATCH'] ?? '');
-                }
+                $sheet->setCellValue('J' . $row, floatval($item['ORDER_QTY'] ?? 0));
+                $sheet->setCellValue('K' . $row, $item['DN'] ?? '');
+                $sheet->setCellValue('L' . $row, floatval($item['QTY_SHIP'] ?? 0));
+                $sheet->setCellValue('M' . $row, floatval($item['OUTS_PO_QTY'] ?? 0));
+                $sheet->setCellValue('N' . $row, $item['INV_NO'] ?? '');
+                $sheet->setCellValue('O' . $row, floatval($item['INV_AMOUNT'] ?? 0));
                 $row++;
             }
 
-            $lastColumn = chr(ord('A') + count($headers) - 1);
-            foreach (range('A', $lastColumn) as $columnID) {
+            foreach (range('A', 'O') as $columnID) {
                 $sheet->getColumnDimension($columnID)->setAutoSize(true);
             }
 
-            $dataRange = 'A1:' . $lastColumn . ($row - 1);
-            $sheet->getStyle($dataRange)->applyFromArray([
-                'borders' => [
-                    'allBorders' => [
-                        'borderStyle' => Border::BORDER_THIN,
-                        'color' => ['rgb' => '000000']
-                    ]
-                ]
-            ]);
-
-            for ($i = 2; $i < $row; $i += 2) {
-                $sheet->getStyle('A' . $i . ':' . $lastColumn . $i)->applyFromArray([
-                    'fill' => [
-                        'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['rgb' => 'F5F5F5']
-                    ]
-                ]);
-            }
-
-            $sheet->getStyle('A2:A' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('B2:B' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('H2:H' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-            $sheet->getStyle('J2:J' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-            $filename = 'SoTracebility_Report_' . date('Y-m-d_H-i-s') . '.xlsx';
+            $filename = 'Sales_Order_Report_' . date('Y-m-d_H-i-s') . '.xlsx';
 
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="' . $filename . '"');
@@ -410,13 +379,12 @@ class SalesOrderController extends BaseController
     public function exportCsv()
     {
         try {
+            ini_set('memory_limit', '256M');
+            set_time_limit(120);
+
             $data = $this->getData();
 
-            $data = array_filter($data, function ($item) {
-                return !empty($item) && isset($item['PROD_YEAR']);
-            });
-
-            $filename = 'SoTracebility_Report_' . date('Y-m-d_H-i-s') . '.csv';
+            $filename = 'Sales_Order_Report_' . date('Y-m-d_H-i-s') . '.csv';
 
             header('Content-Type: text/csv; charset=utf-8');
             header('Content-Disposition: attachment;filename="' . $filename . '"');
@@ -428,18 +396,20 @@ class SalesOrderController extends BaseController
 
             $headers = [
                 '#',
-                'Forecast Quotation',
-                'SO Forecast',
-                'SO Actual (Allocated)',
-                'Customer',
-                'Actual Quotation',
+                'QO SSA',
+                'PO SSA',
                 'PO Buyer',
-                'Style',
-                'Color',
-                'Size',
-                'Qty',
-                'Production Year',
-                'Aging (days)'
+                'End Customer',
+                'Sales Order (AMT)',
+                'Buyer Style',
+                'SSA Style',
+                'Colour',
+                'Order Qty',
+                'Delivery Note',
+                'Shipment Qty',
+                'Outstanding PO Qty',
+                'Invoice Number',
+                'Invoice Amount'
             ];
 
             fputcsv($output, $headers);
@@ -448,17 +418,20 @@ class SalesOrderController extends BaseController
             foreach ($data as $item) {
                 $row = [
                     $counter++,
-                    $item['FORECAST_QUOTATION'] ?? '',
-                    $item['SO_FORECAST'] ?? '',
-                    $item['SO_ACTUAL'] ?? '',
-                    $item['CUSTOMER_NAME'] ?? '',
-                    $item['QUOT_ACTUAL'] ?? '',
+                    $item['QO_SSA'] ?? '',
+                    $item['PO_SSA'] ?? '',
                     $item['PO_BUYER'] ?? '',
-                    $item['STYLE'] ?? '',
+                    $item['END_CUSTOMER'] ?? '',
+                    $item['SO'] ?? '',
+                    $item['BUYER_STYLE'] ?? '',
+                    $item['SSA_STYLE'] ?? '',
                     $item['COLOR'] ?? '',
-                    $item['SIZE'] ?? '',
-                    $item['QTY'] ?? 0,
-                    $item['PROD_YEAR'] ?? '',
+                    floatval($item['ORDER_QTY'] ?? 0),
+                    $item['DN'] ?? '',
+                    floatval($item['QTY_SHIP'] ?? 0),
+                    floatval($item['OUTS_PO_QTY'] ?? 0),
+                    $item['INV_NO'] ?? '',
+                    floatval($item['INV_AMOUNT'] ?? 0)
                 ];
                 fputcsv($output, $row);
             }
@@ -473,21 +446,22 @@ class SalesOrderController extends BaseController
 
     public function refreshCache()
     {
-        $cacheKey = $this->getCacheKey();
-        $this->cache->delete($cacheKey);
-
-        $SoTracebilityFile = $this->getSoTracebilityFilePath();
-        if (file_exists($SoTracebilityFile)) {
-            unlink($SoTracebilityFile);
-        }
-
         try {
+            $cacheKey = $this->getCacheKey();
+            $this->cache->delete($cacheKey);
+
+            $soFile = $this->getSoTracebilityFilePath();
+            if (file_exists($soFile)) {
+                unlink($soFile);
+            }
+
             $this->getData();
             return $this->response->setJSON([
                 'status' => 'success',
                 'message' => 'Cache refreshed successfully and new data loaded'
             ]);
         } catch (\Exception $e) {
+            log_message('error', 'Refresh cache error: ' . $e->getMessage());
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'Failed to refresh cache: ' . $e->getMessage()

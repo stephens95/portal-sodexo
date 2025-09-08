@@ -42,15 +42,13 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('/report-inventory', 'InventoryController::index');
     $routes->post('/report-inventory/data', 'InventoryController::getInventoryData');
     $routes->post('/report-inventory/refresh-cache', 'InventoryController::refreshCache');
-    $routes->post('/report-inventory/all-data', 'InventoryController::getAllInventoryData');
     $routes->get('/report-inventory/export-excel', 'InventoryController::exportExcel');
     $routes->get('/report-inventory/export-csv', 'InventoryController::exportCsv');
 
-    // Report Sales Order Tracebility
+    // Report Sales Order Traceability
     $routes->get('/report-so', 'SalesOrderController::index');
-    $routes->post('/report-so/data', 'SalesOrderController::getSoTracebilityData');
+    $routes->post('/report-so/data', 'SalesOrderController::getSalesOrderData');
     $routes->post('/report-so/refresh-cache', 'SalesOrderController::refreshCache');
-    $routes->post('/report-so/all-data', 'SalesOrderController::getAllInventoryData');
     $routes->get('/report-so/export-excel', 'SalesOrderController::exportExcel');
     $routes->get('/report-so/export-csv', 'SalesOrderController::exportCsv');
 
