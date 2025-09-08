@@ -340,8 +340,8 @@ class SalesOrderController extends BaseController
                 $sheet->setCellValue('D' . $row, $item['PO_BUYER'] ?? '');
                 $sheet->setCellValue('E' . $row, $item['END_CUSTOMER'] ?? '');
                 $sheet->setCellValue('F' . $row, $item['SO'] ?? '');
-                $sheet->setCellValue('G' . $row, $item['BUYER_STYLE'] ?? '');
-                $sheet->setCellValue('H' . $row, $item['SSA_STYLE'] ?? '');
+                $sheet->setCellValue('G' . $row, !empty($item['BUYER_STYLE']) ? explode(' ', ltrim($item['BUYER_STYLE']))[0] : '' ?? '');
+                $sheet->setCellValue('H' . $row, !empty($item['SSA_STYLE']) ? explode(' ', ltrim($item['SSA_STYLE']))[0] : '' ?? '');
                 $sheet->setCellValue('I' . $row, $item['COLOR'] ?? '');
                 $sheet->setCellValue('J' . $row, floatval($item['ORDER_QTY'] ?? 0));
                 $sheet->setCellValue('K' . $row, $item['DO'] ?? '');
@@ -422,8 +422,8 @@ class SalesOrderController extends BaseController
                     $item['PO_BUYER'] ?? '',
                     $item['END_CUSTOMER'] ?? '',
                     $item['SO'] ?? '',
-                    $item['BUYER_STYLE'] ?? '',
-                    $item['SSA_STYLE'] ?? '',
+                    !empty($item['BUYER_STYLE']) ? explode(' ', ltrim($item['BUYER_STYLE']))[0] : '',
+                    !empty($item['SSA_STYLE']) ? explode(' ', ltrim($item['SSA_STYLE']))[0] : '',
                     $item['COLOR'] ?? '',
                     floatval($item['ORDER_QTY'] ?? 0),
                     $item['DO'] ?? '',
