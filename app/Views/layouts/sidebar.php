@@ -58,6 +58,7 @@
                     </a>
                     <ul class="pc-submenu">
                         <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-so') ?>">Tracebility Sales Order</a></li>
+                        <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-dn') ?>">DN Document</a></li>
                     </ul>
                 </li>
 
@@ -80,9 +81,10 @@
                     <i class="ti ti-news"></i>
                 </li>
                 <li class="pc-item">
-                    <a class="pc-link" target="_blank" href="<?= base_url('/api-inventory') ?>">
+                    <!-- <a class="pc-link" target="_blank" href="<?= base_url('/doc-api') ?>"> -->
+                    <a class="pc-link" href="<?= base_url('/doc-api') ?>">
                         <span class="pc-micon"><i class="ti ti-screen-share"></i></span>
-                        <span class="pc-mtext">Inventory</span>
+                        <span class="pc-mtext">Documentation</span>
                     </a>
                 </li>
             </ul>

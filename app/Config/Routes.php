@@ -52,13 +52,19 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('/report-so/export-excel', 'SalesOrderController::exportExcel');
     $routes->get('/report-so/export-csv', 'SalesOrderController::exportCsv');
 
+    // Debit Note Document
+    $routes->get('/report-dn', 'DebitNoteController::index');
+
     // Sales Order Routes
     // $routes->get('/sales-order', 'SalesOrderController::index');
 
     // Documentation API
     // $routes->get('/api-inventory', 'Api\DocumentationController::inventory');
+    $routes->get('/doc-api', 'API\ApiController::docApi');
+    $routes->get('/generate-token', 'API\TokenController::generate');
 });
 $routes->get('/api-inventory', 'API\ApiController::getInventory');
+
 
 // $routes->group('', ['filter' => 'auth', 'namespace' => 'App\Controllers\Api'], function ($routes) {
 //     $routes->get('api-inventory', 'ApiController::getInventory');

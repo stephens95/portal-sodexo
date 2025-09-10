@@ -2,13 +2,130 @@
 
 namespace App\Controllers\Api;
 
+use App\Models\UserModel;
+use App\Models\ApiTokenModel;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 
 class ApiController extends BaseController
 {
+    public function docApi()
+    {
+        $data['title'] = 'API Documentation';
+        $model = new ApiTokenModel();
+
+        // Ambil token terakhir yang masih valid
+        $data['api'] = $model->findAll();
+        return view('api/doc/inventory', $data);
+    }
+
+    // public function getInventory()
+    // {
+    //     $client = \Config\Services::curlrequest();
+    //     $url = "http://10.2.38.133:8000/zapi_sth/zapi_sodexo/zstock?sap-client=888";
+
+    //     try {
+    //         $response = $client->get($url, [
+    //             'headers' => [
+    //                 'Accept' => 'application/json'
+    //             ]
+    //         ]);
+
+    //         $result = json_decode($response->getBody(), true);
+
+    //         // Mapping antara nama parameter di URL dengan field asli dari API
+    //         $fieldMap = [
+    //             'FCASTQONO'     => 'FORECAST_QUOTATION',
+    //             'FCASTSONO'     => 'SO_FORECAST',
+    //             'ALCTDSONO'     => 'SO_ACTUAL',
+    //             'CUSTNAME'      => 'CUSTOMER_NAME',
+    //             'ALCTDQONO'     => 'QUOT_ACTUAL',
+    //             'ALCTDCUSTPONO' => 'PO_BUYER',
+    //             'STYLE'         => 'STYLE',
+    //             'COLOUR'        => 'COLOR',
+    //             'UNISIZE'       => 'SIZE',
+    //             'QTY'           => 'QTY',
+    //             'PRODYEAR'      => 'PROD_YEAR',
+    //             'COUNTRY'       => 'COUNTRY_NAME',
+    //         ];
+
+    //         // Ambil semua parameter dari request
+    //         $params = $this->request->getGet();
+
+    //         // Filter data sesuai parameter
+    //         $result = array_filter($result, function ($item) use ($params, $fieldMap) {
+    //             foreach ($params as $paramKey => $paramValue) {
+    //                 if (isset($fieldMap[$paramKey])) {
+    //                     $field = $fieldMap[$paramKey];
+    //                     if (!isset($item[$field]) || $item[$field] != $paramValue) {
+    //                         return false;
+    //                     }
+    //                 }
+    //             }
+    //             return true;
+    //         });
+
+    //         // Pilih hanya field tertentu
+    //         $filtered = array_map(function ($item) {
+    //             return [
+    //                 'FCASTQONO'      => $item['FORECAST_QUOTATION'] ?? null,
+    //                 'FCASTSONO'      => $item['SO_FORECAST'] ?? null,
+    //                 'ALCTDSONO'      => $item['SO_ACTUAL'] ?? null,
+    //                 'CUSTNAME'       => $item['CUSTOMER_NAME'] ?? null,
+    //                 'ALCTDQONO'      => $item['QUOT_ACTUAL'] ?? null,
+    //                 'ALCTDCUSTPONO'  => $item['PO_BUYER'] ?? null,
+    //                 'STYLE'          => $item['STYLE'] ?? null,
+    //                 'COLOUR'         => $item['COLOR'] ?? null,
+    //                 'UNISIZE'        => $item['SIZE'] ?? null,
+    //                 'QTY'            => $item['QTY'] ?? null,
+    //                 'PRODYEAR'       => $item['PROD_YEAR'] ?? null,
+    //                 'AGINGDAYS'      => $this->calculateAging($item['GR_DATE']) ?? null,
+    //                 'COUNTRY'        => $item['COUNTRY_NAME'] ?? null,
+    //             ];
+    //         }, $result);
+
+    //         return $this->response->setJSON(array_values($filtered));
+    //     } catch (\Exception $e) {
+    //         return $this->response->setJSON([
+    //             'error' => true,
+    //             'message' => $e->getMessage()
+    //         ]);
+    //     }
+    // }
+
+    // With Login Account
     public function getInventory()
     {
+        $request = service('request');
+
+        // Ambil Authorization Header
+        $authHeader = $request->getHeaderLine('Authorization');
+
+        if (!$authHeader || strpos($authHeader, 'Basic ') !== 0) {
+            return $this->response->setHeader('WWW-Authenticate', 'Basic realm="MyAPI"')->setJSON([
+                'error' => true,
+                'message' => 'Missing or invalid Authorization header'
+            ])->setStatusCode(401);
+        }
+
+        // Decode base64 username:password
+        $encoded = substr($authHeader, 6);
+        $decoded = base64_decode($encoded);
+        [$email, $password] = explode(':', $decoded, 2);
+
+        // Validasi user dari tabel
+        $userModel = new UserModel();
+
+        $user = $userModel->where('email', $email)->first();
+
+        if (!$user || !password_verify($password, $user['password'])) {
+            return $this->response->setHeader('WWW-Authenticate', 'Basic realm="MyAPI"')->setJSON([
+                'error' => true,
+                'message' => 'Unauthorized'
+            ])->setStatusCode(401);
+        }
+
+        // Kalau lolos auth, lanjut ke API SAP
         $client = \Config\Services::curlrequest();
         $url = "http://10.2.38.133:8000/zapi_sth/zapi_sodexo/zstock?sap-client=888";
 
@@ -21,7 +138,6 @@ class ApiController extends BaseController
 
             $result = json_decode($response->getBody(), true);
 
-            // Mapping antara nama parameter di URL dengan field asli dari API
             $fieldMap = [
                 'FCASTQONO'     => 'FORECAST_QUOTATION',
                 'FCASTSONO'     => 'SO_FORECAST',
@@ -37,10 +153,8 @@ class ApiController extends BaseController
                 'COUNTRY'       => 'COUNTRY_NAME',
             ];
 
-            // Ambil semua parameter dari request
             $params = $this->request->getGet();
 
-            // Filter data sesuai parameter
             $result = array_filter($result, function ($item) use ($params, $fieldMap) {
                 foreach ($params as $paramKey => $paramValue) {
                     if (isset($fieldMap[$paramKey])) {
@@ -53,7 +167,6 @@ class ApiController extends BaseController
                 return true;
             });
 
-            // Pilih hanya field tertentu
             $filtered = array_map(function ($item) {
                 return [
                     'FCASTQONO'      => $item['FORECAST_QUOTATION'] ?? null,
@@ -80,6 +193,108 @@ class ApiController extends BaseController
             ]);
         }
     }
+
+    // With Token
+    // public function getInventory()
+    // {
+    //     $client = \Config\Services::curlrequest();
+    //     $url = "http://10.2.38.133:8000/zapi_sth/zapi_sodexo/zstock?sap-client=888";
+
+    //     try {
+    //         $authHeader = $this->request->getHeaderLine('Authorization');
+
+    //         if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+    //             return $this->response->setJSON([
+    //                 'error' => true,
+    //                 'message' => 'Unauthorized: Token is missing'
+    //             ])->setStatusCode(401);
+    //         }
+
+    //         $incomingToken = $matches[1];
+
+    //         $model = new ApiTokenModel();
+
+    //         // Ambil token terakhir yang masih valid
+    //         $tokenRow = $model->where('token', $incomingToken)
+    //             ->where('expired_at >=', date('Y-m-d H:i:s'))
+    //             ->first();
+
+    //         if (!$tokenRow) {
+    //             return $this->response->setJSON([
+    //                 'error' => true,
+    //                 'message' => 'Unauthorized: Token invalid atau expired'
+    //             ])->setStatusCode(401);
+    //         }
+
+    //         $response = $client->get($url, [
+    //             'headers' => [
+    //                 'Accept'        => 'application/json',
+    //                 'Authorization' => 'Bearer ' . $tokenRow['token']
+    //             ]
+    //         ]);
+
+    //         $result = json_decode($response->getBody(), true);
+
+    //         //         // Mapping antara nama parameter di URL dengan field asli dari API
+    //         $fieldMap = [
+    //             'FCASTQONO'     => 'FORECAST_QUOTATION',
+    //             'FCASTSONO'     => 'SO_FORECAST',
+    //             'ALCTDSONO'     => 'SO_ACTUAL',
+    //             'CUSTNAME'      => 'CUSTOMER_NAME',
+    //             'ALCTDQONO'     => 'QUOT_ACTUAL',
+    //             'ALCTDCUSTPONO' => 'PO_BUYER',
+    //             'STYLE'         => 'STYLE',
+    //             'COLOUR'        => 'COLOR',
+    //             'UNISIZE'       => 'SIZE',
+    //             'QTY'           => 'QTY',
+    //             'PRODYEAR'      => 'PROD_YEAR',
+    //             'COUNTRY'       => 'COUNTRY_NAME',
+    //         ];
+
+    //         // Ambil semua parameter dari request
+    //         $params = $this->request->getGet();
+
+    //         // Filter data sesuai parameter
+    //         $result = array_filter($result, function ($item) use ($params, $fieldMap) {
+    //             foreach ($params as $paramKey => $paramValue) {
+    //                 if (isset($fieldMap[$paramKey])) {
+    //                     $field = $fieldMap[$paramKey];
+    //                     if (!isset($item[$field]) || $item[$field] != $paramValue) {
+    //                         return false;
+    //                     }
+    //                 }
+    //             }
+    //             return true;
+    //         });
+
+    //         // Pilih hanya field tertentu
+    //         $filtered = array_map(function ($item) {
+    //             return [
+    //                 'FCASTQONO'      => $item['FORECAST_QUOTATION'] ?? null,
+    //                 'FCASTSONO'      => $item['SO_FORECAST'] ?? null,
+    //                 'ALCTDSONO'      => $item['SO_ACTUAL'] ?? null,
+    //                 'CUSTNAME'       => $item['CUSTOMER_NAME'] ?? null,
+    //                 'ALCTDQONO'      => $item['QUOT_ACTUAL'] ?? null,
+    //                 'ALCTDCUSTPONO'  => $item['PO_BUYER'] ?? null,
+    //                 'STYLE'          => $item['STYLE'] ?? null,
+    //                 'COLOUR'         => $item['COLOR'] ?? null,
+    //                 'UNISIZE'        => $item['SIZE'] ?? null,
+    //                 'QTY'            => $item['QTY'] ?? null,
+    //                 'PRODYEAR'       => $item['PROD_YEAR'] ?? null,
+    //                 'AGINGDAYS'      => $this->calculateAging($item['GR_DATE']) ?? null,
+    //                 'COUNTRY'        => $item['COUNTRY_NAME'] ?? null,
+    //             ];
+    //         }, $result);
+
+    //         return $this->response->setJSON(array_values($filtered));
+    //     } catch (\Exception $e) {
+    //         return $this->response->setJSON([
+    //             'error' => true,
+    //             'message' => $e->getMessage()
+    //         ]);
+    //     }
+    // }
+
     // public function getInventory()
     // {
     //     $client = \Config\Services::curlrequest();
