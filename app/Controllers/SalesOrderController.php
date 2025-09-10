@@ -22,7 +22,7 @@ class SalesOrderController extends BaseController
 
     public function index()
     {
-        $data['title'] = 'Sales Order Traceability Report';
+        $data['title'] = 'Sales Order Tracebility Report';
         $data['segment1'] = 'Report';
         return view('report/sd/index', $data);
     }
@@ -167,7 +167,11 @@ class SalesOrderController extends BaseController
                 11 => 'QTY_SHIP',
                 12 => 'OUTS_PO_QTY',
                 13 => 'INV_NO',
-                14 => 'INV_AMOUNT'
+                14 => 'INV_AMOUNT',
+                15 => '',
+                16 => '',
+                17 => 'BRK_FEE',
+                18 => 'MNG_FEE',
             ];
 
             $filteredData = $data;
@@ -230,15 +234,18 @@ class SalesOrderController extends BaseController
             $counter = $start + 1;
 
             foreach ($pagedData as $item) {
+                $buyer_style = !empty($item['BUYER_STYLE']) ? explode(' ', ltrim($item['BUYER_STYLE']))[0] : '';
+                $ssa_style = !empty($item['SSA_STYLE']) ? explode(' ', ltrim($item['SSA_STYLE']))[0] : '';
                 $processedData[] = [
                     $counter++,
-                    $item['QO_SSA'] ?? '',
+                    $item['QO_SSA'] . '<br>' . $item['PO_SSA'],
                     $item['PO_SSA'] ?? '',
                     $item['PO_BUYER'] ?? '',
                     $item['END_CUSTOMER'] ?? '',
                     $item['SO'] ?? '',
-                    !empty($item['BUYER_STYLE']) ? explode(' ', ltrim($item['BUYER_STYLE']))[0] : '',
-                    !empty($item['SSA_STYLE']) ? explode(' ', ltrim($item['SSA_STYLE']))[0] : '',
+                    $buyer_style . '<br>' . $ssa_style,
+                    // !empty($item['BUYER_STYLE']) ? explode(' ', ltrim($item['BUYER_STYLE']))[0] : '',
+                    // !empty($item['SSA_STYLE']) ? explode(' ', ltrim($item['SSA_STYLE']))[0] : '',
                     $item['COLOR'] ?? '',
                     number_format(floatval($item['ORDER_QTY'] ?? 0), 0),
                     $item['DO'] ?? '',
@@ -246,6 +253,12 @@ class SalesOrderController extends BaseController
                     number_format(floatval($item['OUTS_PO_QTY'] ?? 0), 0),
                     $item['INV_NO'] ?? '',
                     number_format(floatval($item['INV_AMOUNT'] ?? 0), 2),
+                    '',
+                    '',
+                    '',
+                    number_format(floatval($item['BRK_FEE'] ?? 0), 2),
+                    number_format(floatval($item['MNG_FEE'] ?? 0), 2),
+                    '',
                 ];
             }
 

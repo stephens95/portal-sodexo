@@ -113,7 +113,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Sales Order Traceability Report</h5>
+                <h5 class="mb-0">Sales Order Tracebility Report</h5>
                 <button type="button" class="btn btn-outline-primary btn-sm" id="refreshCache">
                     <i class="fas fa-sync-alt"></i> Refresh Data
                 </button>
@@ -182,14 +182,14 @@
 
                             <!-- Table Section -->
                             <div class="table-container position-relative">
-                                <div class="loading-overlay d-none" id="<?= $content['overlayId'] ?>">
+                                <!-- <div class="loading-overlay d-none" id="<?= $content['overlayId'] ?>">
                                     <div class="text-center">
                                         <div class="spinner-border text-primary" role="status">
                                             <span class="visually-hidden">Loading...</span>
                                         </div>
                                         <div class="mt-2">Loading data...</div>
                                     </div>
-                                </div>
+                                </div> -->
 
                                 <div class="table-responsive">
                                     <table id="<?= $content['tableId'] ?>" class="table table-sm table-bordered table-striped table-hover w-100" style="white-space: nowrap; font-size: 11px;">
@@ -198,20 +198,26 @@
                                                 <?php
                                                 $headers = [
                                                     ['text' => '#', 'width' => '3%'],
-                                                    ['text' => 'QO SSA'],
-                                                    ['text' => 'PO SSA'],
+                                                    ['text' => 'QO SSA<br>PO SSA'],
+                                                    // ['text' => 'PO SSA'],
                                                     ['text' => 'PO Buyer'],
                                                     ['text' => 'End Customer'],
-                                                    ['text' => 'Sales Order (AMT)'],
-                                                    ['text' => 'Buyer Style'],
-                                                    ['text' => 'SSA Style'],
+                                                    ['text' => 'Sales Order<br>(AMT)'],
+                                                    ['text' => 'Buyer Style<br>SSA Style'],
+                                                    // ['text' => 'SSA Style'],
                                                     ['text' => 'Colour'],
-                                                    ['text' => 'Order Qty', 'class' => 'text-end'],
+                                                    ['text' => 'Order<br>Qty', 'class' => 'text-end'],
                                                     ['text' => 'Delivery Note'],
-                                                    ['text' => 'Shipment Qty', 'class' => 'text-end'],
-                                                    ['text' => 'Outstanding PO Qty', 'class' => 'text-end'],
-                                                    ['text' => 'Invoice Number'],
-                                                    ['text' => 'Invoice Amount', 'class' => 'text-end']
+                                                    ['text' => 'Shipment<br>Qty', 'class' => 'text-end'],
+                                                    ['text' => 'Outstanding<br>PO Qty', 'class' => 'text-end'],
+                                                    ['text' => 'Invoice<br>Number'],
+                                                    ['text' => 'Invoice<br>Amount', 'class' => 'text-end'],
+                                                    ['text' => 'Doc Curr<br>Invoice'],
+                                                    ['text' => 'Due Date'],
+                                                    ['text' => 'Payment<br>Received Date'],
+                                                    ['text' => 'Broker Fee'],
+                                                    ['text' => 'Management Fee'],
+                                                    ['text' => 'Attachments', 'width' => '5%', 'class' => 'text-center'],
                                                 ];
 
                                                 foreach ($headers as $header): ?>
@@ -261,22 +267,101 @@
         }
 
         getTableConfig() {
-            const columns = [
-                { data: 0, orderable: false, searchable: false },
-                { data: 1, orderable: true },
-                { data: 2, orderable: true },
-                { data: 3, orderable: true },
-                { data: 4, orderable: true },
-                { data: 5, orderable: true },
-                { data: 6, orderable: true },
-                { data: 7, orderable: true },
-                { data: 8, orderable: true },
-                { data: 9, orderable: true, type: 'num' },
-                { data: 10, orderable: true },
-                { data: 11, orderable: true, type: 'num' },
-                { data: 12, orderable: true, type: 'num' },
-                { data: 13, orderable: true },
-                { data: 14, orderable: true, type: 'num' }
+            const columns = [{
+                    data: 0,
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 1,
+                    orderable: true
+                },
+                // {
+                //     data: 2,
+                //     orderable: true
+                // },
+                {
+                    data: 3,
+                    orderable: true
+                },
+                {
+                    data: 4,
+                    orderable: true
+                },
+                {
+                    data: 5,
+                    orderable: true
+                },
+                {
+                    data: 6,
+                    orderable: true
+                },
+                {
+                    data: 7,
+                    orderable: true
+                },
+                // {
+                //     data: 8,
+                //     orderable: true
+                // },
+                {
+                    data: 8,
+                    orderable: true,
+                    className: 'text-end',
+                    type: 'num'
+                },
+                {
+                    data: 9,
+                    orderable: true
+                },
+                {
+                    data: 10,
+                    orderable: true,
+                    className: 'text-end',
+                    type: 'num'
+                },
+                {
+                    data: 11,
+                    orderable: true,
+                    className: 'text-end',
+                    type: 'num'
+                },
+                {
+                    data: 12,
+                    orderable: true
+                },
+                {
+                    data: 13,
+                    orderable: true,
+                    className: 'text-end',
+                    type: 'num'
+                },
+                {
+                    data: 14,
+                    orderable: true
+                },
+                {
+                    data: 15,
+                    orderable: true
+                },
+                {
+                    data: 16,
+                    orderable: true,
+                    className: 'text-end',
+                    type: 'num'
+                },
+                {
+                    data: 17,
+                    orderable: true,
+                    className: 'text-end',
+                    type: 'num'
+                },
+                {
+                    data: 18,
+                    orderable: true,
+                    className: 'text-end',
+                    type: 'num'
+                },
             ];
 
             return {
@@ -284,22 +369,37 @@
                 serverSide: true,
                 responsive: true,
                 ordering: true,
-                order: [[1, 'asc']],
-                columnDefs: [
-                    { targets: 0, orderable: false, searchable: false },
-                    { targets: '_all', className: 'text-start' },
-                    { targets: [9, 11, 12, 14], className: 'text-end' }
+                order: [
+                    [1, 'asc']
+                ],
+                columnDefs: [{
+                        targets: 0,
+                        orderable: false,
+                        searchable: false
+                    },
+                    // {
+                    //     targets: '_all',
+                    //     className: 'text-start'
+                    // },
+                    // {
+                    //     // targets: [9, 11, 12, 13],
+                    //     className: 'text-end'
+                    // }
                 ],
                 pageLength: 25,
-                lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+                lengthMenu: [
+                    [10, 25, 50, 100],
+                    [10, 25, 50, 100]
+                ],
                 dom: 'Bfrtip',
-                buttons: [
-                    {
+                buttons: [{
                         extend: 'excel',
                         text: '<i class="fas fa-file-excel"></i> Excel (Current Page)',
                         className: 'btn btn-success btn-sm me-2',
                         title: 'Sales Order Report (Current Page)',
-                        exportOptions: { columns: ':visible' }
+                        exportOptions: {
+                            columns: ':visible'
+                        }
                     },
                     {
                         extend: 'pdf',
@@ -308,14 +408,18 @@
                         title: 'Sales Order Report (Current Page)',
                         orientation: 'landscape',
                         pageSize: 'A4',
-                        exportOptions: { columns: ':visible' }
+                        exportOptions: {
+                            columns: ':visible'
+                        }
                     },
                     {
                         extend: 'print',
                         text: '<i class="fas fa-print"></i> Print (Current Page)',
                         className: 'btn btn-info btn-sm',
                         title: 'Sales Order Report (Current Page)',
-                        exportOptions: { columns: ':visible' }
+                        exportOptions: {
+                            columns: ':visible'
+                        }
                     }
                 ],
                 columns,
@@ -370,7 +474,7 @@
         bindEvents() {
             $('#refreshCache').on('click', () => this.refreshCache());
             $('.btn-export').on('click', (e) => this.handleExport(e));
-            
+
             // Auto refresh every 10 minutes
             setInterval(() => this.autoRefresh(), 600000);
         }
@@ -385,7 +489,9 @@
                 url: `${this.baseUrl}/report-so/refresh-cache`,
                 type: 'POST',
                 timeout: 60000,
-                data: { [this.csrfToken]: this.csrfHash },
+                data: {
+                    [this.csrfToken]: this.csrfHash
+                },
                 success: (response) => {
                     if (response.status === 'success') {
                         this.showNotification('success', 'Cache refreshed successfully');
