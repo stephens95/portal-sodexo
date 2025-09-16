@@ -49,19 +49,6 @@
                     <i class="ti ti-apps"></i>
                 </li>
 
-                <!-- Sales Distribution -->
-                <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-database-export"></i></span>
-                        <span class="pc-mtext">Sales Distribution</span>
-                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
-                    </a>
-                    <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-so') ?>">Tracebility Sales Order</a></li>
-                        <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-dn') ?>">DN Document</a></li>
-                    </ul>
-                </li>
-
                 <!-- Material Management -->
                 <li class="pc-item pc-hasmenu">
                     <a href="#!" class="pc-link">
@@ -76,17 +63,44 @@
                     </ul>
                 </li>
 
-                <li class="pc-item pc-caption">
+                <!-- Sales Distribution -->
+                <li class="pc-item pc-hasmenu">
+                    <a href="#!" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-database-export"></i></span>
+                        <span class="pc-mtext">Sales Distribution</span>
+                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                    </a>
+                    <ul class="pc-submenu">
+                        <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-so') ?>">Sales Order Status</a></li>
+                        <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-summary') ?>">Add. Doc Invoice </a></li>
+                    </ul>
+                </li>
+
+                <!-- Financial -->
+                <li class="pc-item pc-hasmenu">
+                    <a href="#!" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-database-export"></i></span>
+                        <span class="pc-mtext">Financial</span>
+                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                    </a>
+                    <ul class="pc-submenu">
+                        <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-dn') ?>">CN Status Report</a></li>
+                        <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-dn') ?>">DN Status Report</a></li>
+                    </ul>
+                </li>
+
+
+                <!-- <li class="pc-item pc-caption">
                     <label>API</label>
                     <i class="ti ti-news"></i>
                 </li>
                 <li class="pc-item">
                     <!-- <a class="pc-link" target="_blank" href="<?= base_url('/doc-api') ?>"> -->
-                    <a class="pc-link" href="<?= base_url('/doc-api') ?>">
-                        <span class="pc-micon"><i class="ti ti-screen-share"></i></span>
-                        <span class="pc-mtext">Documentation</span>
-                    </a>
-                </li>
+                <a class="pc-link" href="<?= base_url('/doc-api') ?>">
+                    <span class="pc-micon"><i class="ti ti-screen-share"></i></span>
+                    <span class="pc-mtext">Documentation</span>
+                </a>
+                </li> -->
             </ul>
         </div>
     </div>

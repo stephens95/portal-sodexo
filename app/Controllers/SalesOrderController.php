@@ -22,7 +22,7 @@ class SalesOrderController extends BaseController
 
     public function index()
     {
-        $data['title'] = 'Sales Order Tracebility Report';
+        $data['title'] = 'Sales Order Status Report';
         $data['segment1'] = 'Report';
         return view('report/sd/index', $data);
     }
@@ -168,10 +168,11 @@ class SalesOrderController extends BaseController
                 12 => 'OUTS_PO_QTY',
                 13 => 'INV_NO',
                 14 => 'INV_AMOUNT',
-                15 => '',
-                16 => '',
-                17 => 'BRK_FEE',
-                18 => 'MNG_FEE',
+                15 => 'INV_CURR',
+                16 => 'DUE_DATE',
+                17 => 'PMT_DATE',
+                18 => 'BRK_FEE',
+                19 => 'MNG_FEE',
             ];
 
             $filteredData = $data;
@@ -236,10 +237,24 @@ class SalesOrderController extends BaseController
             foreach ($pagedData as $item) {
                 $buyer_style = !empty($item['BUYER_STYLE']) ? explode(' ', ltrim($item['BUYER_STYLE']))[0] : '';
                 $ssa_style = !empty($item['SSA_STYLE']) ? explode(' ', ltrim($item['SSA_STYLE']))[0] : '';
+                $dueDate = $item['DUE_DATE'] ?? '';
+                if ($dueDate && $dueDate !== '0000-00-00') {
+                    $dueDate = date('d M y', strtotime($dueDate));
+                } else {
+                    $dueDate = '';
+                }
+
+                $pmtDate = $item['PMT_DATE'] ?? '';
+                if ($pmtDate && $pmtDate !== '0000-00-00') {
+                    $pmtDate = date('d M y', strtotime($pmtDate));
+                } else {
+                    $pmtDate = '';
+                }
+
                 $processedData[] = [
                     $counter++,
                     $item['QO_SSA'] . '<br>' . $item['PO_SSA'],
-                    $item['PO_SSA'] ?? '',
+                    // $item['PO_SSA'] ?? '',
                     $item['PO_BUYER'] ?? '',
                     $item['END_CUSTOMER'] ?? '',
                     $item['SO'] ?? '',
@@ -253,9 +268,9 @@ class SalesOrderController extends BaseController
                     number_format(floatval($item['OUTS_PO_QTY'] ?? 0), 0),
                     $item['INV_NO'] ?? '',
                     number_format(floatval($item['INV_AMOUNT'] ?? 0), 2),
-                    '',
-                    '',
-                    '',
+                    $item['INV_CURR'] ?? '',
+                    $dueDate ?? '',
+                    $pmtDate ?? '',
                     number_format(floatval($item['BRK_FEE'] ?? 0), 2),
                     number_format(floatval($item['MNG_FEE'] ?? 0), 2),
                     '',
@@ -479,5 +494,205 @@ class SalesOrderController extends BaseController
                 'message' => 'Failed to refresh cache: ' . $e->getMessage()
             ]);
         }
+    }
+
+    // public function uploadDocument()
+    // {
+    //     $file = $this->request->getFile('document');
+    //     if ($file && $file->isValid() && !$file->hasMoved()) {
+    //         $newName = $file->getRandomName();
+    //         $file->move(WRITEPATH . 'uploads/documents', $newName);
+    //         return $this->response->setJSON([
+    //             'status' => 'success',
+    //             'message' => 'File uploaded successfully',
+    //             'file_path' => 'uploads/documents/' . $newName
+    //         ]);
+    //     } else {
+    //         return $this->response->setJSON([
+    //             'status' => 'error',
+    //             'message' => 'File upload failed: ' . ($file ? $file->getErrorString() : 'No file uploaded')
+    //         ]);
+    //     }
+    // }
+
+    // public function uploadDocument()
+    // {
+    //     $file = $this->request->getFile('document');
+    //     $docType = $this->request->getPost('doc_type');
+    //     $salesOrder = $this->request->getPost('sales_order');
+
+    //     if (!$file || !$docType || !$salesOrder) {
+    //         return $this->response->setJSON([
+    //             'status' => 'error',
+    //             'message' => 'Missing required parameters'
+    //         ]);
+    //     }
+
+    //     if ($file->isValid() && !$file->hasMoved()) {
+    //         try {
+    //             // Get file extension
+    //             $ext = $file->getExtension();
+
+    //             // Map document types to prefixes
+    //             $docTypePrefixes = [
+    //                 'invoice' => 'INV',
+    //                 'packing_list' => 'PL',
+    //                 'bl_rw' => 'BL',
+    //                 'coo' => 'COO',
+    //                 'insurance' => 'INS'
+    //             ];
+
+    //             // Get prefix for document type
+    //             $prefix = $docTypePrefixes[$docType] ?? 'DOC';
+
+    //             // Generate filename: PREFIX_SALESORDER_TIMESTAMP.extension
+    //             $newName = sprintf(
+    //                 '%s_%s_%s.%s',
+    //                 $prefix,
+    //                 $salesOrder,
+    //                 date('YmdHis'),
+    //                 $ext
+    //             );
+
+    //             // Create upload directory if it doesn't exist
+    //             $uploadPath = WRITEPATH . 'uploads/documents/' . $salesOrder;
+    //             if (!is_dir($uploadPath)) {
+    //                 mkdir($uploadPath, 0755, true);
+    //             }
+
+    //             // Move file to directory
+    //             $file->move($uploadPath, $newName);
+
+    //             return $this->response->setJSON([
+    //                 'status' => 'success',
+    //                 'message' => 'File uploaded successfully',
+    //                 'file_path' => 'uploads/documents/' . $salesOrder . '/' . $newName
+    //             ]);
+    //         } catch (\Exception $e) {
+    //             log_message('error', 'File upload error: ' . $e->getMessage());
+    //             return $this->response->setJSON([
+    //                 'status' => 'error',
+    //                 'message' => 'Error processing file upload: ' . $e->getMessage()
+    //             ]);
+    //         }
+    //     }
+
+    //     return $this->response->setJSON([
+    //         'status' => 'error',
+    //         'message' => 'File upload failed: ' . ($file ? $file->getErrorString() : 'No file uploaded')
+    //     ]);
+    // }
+
+    public function uploadDocument()
+    {
+        $file = $this->request->getFile('document');
+        $docType = $this->request->getPost('doc_type');
+        $salesOrder = $this->request->getPost('sales_order');
+
+        if (!$file || !$docType || !$salesOrder) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Missing required parameters'
+            ]);
+        }
+
+        if ($file->isValid() && !$file->hasMoved()) {
+            try {
+                // Get file extension
+                $ext = $file->getExtension();
+
+                // Get current year and month
+                $year = date('Y');
+                $month = date('m');
+
+                // Map document types to prefixes and add running number format
+                $docTypePrefixes = [
+                    'invoice' => [
+                        'prefix' => 'INV',
+                        'format' => 'INV/%s/%s/%s/%04d'  // INV/YEAR/MONTH/SO/SEQUENCE
+                    ],
+                    'packing_list' => [
+                        'prefix' => 'PL',
+                        'format' => 'PL/%s/%s/%s/%04d'   // PL/YEAR/MONTH/SO/SEQUENCE
+                    ],
+                    'bl_rw' => [
+                        'prefix' => 'BL',
+                        'format' => 'BL/%s/%s/%s/%04d'   // BL/YEAR/MONTH/SO/SEQUENCE
+                    ],
+                    'coo' => [
+                        'prefix' => 'COO',
+                        'format' => 'COO/%s/%s/%s/%04d'  // COO/YEAR/MONTH/SO/SEQUENCE
+                    ],
+                    'insurance' => [
+                        'prefix' => 'INS',
+                        'format' => 'INS/%s/%s/%s/%04d'  // INS/YEAR/MONTH/SO/SEQUENCE
+                    ]
+                ];
+
+                // Get document type configuration
+                $docConfig = $docTypePrefixes[$docType] ?? [
+                    'prefix' => 'DOC',
+                    'format' => 'DOC/%s/%s/%s/%04d'
+                ];
+
+                // Create directory path for the month
+                $uploadPath = WRITEPATH . 'uploads/documents/' . $year . '/' . $month . '/' . $salesOrder;
+                if (!is_dir($uploadPath)) {
+                    mkdir($uploadPath, 0755, true);
+                }
+
+                // Get existing files to determine sequence number
+                $files = glob($uploadPath . '/' . $docConfig['prefix'] . '*');
+                $sequence = count($files) + 1;
+
+                // Generate document number
+                $docNumber = sprintf(
+                    $docConfig['format'],
+                    $year,
+                    $month,
+                    $salesOrder,
+                    $sequence
+                );
+
+                // Generate filename with document number
+                $newName = sprintf(
+                    '%s_%s.%s',
+                    $docConfig['prefix'],
+                    date('YmdHis'),
+                    $ext
+                );
+
+                // Move file to directory
+                $file->move($uploadPath, $newName);
+
+                // Store document information (you might want to save this in a database)
+                $documentInfo = [
+                    'doc_number' => $docNumber,
+                    'doc_type' => $docType,
+                    'sales_order' => $salesOrder,
+                    'file_name' => $newName,
+                    'file_path' => 'uploads/documents/' . $year . '/' . $month . '/' . $salesOrder . '/' . $newName,
+                    'uploaded_at' => date('Y-m-d H:i:s')
+                ];
+
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'message' => 'File uploaded successfully',
+                    'doc_number' => $docNumber,
+                    'file_path' => $documentInfo['file_path']
+                ]);
+            } catch (\Exception $e) {
+                log_message('error', 'File upload error: ' . $e->getMessage());
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Error processing file upload: ' . $e->getMessage()
+                ]);
+            }
+        }
+
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'File upload failed: ' . ($file ? $file->getErrorString() : 'No file uploaded')
+        ]);
     }
 }

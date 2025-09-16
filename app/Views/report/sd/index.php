@@ -113,7 +113,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Sales Order Tracebility Report</h5>
+                <h5 class="mb-0">Sales Order Status Report</h5>
                 <button type="button" class="btn btn-outline-primary btn-sm" id="refreshCache">
                     <i class="fas fa-sync-alt"></i> Refresh Data
                 </button>
@@ -247,6 +247,45 @@
     </div>
 </div>
 
+<div class="modal fade" id="uploadModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Documents</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadForm">
+                    <input type="hidden" id="uploadSalesOrder" name="sales_order">
+
+                    <div class="mb-3">
+                        <label class="form-label">Document Type</label>
+                        <select class="form-select" name="doc_type" required>
+                            <option value="">Select document type...</option>
+                            <option value="invoice">Invoice (PDF)</option>
+                            <option value="packing_list">Packing List (PDF/Excel)</option>
+                            <option value="bl_rw">BL/RW Bill (PDF)</option>
+                            <option value="coo">COO (PDF)</option>
+                            <option value="insurance">Insurance (PDF)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Document File</label>
+                        <input type="file" class="form-control" name="document" required
+                            accept=".pdf,.xlsx,.xls">
+                        <div class="form-text">Maximum file size: 3MB</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="uploadButton">Upload</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('js') ?>
@@ -261,9 +300,71 @@
             this.init();
         }
 
+        // init() {
+        //     this.initTables();
+        //     this.bindEvents();
+        // }
+
+        initializeUploadModal() {
+            const modal = new bootstrap.Modal('#uploadModal');
+            const form = document.getElementById('uploadForm');
+            const uploadButton = document.getElementById('uploadButton');
+
+            uploadButton.addEventListener('click', () => {
+                const formData = new FormData(form);
+
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                const file = formData.get('document');
+                if (file.size > 3145728) { // 3MB
+                    this.showNotification('error', 'File size exceeds 3MB limit');
+                    return;
+                }
+
+                uploadButton.disabled = true;
+                uploadButton.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Uploading...';
+
+                $.ajax({
+                    url: `${this.baseUrl}/report-so/upload-document`,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: (response) => {
+                        if (response.status === 'success') {
+                            this.showNotification('success', 'Document uploaded successfully');
+                            modal.hide();
+                            this.tables['all'].ajax.reload();
+                        } else {
+                            this.showNotification('error', response.message || 'Upload failed');
+                        }
+                    },
+                    error: (xhr, status, error) => {
+                        console.error('Upload error:', status, error);
+                        this.showNotification('error', 'Failed to upload document');
+                    },
+                    complete: () => {
+                        uploadButton.disabled = false;
+                        uploadButton.innerHTML = 'Upload';
+                        form.reset();
+                    }
+                });
+            });
+        }
+
         init() {
             this.initTables();
             this.bindEvents();
+            this.initializeUploadModal(); // Add this line
+        }
+
+        openUploadModal(salesOrder) {
+            document.getElementById('uploadSalesOrder').value = salesOrder;
+            const modal = new bootstrap.Modal('#uploadModal');
+            modal.show();
         }
 
         getTableConfig() {
@@ -276,10 +377,10 @@
                     data: 1,
                     orderable: true
                 },
-                // {
-                //     data: 2,
-                //     orderable: true
-                // },
+                {
+                    data: 2,
+                    orderable: true
+                },
                 {
                     data: 3,
                     orderable: true
@@ -328,13 +429,13 @@
                 },
                 {
                     data: 12,
-                    orderable: true
+                    orderable: true,
+                    className: 'text-end',
+                    type: 'num'
                 },
                 {
                     data: 13,
                     orderable: true,
-                    className: 'text-end',
-                    type: 'num'
                 },
                 {
                     data: 14,
@@ -356,11 +457,25 @@
                     className: 'text-end',
                     type: 'num'
                 },
+                // Modify the columns configuration in getTableConfig()
                 {
                     data: 18,
-                    orderable: true,
-                    className: 'text-end',
-                    type: 'num'
+                    orderable: false,
+                    className: 'text-center',
+                    render: (data, type, row) => {
+                        const so = row[5]; // Assuming SO number is in column 5
+                        return `
+            <div class="btn-group">
+            
+                <button type="button" class="btn btn-sm btn-info" onclick="window.location.href='${this.baseUrl}/report-so/documents/${so}'">
+                    <i class="fas fa-folder-open"></i>
+                </button>
+            </div>
+        `;
+                        // <button type="button" class="btn btn-sm btn-primary" onclick="window.salesOrderReport.openUploadModal('${so}')">
+                        //         <i class="fas fa-upload"></i>
+                        //     </button>
+                    }
                 },
             ];
 
@@ -552,7 +667,7 @@
 
     $(document).ready(() => {
         try {
-            new SalesOrderReport();
+            window.salesOrderReport = new SalesOrderReport();
         } catch (error) {
             console.error('Error initializing SalesOrderReport:', error);
         }

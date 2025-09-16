@@ -51,6 +51,17 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->post('/report-so/refresh-cache', 'SalesOrderController::refreshCache');
     $routes->get('/report-so/export-excel', 'SalesOrderController::exportExcel');
     $routes->get('/report-so/export-csv', 'SalesOrderController::exportCsv');
+    $routes->post('/report-so/upload-document', 'SalesOrderController::uploadDocument');
+
+    // Report Summary Sales Order
+    $routes->get('/report-summary', 'SummarySalesOrderController::index');
+    $routes->get('report/sd/summary/getData', 'SummarySalesOrderController::getData');
+    $routes->post('report/sd/summary/upload', 'SummarySalesOrderController::uploadDocument');
+    $routes->get('document/downloadAll', 'SummarySalesOrderController::downloadAll');
+    $routes->get('document/getNote', 'SummarySalesOrderController::getNote');
+    $routes->post('document/saveNote', 'SummarySalesOrderController::saveNote');
+    $routes->get('document/exportExcelByDate', 'SummarySalesOrderController::exportExcelByDate');
+
 
     // Debit Note Document
     $routes->get('/report-dn', 'DebitNoteController::index');
@@ -63,6 +74,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('/doc-api', 'API\ApiController::docApi');
     $routes->get('/generate-token', 'API\TokenController::generate');
 });
+
 $routes->get('/api-inventory', 'API\ApiController::getInventory');
 
 
