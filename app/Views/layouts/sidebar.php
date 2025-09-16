@@ -95,8 +95,8 @@
                     <i class="ti ti-news"></i>
                 </li>
                 <li class="pc-item">
-                    <!-- <a class="pc-link" target="_blank" href="<?= base_url('/doc-api') ?>"> -->
-                <a class="pc-link" href="<?= base_url('/doc-api') ?>">
+                    <a class="pc-link" target="_blank" href="<?= base_url('/doc-api') ?>"> -->
+                <!-- <a class="pc-link" href="<?= base_url('/doc-api') ?>">
                     <span class="pc-micon"><i class="ti ti-screen-share"></i></span>
                     <span class="pc-mtext">Documentation</span>
                 </a>
