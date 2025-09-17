@@ -243,12 +243,13 @@
                         <textarea class="form-control" id="noteText" name="note" rows="20"
                             maxlength="1000"
                             placeholder="Tulis catatan di sini... (max 1000 karakter)"
-                            <?php if (!auth()->isAdmin()): ?>disabled<?php endif; ?>></textarea>
+                            <?php if (!auth()->isAdmin() && !auth()->hasRoles(['User02'])): ?>disabled<?php endif; ?>></textarea>
+
                         <small id="charCount" class="text-muted">0 / 1000</small>
                     </div>
                 </form>
             </div>
-            <?php if (auth()->isAdmin()): ?>
+            <?php if (auth()->isAdmin() || auth()->hasRoles(['User02'])): ?>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                     <button type="button" class="btn btn-primary" id="saveNoteBtn">Simpan</button>
@@ -323,7 +324,7 @@
                 {
                     data: 7
                 }, // Doc INS
-                <?php if (auth()->isAdmin()): ?> {
+                <?php if (auth()->isAdmin() || auth()->hasRoles(['User02'])): ?> {
                         data: 0, // pakai Invoice sebagai identifier
                         render: function(data, type, row) {
 
