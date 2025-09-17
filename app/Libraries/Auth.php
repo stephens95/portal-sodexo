@@ -36,11 +36,11 @@ class Auth
         if ($this->user && !$this->roles) {
             $db = \Config\Database::connect();
             $this->roles = $db->table('user_has_roles uhr')
-                             ->select('r.role_id, r.role_name')
-                             ->join('roles r', 'r.role_id = uhr.role_id')
-                             ->where('uhr.user_id', $this->user['user_id'])
-                             ->get()
-                             ->getResultArray();
+                ->select('r.role_id, r.role_name')
+                ->join('roles r', 'r.role_id = uhr.role_id')
+                ->where('uhr.user_id', $this->user['user_id'])
+                ->get()
+                ->getResultArray();
         }
     }
 
@@ -49,12 +49,12 @@ class Auth
         if ($this->user && !$this->buyers) {
             $db = \Config\Database::connect();
             $this->buyers = $db->table('user_has_buyers uhb')
-                            //   ->select('b.buyer_id, b.buyer_name, b.group_name')
-                              ->select('b.*')
-                              ->join('buyers b', 'b.buyer_id = uhb.buyer_id')
-                              ->where('uhb.user_id', $this->user['user_id'])
-                              ->get()
-                              ->getResultArray();
+                //   ->select('b.buyer_id, b.buyer_name, b.group_name')
+                ->select('b.*')
+                ->join('buyers b', 'b.buyer_id = uhb.buyer_id')
+                ->where('uhb.user_id', $this->user['user_id'])
+                ->get()
+                ->getResultArray();
         }
     }
 
@@ -149,7 +149,7 @@ class Auth
 
     public function isAdmin()
     {
-        return $this->hasRole('Admin');
+        return $this->hasRole('Admin01');
     }
 
     public function isVerified()

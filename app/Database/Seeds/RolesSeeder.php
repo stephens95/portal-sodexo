@@ -10,8 +10,11 @@ class RolesSeeder extends Seeder
     {
         // $this->db->table('roles')->truncate();
         $data = [
-            ['role_name' => 'Admin'],
-            ['role_name'  => 'User'],
+            ['role_name' => 'Admin01'],
+            ['role_name' => 'Admin02'],
+            ['role_name' => 'User01'],
+            ['role_name' => 'User02'],
+            ['role_name' => 'User03'],
         ];
 
         $this->db->table('roles')->insertBatch($data);

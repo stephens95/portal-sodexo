@@ -31,9 +31,8 @@
                             <span class="pc-mtext">Buyers</span>
                         </a>
                     </li>
-                <?php endif; ?>
 
-                <li class="pc-item pc-caption">
+                    <!-- <li class="pc-item pc-caption">
                     <label>Dashboard</label>
                     <i class="ti ti-dashboard"></i>
                 </li>
@@ -42,53 +41,53 @@
                         <span class="pc-micon"><i class="ti ti-news"></i></span>
                         <span class="pc-mtext">News & Updates</span>
                     </a>
-                </li>
+                </li> -->
 
-                <li class="pc-item pc-caption">
-                    <label>Report</label>
-                    <i class="ti ti-apps"></i>
-                </li>
+                    <li class="pc-item pc-caption">
+                        <label>Report</label>
+                        <i class="ti ti-apps"></i>
+                    </li>
 
-                <!-- Material Management -->
-                <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-database-export"></i></span>
-                        <span class="pc-mtext">Material Management</span>
-                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
-                    </a>
-                    <ul class="pc-submenu">
-                        <li class="pc-item">
-                            <a class="pc-link" href="<?= base_url('/report-inventory') ?>">Inventory</a>
-                        </li>
-                    </ul>
-                </li>
+                    <!-- Material Management -->
+                    <li class="pc-item pc-hasmenu">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-database-export"></i></span>
+                            <span class="pc-mtext">Material Management</span>
+                            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item">
+                                <a class="pc-link" href="<?= base_url('/report-inventory') ?>">Inventory</a>
+                            </li>
+                        </ul>
+                    </li>
 
-                <!-- Sales Distribution -->
-                <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-database-export"></i></span>
-                        <span class="pc-mtext">Sales Distribution</span>
-                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
-                    </a>
-                    <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-so') ?>">Sales Order Status</a></li>
-                        <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-summary') ?>">Add. Doc Invoice </a></li>
-                    </ul>
-                </li>
+                    <!-- Sales Distribution -->
+                    <li class="pc-item pc-hasmenu">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-database-export"></i></span>
+                            <span class="pc-mtext">Sales Distribution</span>
+                            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-so') ?>">Sales Order Status</a></li>
+                            <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-summary') ?>">Add. Doc Invoice </a></li>
+                        </ul>
+                    </li>
 
-                <!-- Financial -->
-                <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-database-export"></i></span>
-                        <span class="pc-mtext">Financial</span>
-                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
-                    </a>
-                    <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-dn') ?>">CN Status Report</a></li>
-                        <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-dn') ?>">DN Status Report</a></li>
-                    </ul>
-                </li>
-
+                    <!-- Financial -->
+                    <li class="pc-item pc-hasmenu">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-database-export"></i></span>
+                            <span class="pc-mtext">Financial</span>
+                            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-dn') ?>">CN Status Report</a></li>
+                            <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-dn') ?>">DN Status Report</a></li>
+                        </ul>
+                    </li>
+                <?php endif; ?>
 
                 <!-- <li class="pc-item pc-caption">
                     <label>API</label>
@@ -101,6 +100,70 @@
                     <span class="pc-mtext">Documentation</span>
                 </a>
                 </li> -->
+
+                <!-- Admin IT ZOHO -->
+                <?php if (auth()->hasRoles(['Admin02']) || auth()->hasRoles(['User01']) || auth()->hasRoles(['User03'])): ?>
+                    <li class="pc-item pc-caption">
+                        <label>Report</label>
+                        <i class="ti ti-apps"></i>
+                    </li>
+
+                    <!-- Material Management -->
+                    <li class="pc-item pc-hasmenu">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-database-export"></i></span>
+                            <span class="pc-mtext">Material Management</span>
+                            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item">
+                                <a class="pc-link" href="<?= base_url('/report-inventory') ?>">Inventory</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Sales Distribution -->
+                    <li class="pc-item pc-hasmenu">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-database-export"></i></span>
+                            <span class="pc-mtext">Sales Distribution</span>
+                            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-so') ?>">Sales Order Status</a></li>
+                            <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-summary') ?>">Add. Doc Invoice </a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Financial -->
+                    <li class="pc-item pc-hasmenu">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-database-export"></i></span>
+                            <span class="pc-mtext">Financial</span>
+                            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-dn') ?>">CN Status Report</a></li>
+                            <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-dn') ?>">DN Status Report</a></li>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+
+
+                <!-- Admin User Exim -->
+                <?php if (auth()->hasRoles(['User02'])): ?>
+                    <!-- Sales Distribution -->
+                    <li class="pc-item pc-hasmenu">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-database-export"></i></span>
+                            <span class="pc-mtext">Sales Distribution</span>
+                            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-summary') ?>">Add. Doc Invoice </a></li>
+                        </ul>
+                    </li>
+                <?php endif; ?>
             </ul>
         </div>
     </div>

@@ -158,7 +158,9 @@
                                 <th>Doc AW Bill</th>
                                 <th>Doc COO</th>
                                 <th>Doc INS</th>
-                                <th>Upload</th>
+                                <?php if (auth()->hasRoles(['Admin01']) || auth()->hasRoles(['Admin02']) || auth()->hasRoles(['User01']) || auth()->hasRoles(['User02']) || auth()->hasRoles(['User03'])): ?>
+                                    <th>Upload</th>
+                                <?php endif; ?>
                             </tr>
                         </thead>
                         <tbody>
@@ -240,15 +242,18 @@
                         <label for="noteText" class="form-label">Catatan</label>
                         <textarea class="form-control" id="noteText" name="note" rows="20"
                             maxlength="1000"
-                            placeholder="Tulis catatan di sini... (max 1000 karakter)"></textarea>
+                            placeholder="Tulis catatan di sini... (max 1000 karakter)"
+                            <?php if (!auth()->isAdmin()): ?>disabled<?php endif; ?>></textarea>
                         <small id="charCount" class="text-muted">0 / 1000</small>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary" id="saveNoteBtn">Simpan</button>
-            </div>
+            <?php if (auth()->isAdmin()): ?>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" id="saveNoteBtn">Simpan</button>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
@@ -318,10 +323,11 @@
                 {
                     data: 7
                 }, // Doc INS
-                {
-                    data: 0, // pakai Invoice sebagai identifier
-                    render: function(data, type, row) {
-                        return `
+                <?php if (auth()->isAdmin()): ?> {
+                        data: 0, // pakai Invoice sebagai identifier
+                        render: function(data, type, row) {
+
+                            return `
                         <button type="button" class="btn btn-sm btn-outline-success upload-btn" 
                                 data-invoice="${row[0]}" data-endcustomer="${row[2]}">
                             <i class="fas fa-upload"></i> Upload
@@ -334,8 +340,26 @@
                     data-invoice="${row[0]}" data-endcustomer="${row[2]}">
                 <i class="fas fa-sticky-note"></i> Note
             </button>`;
-                    }
-                }
+                        }
+                    },
+                <?php endif; ?>
+
+                <?php if (auth()->hasRoles(['User01']) || auth()->hasRoles(['Admin02']) || auth()->hasRoles(['User03'])): ?> {
+                        data: 0, // pakai Invoice sebagai identifier
+                        render: function(data, type, row) {
+
+                            return `
+                         <button type="button" class="btn btn-sm btn-outline-primary download-all-btn" 
+                    data-invoice="${row[0]}" data-endcustomer="${row[2]}">
+                <i class="fas fa-download"></i> Download All
+            </button>
+             <button type="button" class="btn btn-sm btn-outline-warning note-btn" 
+                    data-invoice="${row[0]}" data-endcustomer="${row[2]}">
+                <i class="fas fa-sticky-note"></i> Note
+            </button>`;
+                        }
+                    },
+                <?php endif; ?>
             ]
         });
         // 🔄 Refresh button

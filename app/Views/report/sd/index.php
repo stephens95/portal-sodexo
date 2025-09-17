@@ -217,7 +217,6 @@
                                                     ['text' => 'Payment<br>Received Date'],
                                                     ['text' => 'Broker Fee'],
                                                     ['text' => 'Management Fee'],
-                                                    ['text' => 'Attachments', 'width' => '5%', 'class' => 'text-center'],
                                                 ];
 
                                                 foreach ($headers as $header): ?>
@@ -242,45 +241,6 @@
                         Data is cached for 30 minutes. Use "Refresh Data" to get the latest data.
                     </small>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="uploadModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Upload Documents</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="uploadForm">
-                    <input type="hidden" id="uploadSalesOrder" name="sales_order">
-
-                    <div class="mb-3">
-                        <label class="form-label">Document Type</label>
-                        <select class="form-select" name="doc_type" required>
-                            <option value="">Select document type...</option>
-                            <option value="invoice">Invoice (PDF)</option>
-                            <option value="packing_list">Packing List (PDF/Excel)</option>
-                            <option value="bl_rw">BL/RW Bill (PDF)</option>
-                            <option value="coo">COO (PDF)</option>
-                            <option value="insurance">Insurance (PDF)</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Document File</label>
-                        <input type="file" class="form-control" name="document" required
-                            accept=".pdf,.xlsx,.xls">
-                        <div class="form-text">Maximum file size: 3MB</div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="uploadButton">Upload</button>
             </div>
         </div>
     </div>
@@ -458,25 +418,6 @@
                     type: 'num'
                 },
                 // Modify the columns configuration in getTableConfig()
-                {
-                    data: 18,
-                    orderable: false,
-                    className: 'text-center',
-                    render: (data, type, row) => {
-                        const so = row[5]; // Assuming SO number is in column 5
-                        return `
-            <div class="btn-group">
-            
-                <button type="button" class="btn btn-sm btn-info" onclick="window.location.href='${this.baseUrl}/report-so/documents/${so}'">
-                    <i class="fas fa-folder-open"></i>
-                </button>
-            </div>
-        `;
-                        // <button type="button" class="btn btn-sm btn-primary" onclick="window.salesOrderReport.openUploadModal('${so}')">
-                        //         <i class="fas fa-upload"></i>
-                        //     </button>
-                    }
-                },
             ];
 
             return {
