@@ -75,10 +75,10 @@ class SalesOrderController extends BaseController
                     throw new \Exception('API returned status: ' . $response->getStatusCode());
                 }
             } catch (\Exception $e) {
-                log_message('error', 'SO API Error: ' . $e->getMessage());
+                log_message('error', message: 'API Error: ' . $e->getMessage());
                 $data = $this->loadSoTracebilityData();
                 if (!$data) {
-                    throw new \Exception('API unavailable and no SO data found: ' . $e->getMessage());
+                    throw new \Exception('API unavailable and no data found: ' . $e->getMessage());
                 }
             }
         }

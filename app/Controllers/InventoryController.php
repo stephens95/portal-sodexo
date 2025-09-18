@@ -61,7 +61,7 @@ class InventoryController extends BaseController
             } catch (\Exception $e) {
                 $data = $this->loadInventoryData();
                 if (!$data) {
-                    throw new \Exception('API unavailable and no inventory data found');
+                    throw new \Exception('API unavailable and no data found');
                 }
             }
         }

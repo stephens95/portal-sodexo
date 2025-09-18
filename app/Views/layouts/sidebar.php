@@ -83,7 +83,7 @@
                             <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                         </a>
                         <ul class="pc-submenu">
-                            <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-dn') ?>">CN Status Report</a></li>
+                            <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-cn') ?>">CN Status Report</a></li>
                             <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-dn') ?>">DN Status Report</a></li>
                         </ul>
                     </li>
@@ -143,7 +143,7 @@
                             <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                         </a>
                         <ul class="pc-submenu">
-                            <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-dn') ?>">CN Status Report</a></li>
+                            <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-cn') ?>">CN Status Report</a></li>
                             <li class="pc-item"><a class="pc-link" href="<?= base_url('/report-dn') ?>">DN Status Report</a></li>
                         </ul>
                     </li>

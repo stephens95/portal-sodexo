@@ -136,10 +136,10 @@
                 <?php endif; ?>
 
                 <!-- Navigation Tabs -->
-                <ul class="nav nav-tabs" id="soTabs" role="tablist">
+                <ul class="nav nav-tabs" id="debitNoteTabs" role="tablist">
                     <?php
                     $tabs = [
-                        ['id' => 'all-so', 'icon' => 'clipboard-list', 'label' => 'All DN Document', 'active' => true],
+                        ['id' => 'all-dn', 'icon' => 'file-invoice', 'label' => 'All DN Document', 'active' => true],
                     ];
                     foreach ($tabs as $tab): ?>
                         <li class="nav-item" role="presentation">
@@ -155,10 +155,10 @@
                 </ul>
 
                 <!-- Tab Content -->
-                <div class="tab-content" id="soTabContent">
+                <div class="tab-content" id="debitNoteTabContent">
                     <?php
                     $tabContents = [
-                        ['id' => 'all-so', 'tableId' => 'soTable', 'overlayId' => 'loadingOverlay1', 'filter' => 'all', 'title' => 'All Data', 'active' => true]
+                        ['id' => 'all-dn', 'tableId' => 'dnTable', 'overlayId' => 'loadingOverlay1', 'filter' => 'all', 'title' => 'All Data', 'active' => true]
                     ];
                     foreach ($tabContents as $content): ?>
                         <div class="tab-pane fade <?= $content['active'] ? 'show active' : '' ?>"
@@ -182,14 +182,14 @@
 
                             <!-- Table Section -->
                             <div class="table-container position-relative">
-                                <!-- <div class="loading-overlay d-none" id="<?= $content['overlayId'] ?>">
+                                <div class="loading-overlay d-none" id="<?= $content['overlayId'] ?>">
                                     <div class="text-center">
                                         <div class="spinner-border text-primary" role="status">
                                             <span class="visually-hidden">Loading...</span>
                                         </div>
                                         <div class="mt-2">Loading data...</div>
                                     </div>
-                                </div> -->
+                                </div>
 
                                 <div class="table-responsive">
                                     <table id="<?= $content['tableId'] ?>" class="table table-sm table-bordered table-striped table-hover w-100" style="white-space: nowrap; font-size: 11px;">
@@ -197,16 +197,20 @@
                                             <tr>
                                                 <?php
                                                 $headers = [
-                                                    ['text' => '#', 'width' => '3%'],
-                                                    ['text' => 'Document<br>Date'],
-                                                    ['text' => 'Document<br>Number'],
-                                                    ['text' => 'Currency'],
-                                                    ['text' => 'Courier'],
-                                                    ['text' => 'Local Charge'],
-                                                    ['text' => 'Duty'],
-                                                    ['text' => 'Others'],
-                                                    ['text' => 'Total'],
-                                                    ['text' => 'Text'],
+                                                    ['text' => '#', 'width' => '2%'],
+                                                    ['text' => 'Doc Date', 'width' => '6%'],
+                                                    ['text' => 'Doc Number', 'width' => '8%'],
+                                                    ['text' => 'Cur', 'width' => '4%'],
+                                                    ['text' => 'Text', 'width' => '20%'],
+                                                    ['text' => 'Courier', 'class' => 'text-end', 'width' => '6%'],
+                                                    ['text' => 'Local Chg', 'class' => 'text-end', 'width' => '6%'],
+                                                    ['text' => 'Duty', 'class' => 'text-end', 'width' => '6%'],
+                                                    ['text' => 'Sample', 'class' => 'text-end', 'width' => '6%'],
+                                                    ['text' => 'Pallet', 'class' => 'text-end', 'width' => '6%'],
+                                                    ['text' => 'Bank Chg', 'class' => 'text-end', 'width' => '6%'],
+                                                    ['text' => 'PPN', 'class' => 'text-end', 'width' => '6%'],
+                                                    ['text' => 'Frt Ins', 'class' => 'text-end', 'width' => '6%'],
+                                                    ['text' => 'Frt Out', 'class' => 'text-end', 'width' => '6%']
                                                 ];
 
                                                 foreach ($headers as $header): ?>
@@ -240,7 +244,7 @@
 
 <?= $this->section('js') ?>
 <script>
-    class SalesOrderReport {
+    class DebitNoteReport {
         constructor() {
             this.tables = {};
             this.baseUrl = '<?= base_url() ?>';
@@ -256,7 +260,8 @@
         }
 
         getTableConfig() {
-            const columns = [{
+            const columns = [
+                {
                     data: 0,
                     orderable: false,
                     searchable: false
@@ -266,14 +271,16 @@
                     orderable: true
                 },
                 {
+                    data: 2,
+                    orderable: true
+                },
+                {
                     data: 3,
                     orderable: true
                 },
                 {
                     data: 4,
-                    orderable: true,
-                    className: 'text-end',
-                    type: 'num'
+                    orderable: true
                 },
                 {
                     data: 5,
@@ -301,8 +308,34 @@
                 },
                 {
                     data: 9,
-                    orderable: true
+                    orderable: true,
+                    className: 'text-end',
+                    type: 'num'
                 },
+                {
+                    data: 10,
+                    orderable: true,
+                    className: 'text-end',
+                    type: 'num'
+                },
+                {
+                    data: 11,
+                    orderable: true,
+                    className: 'text-end',
+                    type: 'num'
+                },
+                {
+                    data: 12,
+                    orderable: true,
+                    className: 'text-end',
+                    type: 'num'
+                },
+                {
+                    data: 13,
+                    orderable: true,
+                    className: 'text-end',
+                    type: 'num'
+                }
             ];
 
             return {
@@ -311,33 +344,31 @@
                 responsive: true,
                 ordering: true,
                 order: [
-                    [1, 'asc']
+                    [1, 'desc']
                 ],
-                columnDefs: [{
+                columnDefs: [
+                    {
                         targets: 0,
                         orderable: false,
                         searchable: false
                     },
-                    // {
-                    //     targets: '_all',
-                    //     className: 'text-start'
-                    // },
-                    // {
-                    //     // targets: [9, 11, 12, 13],
-                    //     className: 'text-end'
-                    // }
+                    {
+                        targets: [5, 6, 7, 8, 9, 10, 11, 12, 13],
+                        className: 'text-end'
+                    }
                 ],
                 pageLength: 25,
                 lengthMenu: [
-                    [10, 25, 50, 100],
-                    [10, 25, 50, 100]
+                    [10, 25, 50, 100, -1],
+                    [10, 25, 50, 100, "All"]
                 ],
                 dom: 'Bfrtip',
-                buttons: [{
+                buttons: [
+                    {
                         extend: 'excel',
                         text: '<i class="fas fa-file-excel"></i> Excel (Current Page)',
                         className: 'btn btn-success btn-sm me-2',
-                        title: 'Sales Order Report (Current Page)',
+                        title: 'Debit Note Report (Current Page)',
                         exportOptions: {
                             columns: ':visible'
                         }
@@ -346,7 +377,7 @@
                         extend: 'pdf',
                         text: '<i class="fas fa-file-pdf"></i> PDF (Current Page)',
                         className: 'btn btn-danger btn-sm me-2',
-                        title: 'Sales Order Report (Current Page)',
+                        title: 'Debit Note Report (Current Page)',
                         orientation: 'landscape',
                         pageSize: 'A4',
                         exportOptions: {
@@ -357,7 +388,7 @@
                         extend: 'print',
                         text: '<i class="fas fa-print"></i> Print (Current Page)',
                         className: 'btn btn-info btn-sm',
-                        title: 'Sales Order Report (Current Page)',
+                        title: 'Debit Note Report (Current Page)',
                         exportOptions: {
                             columns: ':visible'
                         }
@@ -371,7 +402,7 @@
                     zeroRecords: 'No matching records found'
                 },
                 drawCallback: function() {
-                    // $('#loadingOverlay1').addClass('d-none');
+                    $('#loadingOverlay1').addClass('d-none');
                 }
             };
         }
@@ -380,7 +411,7 @@
             return $(`#${tableId}`).DataTable({
                 ...this.getTableConfig(),
                 ajax: {
-                    url: `${this.baseUrl}/report-so/data`,
+                    url: `${this.baseUrl}/report-dn/data`,
                     type: 'POST',
                     timeout: 60000,
                     data: (d) => {
@@ -405,7 +436,7 @@
 
         initTables() {
             try {
-                this.tables['all'] = this.createTable('soTable', 'all', 'loadingOverlay1');
+                this.tables['all'] = this.createTable('dnTable', 'all', 'loadingOverlay1');
             } catch (error) {
                 console.error('Error initializing tables:', error);
                 this.showNotification('error', 'Failed to initialize tables');
@@ -427,7 +458,7 @@
             $button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Refreshing...');
 
             $.ajax({
-                url: `${this.baseUrl}/report-so/refresh-cache`,
+                url: `${this.baseUrl}/report-dn/refresh-cache`,
                 type: 'POST',
                 timeout: 60000,
                 data: {
@@ -465,7 +496,7 @@
 
             this.showNotification('info', `Preparing ${exportType.toUpperCase()} file. This may take a moment...`);
 
-            window.location.href = `${this.baseUrl}/report-so/export-${exportType}?filter=${tableType}`;
+            window.location.href = `${this.baseUrl}/report-dn/export-${exportType}?filter=${tableType}`;
 
             setTimeout(() => {
                 $button.prop('disabled', false).html(originalText);
@@ -493,9 +524,9 @@
 
     $(document).ready(() => {
         try {
-            new SalesOrderReport();
+            new DebitNoteReport();
         } catch (error) {
-            console.error('Error initializing SalesOrderReport:', error);
+            console.error('Error initializing DebitNoteReport:', error);
         }
     });
 </script>

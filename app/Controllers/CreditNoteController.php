@@ -9,7 +9,7 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
-class DebitNoteController extends BaseController
+class CreditNoteController extends BaseController
 {
     protected $cache;
     protected $apiUrl;
@@ -17,24 +17,24 @@ class DebitNoteController extends BaseController
     public function __construct()
     {
         $this->cache = \Config\Services::cache();
-        $this->apiUrl = env('sap.api.fidn.url');
+        $this->apiUrl = env('sap.api.ficn.url');
     }
 
     public function index()
     {
-        $data['title'] = 'Debit Note Document';
+        $data['title'] = 'Credit Note Document';
         $data['segment1'] = 'Report';
-        return view('report/fi/dn/index', $data);
+        return view('report/fi/cn/index', $data);
     }
 
     private function getCacheKey()
     {
-        return 'fidn_data_' . md5($this->apiUrl);
+        return 'ficn_data_' . md5($this->apiUrl);
     }
 
-    private function getFidnFilePath()
+    private function getFicnFilePath()
     {
-        return WRITEPATH . 'cache/fidn.json';
+        return WRITEPATH . 'cache/ficn.json';
     }
 
     private function getData()
@@ -54,12 +54,12 @@ class DebitNoteController extends BaseController
                     $data = json_decode($response->getBody(), true);
 
                     $this->cache->save($cacheKey, $data, 1800);
-                    $this->saveFidnData($data);
+                    $this->saveFicnData($data);
                 } else {
                     throw new \Exception('API returned status: ' . $response->getStatusCode());
                 }
             } catch (\Exception $e) {
-                $data = $this->loadFidnData();
+                $data = $this->loadFicnData();
                 if (!$data) {
                     throw new \Exception('API unavailable and no data found');
                 }
@@ -69,36 +69,36 @@ class DebitNoteController extends BaseController
         return $data;
     }
 
-    private function saveFidnData($data)
+    private function saveFicnData($data)
     {
-        $fidnFile = $this->getFidnFilePath();
-        if (!is_dir(dirname($fidnFile))) {
-            mkdir(dirname($fidnFile), 0777, true);
+        $ficnFile = $this->getFicnFilePath();
+        if (!is_dir(dirname($ficnFile))) {
+            mkdir(dirname($ficnFile), 0777, true);
         }
 
-        $fidnData = [
+        $ficnData = [
             'api_url' => $this->apiUrl,
             'updated_at' => date('Y-m-d H:i:s'),
             'data' => $data
         ];
 
-        file_put_contents($fidnFile, json_encode($fidnData));
+        file_put_contents($ficnFile, json_encode($ficnData));
     }
 
-    private function loadFidnData()
+    private function loadFicnData()
     {
-        $fidnFile = $this->getFidnFilePath();
-        if (file_exists($fidnFile)) {
-            $fidnData = json_decode(file_get_contents($fidnFile), true);
+        $ficnFile = $this->getFicnFilePath();
+        if (file_exists($ficnFile)) {
+            $ficnData = json_decode(file_get_contents($ficnFile), true);
 
-            if (isset($fidnData['api_url']) && $fidnData['api_url'] === $this->apiUrl) {
-                return $fidnData['data'] ?? null;
+            if (isset($ficnData['api_url']) && $ficnData['api_url'] === $this->apiUrl) {
+                return $ficnData['data'] ?? null;
             }
         }
         return null;
     }
 
-    public function getFidnData()
+    public function getFicnData()
     {
         try {
             $data = $this->getData();
@@ -118,17 +118,12 @@ class DebitNoteController extends BaseController
                 0 => null, // # column - not sortable
                 1 => 'DOC_DATE',
                 2 => 'DOC_NUMBER',
-                3 => 'CURRENCY',
-                4 => 'TEXT',
-                5 => 'COURIER',
-                6 => 'LOCAL_CHARGE',
-                7 => 'DUTY',
-                8 => 'SAMPLE',
-                9 => 'PALLET',
-                10 => 'BANK_CHARGE',
-                11 => 'PPN',
-                12 => 'FREIGHT_INSURANCE',
-                13 => 'FREIGHT_OUT'
+                3 => 'CLEARING_DATE',
+                4 => 'DOC_YEAR',
+                5 => 'VENDOR',
+                6 => 'CURRENCY',
+                7 => 'COMMISSION',
+                8 => 'TEXT'
             ];
 
             $filteredData = $data;
@@ -137,17 +132,12 @@ class DebitNoteController extends BaseController
                     $searchFields = [
                         $item['DOC_NUMBER'] ?? '',
                         $item['DOC_DATE'] ?? '',
+                        $item['CLEARING_DATE'] ?? '',
+                        $item['DOC_YEAR'] ?? '',
+                        $item['VENDOR'] ?? '',
                         $item['CURRENCY'] ?? '',
-                        $item['TEXT'] ?? '',
-                        $item['COURIER'] ?? '',
-                        $item['LOCAL_CHARGE'] ?? '',
-                        $item['DUTY'] ?? '',
-                        $item['SAMPLE'] ?? '',
-                        $item['PALLET'] ?? '',
-                        $item['BANK_CHARGE'] ?? '',
-                        $item['PPN'] ?? '',
-                        $item['FREIGHT_INSURANCE'] ?? '',
-                        $item['FREIGHT_OUT'] ?? ''
+                        $item['COMMISSION'] ?? '',
+                        $item['TEXT'] ?? ''
                     ];
 
                     foreach ($searchFields as $field) {
@@ -168,7 +158,7 @@ class DebitNoteController extends BaseController
                     $valueB = $b[$sortField] ?? '';
 
                     // Handle numeric sorting
-                    if (in_array($sortField, ['COURIER', 'LOCAL_CHARGE', 'DUTY', 'SAMPLE', 'PALLET', 'BANK_CHARGE', 'PPN', 'FREIGHT_INSURANCE', 'FREIGHT_OUT'])) {
+                    if (in_array($sortField, ['DOC_YEAR', 'COMMISSION'])) {
                         $valueA = floatval($valueA);
                         $valueB = floatval($valueB);
                     } else {
@@ -199,17 +189,12 @@ class DebitNoteController extends BaseController
                     $counter++,
                     $item['DOC_DATE'] ?? '',
                     $item['DOC_NUMBER'] ?? '',
+                    $item['CLEARING_DATE'] ?? '',
+                    $item['DOC_YEAR'] ?? '',
+                    $item['VENDOR'] ?? '',
                     $item['CURRENCY'] ?? '',
-                    $item['TEXT'] ?? '',
-                    number_format($item['COURIER'] ?? 0, 2),
-                    number_format($item['LOCAL_CHARGE'] ?? 0, 2),
-                    number_format($item['DUTY'] ?? 0, 2),
-                    number_format($item['SAMPLE'] ?? 0, 2),
-                    number_format($item['PALLET'] ?? 0, 2),
-                    number_format($item['BANK_CHARGE'] ?? 0, 2),
-                    number_format($item['PPN'] ?? 0, 2),
-                    number_format($item['FREIGHT_INSURANCE'] ?? 0, 2),
-                    number_format($item['FREIGHT_OUT'] ?? 0, 2)
+                    number_format($item['COMMISSION'] ?? 0, 2),
+                    $item['TEXT'] ?? ''
                 ];
             }
 
@@ -222,6 +207,7 @@ class DebitNoteController extends BaseController
         } catch (\Exception $e) {
             return $this->response->setJSON([
                 'draw' => intval($this->request->getPost('draw')),
+
                 'recordsTotal' => 0,
                 'recordsFiltered' => 0,
                 'data' => [],
@@ -241,25 +227,20 @@ class DebitNoteController extends BaseController
 
             $spreadsheet->getProperties()
                 ->setCreator('Sodexo Portal')
-                ->setTitle('Debit Note Report')
-                ->setSubject('Debit Note Data Export')
-                ->setDescription('Complete debit note data from Sodexo Portal');
+                ->setTitle('Credit Note Report')
+                ->setSubject('Credit Note Data Export')
+                ->setDescription('Complete credit note data from Sodexo Portal');
 
             $headers = [
                 '#',
                 'Document Date',
                 'Document Number',
+                'Clearing Date',
+                'Document Year',
+                'Vendor',
                 'Currency',
+                'Commission',
                 'Text',
-                'Courier',
-                'Local Charge',
-                'Duty',
-                'Sample',
-                'Pallet',
-                'Bank Charge',
-                'PPN',
-                'Freight Insurance',
-                'Freight Out'
             ];
 
             $col = 'A';
@@ -295,19 +276,15 @@ class DebitNoteController extends BaseController
             $counter = 1;
             foreach ($data as $item) {
                 $sheet->setCellValue('A' . $row, $counter++);
+
                 $sheet->setCellValue('B' . $row, $item['DOC_DATE'] ?? '');
                 $sheet->setCellValue('C' . $row, $item['DOC_NUMBER'] ?? '');
-                $sheet->setCellValue('D' . $row, $item['CURRENCY'] ?? '');
-                $sheet->setCellValue('E' . $row, $item['TEXT'] ?? '');
-                $sheet->setCellValue('F' . $row, $item['COURIER'] ?? 0);
-                $sheet->setCellValue('G' . $row, $item['LOCAL_CHARGE'] ?? 0);
-                $sheet->setCellValue('H' . $row, $item['DUTY'] ?? 0);
-                $sheet->setCellValue('I' . $row, $item['SAMPLE'] ?? 0);
-                $sheet->setCellValue('J' . $row, $item['PALLET'] ?? 0);
-                $sheet->setCellValue('K' . $row, $item['BANK_CHARGE'] ?? 0);
-                $sheet->setCellValue('L' . $row, $item['PPN'] ?? 0);
-                $sheet->setCellValue('M' . $row, $item['FREIGHT_INSURANCE'] ?? 0);
-                $sheet->setCellValue('N' . $row, $item['FREIGHT_OUT'] ?? 0);
+                $sheet->setCellValue('D' . $row, $item['CLEARING_DATE'] ?? '');
+                $sheet->setCellValue('E' . $row, $item['DOC_YEAR'] ?? '');
+                $sheet->setCellValue('F' . $row, $item['VENDOR'] ?? '');
+                $sheet->setCellValue('G' . $row, $item['CURRENCY'] ?? '');
+                $sheet->setCellValue('H' . $row, $item['COMMISSION'] ?? 0);
+                $sheet->setCellValue('I' . $row, $item['TEXT'] ?? '');
                 $row++;
             }
 
@@ -336,9 +313,9 @@ class DebitNoteController extends BaseController
             }
 
             $sheet->getStyle('A2:A' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('F2:N' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+            $sheet->getStyle('H2:H' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-            $filename = 'Debit_Note_Report_' . date('Y-m-d_H-i-s') . '.xlsx';
+            $filename = 'Credit_Note_Report_' . date('Y-m-d_H-i-s') . '.xlsx';
 
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="' . $filename . '"');
@@ -362,7 +339,7 @@ class DebitNoteController extends BaseController
         try {
             $data = $this->getData();
 
-            $filename = 'Debit_Note_Report_' . date('Y-m-d_H-i-s') . '.csv';
+            $filename = 'Credit_Note_Report_' . date('Y-m-d_H-i-s') . '.csv';
 
             header('Content-Type: text/csv; charset=utf-8');
             header('Content-Disposition: attachment;filename="' . $filename . '"');
@@ -376,17 +353,12 @@ class DebitNoteController extends BaseController
                 '#',
                 'Document Date',
                 'Document Number',
+                'Clearing Date',
+                'Document Year',
+                'Vendor',
                 'Currency',
-                'Text',
-                'Courier',
-                'Local Charge',
-                'Duty',
-                'Sample',
-                'Pallet',
-                'Bank Charge',
-                'PPN',
-                'Freight Insurance',
-                'Freight Out'
+                'Commission',
+                'Text'
             ];
 
             fputcsv($output, $headers);
@@ -397,17 +369,12 @@ class DebitNoteController extends BaseController
                     $counter++,
                     $item['DOC_DATE'] ?? '',
                     $item['DOC_NUMBER'] ?? '',
+                    $item['CLEARING_DATE'] ?? '',
+                    $item['DOC_YEAR'] ?? '',
+                    $item['VENDOR'] ?? '',
                     $item['CURRENCY'] ?? '',
-                    $item['TEXT'] ?? '',
-                    $item['COURIER'] ?? 0,
-                    $item['LOCAL_CHARGE'] ?? 0,
-                    $item['DUTY'] ?? 0,
-                    $item['SAMPLE'] ?? 0,
-                    $item['PALLET'] ?? 0,
-                    $item['BANK_CHARGE'] ?? 0,
-                    $item['PPN'] ?? 0,
-                    $item['FREIGHT_INSURANCE'] ?? 0,
-                    $item['FREIGHT_OUT'] ?? 0
+                    $item['COMMISSION'] ?? 0,
+                    $item['TEXT'] ?? ''
                 ];
                 fputcsv($output, $row);
             }
@@ -425,9 +392,9 @@ class DebitNoteController extends BaseController
         $cacheKey = $this->getCacheKey();
         $this->cache->delete($cacheKey);
 
-        $fidnFile = $this->getFidnFilePath();
-        if (file_exists($fidnFile)) {
-            unlink($fidnFile);
+        $ficnFile = $this->getFicnFilePath();
+        if (file_exists($ficnFile)) {
+            unlink($ficnFile);
         }
 
         try {

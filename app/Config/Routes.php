@@ -62,9 +62,19 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->post('document/saveNote', 'SummarySalesOrderController::saveNote');
     $routes->get('document/exportExcelByDate', 'SummarySalesOrderController::exportExcelByDate');
 
+    // Credit Note Document
+    $routes->get('/report-cn', 'CreditNoteController::index');
+    $routes->post('/report-cn/data', 'CreditNoteController::getFicnData');
+    $routes->post('/report-cn/refresh-cache', 'CreditNoteController::refreshCache');
+    $routes->get('/report-cn/export-excel', 'CreditNoteController::exportExcel');
+    $routes->get('/report-cn/export-csv', 'CreditNoteController::exportCsv');
 
     // Debit Note Document
     $routes->get('/report-dn', 'DebitNoteController::index');
+    $routes->post('/report-dn/data', 'DebitNoteController::getFidnData');
+    $routes->post('/report-dn/refresh-cache', 'DebitNoteController::refreshCache');
+    $routes->get('/report-dn/export-excel', 'DebitNoteController::exportExcel');
+    $routes->get('/report-dn/export-csv', 'DebitNoteController::exportCsv');
 
     // Sales Order Routes
     // $routes->get('/sales-order', 'SalesOrderController::index');

@@ -1,0 +1,302 @@
+[
+    {
+        "DOC_NUMBER": "1900001611",
+        "DOC_DATE": "2021-08-03",
+        "CLEARING_DATE": "2021-09-30",
+        "DOC_YEAR": 2021,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Sales Komisi Sodexo CI/GWA/20/235,227,301,327,328",
+        "COMMISSION": 44029.22
+    },
+    {
+        "DOC_NUMBER": "1900008319",
+        "DOC_DATE": "2024-02-28",
+        "CLEARING_DATE": "2024-02-28",
+        "DOC_YEAR": 2024,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo Okt-Des",
+        "COMMISSION": 276465.18
+    },
+    {
+        "DOC_NUMBER": "1900006462",
+        "DOC_DATE": "2023-06-27",
+        "CLEARING_DATE": "2023-06-27",
+        "DOC_YEAR": 2023,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo",
+        "COMMISSION": 259615.74
+    },
+    {
+        "DOC_NUMBER": "1900011018",
+        "DOC_DATE": "2024-12-31",
+        "CLEARING_DATE": "2025-01-14",
+        "DOC_YEAR": 2024,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo 2024_CY24ADQ2",
+        "COMMISSION": 150000.00
+    },
+    {
+        "DOC_NUMBER": "1900004108",
+        "DOC_DATE": "2022-08-16",
+        "CLEARING_DATE": "2022-08-16",
+        "DOC_YEAR": 2022,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Initial SAS_3510000550",
+        "COMMISSION": 615.33
+    },
+    {
+        "DOC_NUMBER": "1900000854",
+        "DOC_DATE": "2021-03-09",
+        "CLEARING_DATE": "2021-03-09",
+        "DOC_YEAR": 2021,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Sales Commision CI234-259",
+        "COMMISSION": 9552.09
+    },
+    {
+        "DOC_NUMBER": "1900008764",
+        "DOC_DATE": "2024-04-16",
+        "CLEARING_DATE": "2024-04-30",
+        "DOC_YEAR": 2024,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo Okt-Des23",
+        "COMMISSION": 476047.04
+    },
+    {
+        "DOC_NUMBER": "1900011100",
+        "DOC_DATE": "2024-12-31",
+        "CLEARING_DATE": "2024-12-31",
+        "DOC_YEAR": 2024,
+        "VENDOR": "2000000002",
+        "CURRENCY": "GBP",
+        "TEXT": "Komisi Sodexo 2024_CY24ADQ3",
+        "COMMISSION": 15334.67
+    },
+    {
+        "DOC_NUMBER": "1900004120",
+        "DOC_DATE": "2022-08-16",
+        "CLEARING_DATE": "2022-08-16",
+        "DOC_YEAR": 2022,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodex-Net_3510000736",
+        "COMMISSION": 24521.75
+    },
+    {
+        "DOC_NUMBER": "1900008318",
+        "DOC_DATE": "2024-02-28",
+        "CLEARING_DATE": "2024-02-28",
+        "DOC_YEAR": 2024,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo Jul-Sept",
+        "COMMISSION": 253321.85
+    },
+    {
+        "DOC_NUMBER": "1900007297",
+        "DOC_DATE": "2023-10-02",
+        "CLEARING_DATE": "2023-10-02",
+        "DOC_YEAR": 2023,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo Apr-Jun23",
+        "COMMISSION": 313415.33
+    },
+    {
+        "DOC_NUMBER": "1900004112",
+        "DOC_DATE": "2022-08-16",
+        "CLEARING_DATE": "2022-08-16",
+        "DOC_YEAR": 2022,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo_3510000441",
+        "COMMISSION": 534.27
+    },
+    {
+        "DOC_NUMBER": "1900006823",
+        "DOC_DATE": "2023-08-01",
+        "CLEARING_DATE": "2023-10-13",
+        "DOC_YEAR": 2023,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo Jan-Apr23",
+        "COMMISSION": 249999.01
+    },
+    {
+        "DOC_NUMBER": "1900009287",
+        "DOC_DATE": "2024-06-05",
+        "CLEARING_DATE": "2024-06-05",
+        "DOC_YEAR": 2024,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo Jan-Mar24_Term 1",
+        "COMMISSION": 150003.26
+    },
+    {
+        "DOC_NUMBER": "1900011110",
+        "DOC_DATE": "2024-12-31",
+        "CLEARING_DATE": "2024-12-31",
+        "DOC_YEAR": 2024,
+        "VENDOR": "2000000002",
+        "CURRENCY": "IDR",
+        "TEXT": "Komisi Sodexo 2024_CY24ADQ3",
+        "COMMISSION": 59391160.00
+    },
+    {
+        "DOC_NUMBER": "1900004126",
+        "DOC_DATE": "2022-08-16",
+        "CLEARING_DATE": "2022-08-16",
+        "DOC_YEAR": 2022,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo_3510000309",
+        "COMMISSION": 5689.28
+    },
+    {
+        "DOC_NUMBER": "1900004892",
+        "DOC_DATE": "2022-11-29",
+        "CLEARING_DATE": "2022-12-15",
+        "DOC_YEAR": 2022,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo",
+        "COMMISSION": 32768.08
+    },
+    {
+        "DOC_NUMBER": "1900006203",
+        "DOC_DATE": "2023-05-10",
+        "CLEARING_DATE": "2023-05-16",
+        "DOC_YEAR": 2023,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo Jul-Agt22",
+        "COMMISSION": 600220.18
+    },
+    {
+        "DOC_NUMBER": "1900011113",
+        "DOC_DATE": "2024-12-31",
+        "CLEARING_DATE": "2024-12-31",
+        "DOC_YEAR": 2024,
+        "VENDOR": "2000000002",
+        "CURRENCY": "EUR",
+        "TEXT": "Komisi Sodexo 2024_CY24ADQ3",
+        "COMMISSION": 7216.01
+    },
+    {
+        "DOC_NUMBER": "1900005633",
+        "DOC_DATE": "2023-02-28",
+        "CLEARING_DATE": "2023-02-28",
+        "DOC_YEAR": 2023,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo",
+        "COMMISSION": 9105.91
+    },
+    {
+        "DOC_NUMBER": "1900011112",
+        "DOC_DATE": "2024-12-31",
+        "CLEARING_DATE": "2024-12-31",
+        "DOC_YEAR": 2024,
+        "VENDOR": "2000000002",
+        "CURRENCY": "EUR",
+        "TEXT": "Komisi Sodexo 2024_CY24ADQ3",
+        "COMMISSION": 199952.68
+    },
+    {
+        "DOC_NUMBER": "1900004106",
+        "DOC_DATE": "2022-08-16",
+        "CLEARING_DATE": "2022-08-16",
+        "DOC_YEAR": 2022,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Initial SAS_3510000460",
+        "COMMISSION": 1006.29
+    },
+    {
+        "DOC_NUMBER": "1900004118",
+        "DOC_DATE": "2022-08-16",
+        "CLEARING_DATE": "2022-08-16",
+        "DOC_YEAR": 2022,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Complete_3510000409",
+        "COMMISSION": 8598.39
+    },
+    {
+        "DOC_NUMBER": "1900011111",
+        "DOC_DATE": "2024-12-31",
+        "CLEARING_DATE": "2025-01-14",
+        "DOC_YEAR": 2024,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo 2024_CY24ADQ3",
+        "COMMISSION": 10925.99
+    },
+    {
+        "DOC_NUMBER": "1900006064",
+        "DOC_DATE": "2023-04-28",
+        "CLEARING_DATE": "2023-04-28",
+        "DOC_YEAR": 2023,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo Jan-Jun22",
+        "COMMISSION": 1200544.24
+    },
+    {
+        "DOC_NUMBER": "1900004122",
+        "DOC_DATE": "2022-08-16",
+        "CLEARING_DATE": "2022-08-16",
+        "DOC_YEAR": 2022,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo SA_3510000368",
+        "COMMISSION": 2960.17
+    },
+    {
+        "DOC_NUMBER": "1900004130",
+        "DOC_DATE": "2022-08-16",
+        "CLEARING_DATE": "2022-08-16",
+        "DOC_YEAR": 2022,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo_3510000608",
+        "COMMISSION": 44595.51
+    },
+    {
+        "DOC_NUMBER": "1900004124",
+        "DOC_DATE": "2022-08-16",
+        "CLEARING_DATE": "2022-08-16",
+        "DOC_YEAR": 2022,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo_3510000677",
+        "COMMISSION": 28261.41
+    },
+    {
+        "DOC_NUMBER": "1900004128",
+        "DOC_DATE": "2022-08-16",
+        "CLEARING_DATE": "2022-08-16",
+        "DOC_YEAR": 2022,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Sodexo_3510000610",
+        "COMMISSION": 291293.28
+    },
+    {
+        "DOC_NUMBER": "1900004110",
+        "DOC_DATE": "2022-08-16",
+        "CLEARING_DATE": "2022-08-16",
+        "DOC_YEAR": 2022,
+        "VENDOR": "2000000002",
+        "CURRENCY": "USD",
+        "TEXT": "Komisi Kelvin CS_3510000458",
+        "COMMISSION": 24.79
+    }
+]

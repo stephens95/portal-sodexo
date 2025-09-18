@@ -83,9 +83,14 @@ encryption.key =
 
 #Tambahan:
 # sap.api.inventory.url="http://10.2.38.143:8000/zapi_sth/zapi_sodexo/zstock?sap-client=180" #Client D180
-#  sap.api.inventory.url="http://10.2.38.138:8000/zapi_sth/zapi_sodexo/zstock?sap-client=250" #Client Q250
+# sap.api.inventory.url="http://10.2.38.138:8000/zapi_sth/zapi_sodexo/zstock?sap-client=250" #Client Q250
  sap.api.inventory.url="http://10.2.38.133:8000/zapi_sth/zapi_sodexo/zstock?sap-client=888" #Client P88
-#  sap.api.buyer.url="http://10.2.38.138:8000/zapi_sth/zapi_sodexo/zbuyer?sap-client=250" #Client Q250
- sap.api.buyer.url="http://10.2.38.133:8000/zapi_sth/zapi_sodexo/zbuyer?sap-client=888" #Client P88
 
- sap.api.sotrcb.url="http://10.2.38.138:8000/zapi_sth/zapi_sodexo/ztrcb?sap-client=250"#Client Q250
+#  sap.api.buyer.url="http://10.2.38.138:8000/zapi_sth/zapi_sodexo/zbuyer?sap-client=250" #Client Q250
+sap.api.buyer.url="http://10.2.38.133:8000/zapi_sth/zapi_sodexo/zbuyer?sap-client=888" #Client P88
+
+sap.api.sotrcb.url="http://10.2.38.138:8000/zapi_sth/zapi_sodexo/ztrcb?sap-client=250"#Client Q250
+
+sap.api.fidn.url="http://10.2.38.138:8000/zapi_sth/zapi_sodexo/zdndoc?sap-client=250&customer=2000000002"#Client Q250
+
+sap.api.ficn.url="http://10.2.38.138:8000/zapi_sth/zapi_sodexo/zcndoc?sap-client=250&vendor=2000000002"#Client Q250
