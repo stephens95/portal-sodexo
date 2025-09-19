@@ -194,6 +194,119 @@ class ApiController extends BaseController
         }
     }
 
+    public function getSO()
+    {
+        $request = service('request');
+
+        // Ambil Authorization Header
+        $authHeader = $request->getHeaderLine('Authorization');
+
+        if (!$authHeader || strpos($authHeader, 'Basic ') !== 0) {
+            return $this->response->setHeader('WWW-Authenticate', 'Basic realm="MyAPI"')->setJSON([
+                'error' => true,
+                'message' => 'Missing or invalid Authorization header'
+            ])->setStatusCode(401);
+        }
+
+        // Decode base64 username:password
+        $encoded = substr($authHeader, 6);
+        $decoded = base64_decode($encoded);
+        [$email, $password] = explode(':', $decoded, 2);
+
+        // Validasi user dari tabel
+        $userModel = new UserModel();
+
+        $user = $userModel->where('email', $email)->first();
+
+        if (!$user || !password_verify($password, $user['password'])) {
+            return $this->response->setHeader('WWW-Authenticate', 'Basic realm="MyAPI"')->setJSON([
+                'error' => true,
+                'message' => 'Unauthorized'
+            ])->setStatusCode(401);
+        }
+
+        // Kalau lolos auth, lanjut ke API SAP
+        $client = \Config\Services::curlrequest();
+        $url = "http://10.2.38.133:8000/zapi_sth/zapi_sodexo/ztrcb?sap-client=888";
+
+        try {
+            $response = $client->get($url, [
+                'headers' => [
+                    'Accept' => 'application/json'
+                ]
+            ]);
+
+            $result = json_decode($response->getBody(), true);
+
+            $fieldMap = [
+                'QOSSA'    => 'QO_SSA',
+                'POSSA'    => 'PO_SSA',
+                'POBYR'    => 'PO_BUYER',
+                'ENDCST'   => 'END_CUSTOMER',
+                'SO'       => 'SO',
+                'BYRSTYL'  => 'BUYER_STYLE',
+                'SSASTYL'  => 'SSA_STYLE',
+                'COLOUR'   => 'COLOR',
+                'ORDQTY'   => 'ORDER_QTY',
+                'DLVNOT'   => 'DO',
+                'SHPQTY'   => 'QTY_SHIP',
+                'OUTPOQTY' => 'OUTS_PO_QTY',
+                'INVNUMB'  => 'INV_NO',
+                'INVAMNT'  => 'INV_AMOUNT',
+                'INVCURR'  => 'INV_CURR',
+                'DUEDATE'  => 'DUE_DATE',
+                'PMT_DATE' => 'PMT_DATE',
+                'BRKFEE'   => 'BRK_FEE',
+                'MNGFEE'   => 'MNG_FEE',
+            ];
+
+            $params = $this->request->getGet();
+
+            $result = array_filter($result, function ($item) use ($params, $fieldMap) {
+                foreach ($params as $paramKey => $paramValue) {
+                    if (isset($fieldMap[$paramKey])) {
+                        $field = $fieldMap[$paramKey];
+                        if (!isset($item[$field]) || $item[$field] != $paramValue) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            });
+
+            $filtered = array_map(function ($item) {
+                return [
+                    'QOSSA'      => $item['QO_SSA'] ?? null,
+                    'POSSA'      => $item['PO_SSA'] ?? null,
+                    'POBYR'      => $item['PO_BUYER'] ?? null,
+                    'ENDCST'     => $item['END_CUSTOMER'] ?? null,
+                    'SO'         => $item['SO'] ?? null,
+                    'BYRSTYL'    => $item['BUYER_STYLE'] ?? null,
+                    'SSASTYL'    => $item['SSA_STYLE'] ?? null,
+                    'COLOUR'     => $item['COLOR'] ?? null,
+                    'ORDQTY'     => $item['ORDER_QTY'] ?? null,
+                    'DLVNOT'     => $item['DO'] ?? null,
+                    'SHPQTY'     => $item['QTY_SHIP'] ?? null,
+                    'OUTPOQTY'   => $item['OUTS_PO_QTY'] ?? null,
+                    'INVNUMB'    => $item['INV_NO'] ?? null,
+                    'INVAMNT'    => $item['INV_AMOUNT'] ?? null,
+                    'INVCURR'    => $item['INV_CURR'] ?? null,
+                    'DUEDATE'    => $item['DUE_DATE'] ?? null,
+                    'PMT_DATE'   => $item['PMT_DATE'] ?? null,
+                    'BRKFEE'     => $item['BRK_FEE'] ?? null,
+                    'MNGFEE'     => $item['MNG_FEE'] ?? null,
+                ];
+            }, $result);
+
+            return $this->response->setJSON(array_values($filtered));
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'error' => true,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
     // With Token
     // public function getInventory()
     // {

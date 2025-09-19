@@ -181,7 +181,7 @@
                                     <button type="button" class="btn btn-primary btn-sm btn-export me-2" data-table="<?= $content['filter'] ?>" data-type="csv">
                                         <i class="fas fa-file-csv"></i> CSV
                                     </button>
-                                    <?php if (auth()->isAdmin()) { ?>
+                                    <?php if (auth()->isAdmin() || auth()->hasRoles(['Admin02'])) { ?>
                                         <a target="_blank" href="<?= base_url('/api-inventory') ?>"
                                             class="btn btn-secondary btn-sm">
                                             <i class="ti ti-screen-share"></i> JSON
