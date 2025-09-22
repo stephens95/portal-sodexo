@@ -198,19 +198,14 @@
                                                 <?php
                                                 $headers = [
                                                     ['text' => '#', 'width' => '2%'],
-                                                    ['text' => 'Doc Date', 'width' => '6%'],
-                                                    ['text' => 'Doc Number', 'width' => '8%'],
-                                                    ['text' => 'Cur', 'width' => '4%'],
-                                                    ['text' => 'Text', 'width' => '20%'],
-                                                    ['text' => 'Courier', 'class' => 'text-end', 'width' => '6%'],
-                                                    ['text' => 'Local Chg', 'class' => 'text-end', 'width' => '6%'],
-                                                    ['text' => 'Duty', 'class' => 'text-end', 'width' => '6%'],
-                                                    ['text' => 'Sample', 'class' => 'text-end', 'width' => '6%'],
-                                                    ['text' => 'Pallet', 'class' => 'text-end', 'width' => '6%'],
-                                                    ['text' => 'Bank Chg', 'class' => 'text-end', 'width' => '6%'],
-                                                    ['text' => 'PPN', 'class' => 'text-end', 'width' => '6%'],
-                                                    ['text' => 'Frt Ins', 'class' => 'text-end', 'width' => '6%'],
-                                                    ['text' => 'Frt Out', 'class' => 'text-end', 'width' => '6%']
+                                                    ['text' => 'Doc Date', 'width' => '8%'],
+                                                    ['text' => 'Doc Number', 'width' => '10%'],
+                                                    ['text' => 'Cur', 'width' => '5%'],
+                                                    ['text' => 'Text', 'width' => '25%'],
+                                                    ['text' => 'Courier', 'class' => 'text-end', 'width' => '8%'],
+                                                    ['text' => 'Local Chg', 'class' => 'text-end', 'width' => '8%'],
+                                                    ['text' => 'Duty', 'class' => 'text-end', 'width' => '8%'],
+                                                    ['text' => 'Others', 'class' => 'text-end', 'width' => '8%']
                                                 ];
 
                                                 foreach ($headers as $header): ?>
@@ -305,36 +300,6 @@
                     orderable: true,
                     className: 'text-end',
                     type: 'num'
-                },
-                {
-                    data: 9,
-                    orderable: true,
-                    className: 'text-end',
-                    type: 'num'
-                },
-                {
-                    data: 10,
-                    orderable: true,
-                    className: 'text-end',
-                    type: 'num'
-                },
-                {
-                    data: 11,
-                    orderable: true,
-                    className: 'text-end',
-                    type: 'num'
-                },
-                {
-                    data: 12,
-                    orderable: true,
-                    className: 'text-end',
-                    type: 'num'
-                },
-                {
-                    data: 13,
-                    orderable: true,
-                    className: 'text-end',
-                    type: 'num'
                 }
             ];
 
@@ -353,7 +318,7 @@
                         searchable: false
                     },
                     {
-                        targets: [5, 6, 7, 8, 9, 10, 11, 12, 13],
+                        targets: [5, 6, 7, 8],
                         className: 'text-end'
                     }
                 ],

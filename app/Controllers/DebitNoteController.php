@@ -121,33 +121,28 @@ class DebitNoteController extends BaseController
                 3 => 'CURRENCY',
                 4 => 'TEXT',
                 5 => 'COURIER',
-                6 => 'LOCAL_CHARGE',
-                7 => 'DUTY',
-                8 => 'SAMPLE',
-                9 => 'PALLET',
-                10 => 'BANK_CHARGE',
-                11 => 'PPN',
-                12 => 'FREIGHT_INSURANCE',
-                13 => 'FREIGHT_OUT'
+                6 => 'LOCAL_CHARGE_CALC',
+                7 => 'DUTY_CALC',
+                8 => 'OTHERS_CALC'
             ];
 
             $filteredData = $data;
             if (!empty($searchValue)) {
                 $filteredData = array_filter($data, function ($item) use ($searchValue) {
+                    // Calculate values first for search
+                    $localChargeCalc = $this->calculateLocalCharge($item);
+                    $dutyCalc = $this->calculateDuty($item);
+                    $othersCalc = $this->calculateOthers($item);
+
                     $searchFields = [
                         $item['DOC_NUMBER'] ?? '',
                         $item['DOC_DATE'] ?? '',
                         $item['CURRENCY'] ?? '',
                         $item['TEXT'] ?? '',
                         $item['COURIER'] ?? '',
-                        $item['LOCAL_CHARGE'] ?? '',
-                        $item['DUTY'] ?? '',
-                        $item['SAMPLE'] ?? '',
-                        $item['PALLET'] ?? '',
-                        $item['BANK_CHARGE'] ?? '',
-                        $item['PPN'] ?? '',
-                        $item['FREIGHT_INSURANCE'] ?? '',
-                        $item['FREIGHT_OUT'] ?? ''
+                        number_format($localChargeCalc, 2),
+                        number_format($dutyCalc, 2),
+                        number_format($othersCalc, 2)
                     ];
 
                     foreach ($searchFields as $field) {
@@ -164,16 +159,34 @@ class DebitNoteController extends BaseController
                 $sortField = $sortableColumns[$orderColumnIndex];
 
                 usort($filteredData, function ($a, $b) use ($sortField, $orderDirection) {
-                    $valueA = $a[$sortField] ?? '';
-                    $valueB = $b[$sortField] ?? '';
-
-                    // Handle numeric sorting
-                    if (in_array($sortField, ['COURIER', 'LOCAL_CHARGE', 'DUTY', 'SAMPLE', 'PALLET', 'BANK_CHARGE', 'PPN', 'FREIGHT_INSURANCE', 'FREIGHT_OUT'])) {
-                        $valueA = floatval($valueA);
-                        $valueB = floatval($valueB);
-                    } else {
-                        $valueA = strtolower((string)$valueA);
-                        $valueB = strtolower((string)$valueB);
+                    switch ($sortField) {
+                        case 'LOCAL_CHARGE_CALC':
+                            $valueA = $this->calculateLocalCharge($a);
+                            $valueB = $this->calculateLocalCharge($b);
+                            break;
+                        case 'DUTY_CALC':
+                            $valueA = $this->calculateDuty($a);
+                            $valueB = $this->calculateDuty($b);
+                            break;
+                        case 'OTHERS_CALC':
+                            $valueA = $this->calculateOthers($a);
+                            $valueB = $this->calculateOthers($b);
+                            break;
+                        case 'COURIER':
+                            $valueA = floatval($a[$sortField] ?? 0);
+                            $valueB = floatval($b[$sortField] ?? 0);
+                            break;
+                        default:
+                            $valueA = $a[$sortField] ?? '';
+                            $valueB = $b[$sortField] ?? '';
+                            if (!is_numeric($valueA)) {
+                                $valueA = strtolower((string)$valueA);
+                                $valueB = strtolower((string)$valueB);
+                            } else {
+                                $valueA = floatval($valueA);
+                                $valueB = floatval($valueB);
+                            }
+                            break;
                     }
 
                     if ($orderDirection === 'asc') {
@@ -202,14 +215,9 @@ class DebitNoteController extends BaseController
                     $item['CURRENCY'] ?? '',
                     $item['TEXT'] ?? '',
                     number_format($item['COURIER'] ?? 0, 2),
-                    number_format($item['LOCAL_CHARGE'] ?? 0, 2),
-                    number_format($item['DUTY'] ?? 0, 2),
-                    number_format($item['SAMPLE'] ?? 0, 2),
-                    number_format($item['PALLET'] ?? 0, 2),
-                    number_format($item['BANK_CHARGE'] ?? 0, 2),
-                    number_format($item['PPN'] ?? 0, 2),
-                    number_format($item['FREIGHT_INSURANCE'] ?? 0, 2),
-                    number_format($item['FREIGHT_OUT'] ?? 0, 2)
+                    number_format($this->calculateLocalCharge($item), 2),
+                    number_format($this->calculateDuty($item), 2),
+                    number_format($this->calculateOthers($item), 2)
                 ];
             }
 
@@ -228,6 +236,42 @@ class DebitNoteController extends BaseController
                 'error' => $e->getMessage()
             ]);
         }
+    }
+
+    private function calculateLocalCharge($item)
+    {
+        $localCharge = floatval($item['LOCAL_CHARGE'] ?? 0);
+        $text = strtolower(trim($item['TEXT'] ?? ''));
+        
+        // Jika text dimulai dengan 'local', tambahkan freight out ke local charge
+        if (strpos($text, 'local') === 0) {
+            $localCharge += floatval($item['FREIGHT_OUT'] ?? 0);
+        }
+        
+        return $localCharge;
+    }
+
+    private function calculateDuty($item)
+    {
+        $duty = floatval($item['DUTY'] ?? 0);
+        $text = strtolower(trim($item['TEXT'] ?? ''));
+        
+        // Jika text dimulai dengan 'duty', tambahkan freight out ke duty
+        if (strpos($text, 'duty') === 0) {
+            $duty += floatval($item['FREIGHT_OUT'] ?? 0);
+        }
+        
+        return $duty;
+    }
+
+    private function calculateOthers($item)
+    {
+        $sample = floatval($item['SAMPLE'] ?? 0);
+        $pallet = floatval($item['PALLET'] ?? 0);
+        $bankCharge = floatval($item['BANK_CHARGE'] ?? 0);
+        $freightInsurance = floatval($item['FREIGHT_INSURANCE'] ?? 0);
+        
+        return $sample + $pallet + $bankCharge + $freightInsurance;
     }
 
     public function exportExcel()
@@ -254,12 +298,7 @@ class DebitNoteController extends BaseController
                 'Courier',
                 'Local Charge',
                 'Duty',
-                'Sample',
-                'Pallet',
-                'Bank Charge',
-                'PPN',
-                'Freight Insurance',
-                'Freight Out'
+                'Others'
             ];
 
             $col = 'A';
@@ -300,14 +339,9 @@ class DebitNoteController extends BaseController
                 $sheet->setCellValue('D' . $row, $item['CURRENCY'] ?? '');
                 $sheet->setCellValue('E' . $row, $item['TEXT'] ?? '');
                 $sheet->setCellValue('F' . $row, $item['COURIER'] ?? 0);
-                $sheet->setCellValue('G' . $row, $item['LOCAL_CHARGE'] ?? 0);
-                $sheet->setCellValue('H' . $row, $item['DUTY'] ?? 0);
-                $sheet->setCellValue('I' . $row, $item['SAMPLE'] ?? 0);
-                $sheet->setCellValue('J' . $row, $item['PALLET'] ?? 0);
-                $sheet->setCellValue('K' . $row, $item['BANK_CHARGE'] ?? 0);
-                $sheet->setCellValue('L' . $row, $item['PPN'] ?? 0);
-                $sheet->setCellValue('M' . $row, $item['FREIGHT_INSURANCE'] ?? 0);
-                $sheet->setCellValue('N' . $row, $item['FREIGHT_OUT'] ?? 0);
+                $sheet->setCellValue('G' . $row, $this->calculateLocalCharge($item));
+                $sheet->setCellValue('H' . $row, $this->calculateDuty($item));
+                $sheet->setCellValue('I' . $row, $this->calculateOthers($item));
                 $row++;
             }
 
@@ -336,7 +370,7 @@ class DebitNoteController extends BaseController
             }
 
             $sheet->getStyle('A2:A' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('F2:N' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+            $sheet->getStyle('F2:I' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
             $filename = 'Debit_Note_Report_' . date('Y-m-d_H-i-s') . '.xlsx';
 
@@ -381,12 +415,7 @@ class DebitNoteController extends BaseController
                 'Courier',
                 'Local Charge',
                 'Duty',
-                'Sample',
-                'Pallet',
-                'Bank Charge',
-                'PPN',
-                'Freight Insurance',
-                'Freight Out'
+                'Others'
             ];
 
             fputcsv($output, $headers);
@@ -400,14 +429,9 @@ class DebitNoteController extends BaseController
                     $item['CURRENCY'] ?? '',
                     $item['TEXT'] ?? '',
                     $item['COURIER'] ?? 0,
-                    $item['LOCAL_CHARGE'] ?? 0,
-                    $item['DUTY'] ?? 0,
-                    $item['SAMPLE'] ?? 0,
-                    $item['PALLET'] ?? 0,
-                    $item['BANK_CHARGE'] ?? 0,
-                    $item['PPN'] ?? 0,
-                    $item['FREIGHT_INSURANCE'] ?? 0,
-                    $item['FREIGHT_OUT'] ?? 0
+                    $this->calculateLocalCharge($item),
+                    $this->calculateDuty($item),
+                    $this->calculateOthers($item)
                 ];
                 fputcsv($output, $row);
             }
