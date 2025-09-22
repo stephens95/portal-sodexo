@@ -82,10 +82,11 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     // Documentation API
     // $routes->get('/api-inventory', 'Api\DocumentationController::inventory');
     $routes->get('/doc-api', 'API\ApiController::docApi');
-    $routes->get('/generate-token', 'API\TokenController::generate');
+    // $routes->get('/generate-token', 'API\TokenController::generate');
 });
 
 $routes->get('/api-inventory', 'API\ApiController::getInventory');
+$routes->get('/api-so', 'API\ApiController::getSO');
 
 
 // $routes->group('', ['filter' => 'auth', 'namespace' => 'App\Controllers\Api'], function ($routes) {

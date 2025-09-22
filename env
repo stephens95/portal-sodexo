@@ -89,7 +89,9 @@ encryption.key =
 #  sap.api.buyer.url="http://10.2.38.138:8000/zapi_sth/zapi_sodexo/zbuyer?sap-client=250" #Client Q250
 sap.api.buyer.url="http://10.2.38.133:8000/zapi_sth/zapi_sodexo/zbuyer?sap-client=888" #Client P88
 
-sap.api.sotrcb.url="http://10.2.38.138:8000/zapi_sth/zapi_sodexo/ztrcb?sap-client=250"#Client Q250
+# sap.api.sotrcb.url="http://10.2.38.138:8000/zapi_sth/zapi_sodexo/ztrcb?sap-client=250"#Client Q250
+sap.api.sotrcb.url="http://10.2.38.133:8000/zapi_sth/zapi_sodexo/ztrcb?sap-client=888"#Client P88
+ sap.api.summaryso.url="http://10.2.38.133:8000/zapi_sth/zapi_sodexo/zsummary?sap-client=888"#Client P88
 
 sap.api.fidn.url="http://10.2.38.138:8000/zapi_sth/zapi_sodexo/zdndoc?sap-client=250&customer=2000000002"#Client Q250
 
