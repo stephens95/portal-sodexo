@@ -120,7 +120,7 @@ class DebitNoteController extends BaseController
                 2 => 'DOC_NUMBER',
                 3 => 'CURRENCY',
                 4 => 'TEXT',
-                5 => 'COURIER',
+                5 => 'COURIER_CALC',
                 6 => 'LOCAL_CHARGE_CALC',
                 7 => 'DUTY_CALC',
                 8 => 'OTHERS_CALC'
@@ -130,6 +130,7 @@ class DebitNoteController extends BaseController
             if (!empty($searchValue)) {
                 $filteredData = array_filter($data, function ($item) use ($searchValue) {
                     // Calculate values first for search
+                    $courierCalc = $this->calculateCourier($item);
                     $localChargeCalc = $this->calculateLocalCharge($item);
                     $dutyCalc = $this->calculateDuty($item);
                     $othersCalc = $this->calculateOthers($item);
@@ -139,7 +140,7 @@ class DebitNoteController extends BaseController
                         $item['DOC_DATE'] ?? '',
                         $item['CURRENCY'] ?? '',
                         $item['TEXT'] ?? '',
-                        $item['COURIER'] ?? '',
+                        number_format($courierCalc, 2),
                         number_format($localChargeCalc, 2),
                         number_format($dutyCalc, 2),
                         number_format($othersCalc, 2)
@@ -160,6 +161,10 @@ class DebitNoteController extends BaseController
 
                 usort($filteredData, function ($a, $b) use ($sortField, $orderDirection) {
                     switch ($sortField) {
+                        case 'COURIER_CALC':
+                            $valueA = $this->calculateCourier($a);
+                            $valueB = $this->calculateCourier($b);
+                            break;
                         case 'LOCAL_CHARGE_CALC':
                             $valueA = $this->calculateLocalCharge($a);
                             $valueB = $this->calculateLocalCharge($b);
@@ -171,10 +176,6 @@ class DebitNoteController extends BaseController
                         case 'OTHERS_CALC':
                             $valueA = $this->calculateOthers($a);
                             $valueB = $this->calculateOthers($b);
-                            break;
-                        case 'COURIER':
-                            $valueA = floatval($a[$sortField] ?? 0);
-                            $valueB = floatval($b[$sortField] ?? 0);
                             break;
                         default:
                             $valueA = $a[$sortField] ?? '';
@@ -214,7 +215,7 @@ class DebitNoteController extends BaseController
                     $item['DOC_NUMBER'] ?? '',
                     $item['CURRENCY'] ?? '',
                     $item['TEXT'] ?? '',
-                    number_format($item['COURIER'] ?? 0, 2),
+                    number_format($this->calculateCourier($item), 2),
                     number_format($this->calculateLocalCharge($item), 2),
                     number_format($this->calculateDuty($item), 2),
                     number_format($this->calculateOthers($item), 2)
@@ -238,14 +239,33 @@ class DebitNoteController extends BaseController
         }
     }
 
+    private function calculateCourier($item)
+    {
+        $courier = floatval($item['COURIER'] ?? 0);
+        $ppn = floatval($item['PPN'] ?? 0);
+        
+        // Jika courier > 0, tambahkan PPN ke courier
+        if ($courier > 0 && $ppn > 0) {
+            $courier += $ppn;
+        }
+        
+        return $courier;
+    }
+
     private function calculateLocalCharge($item)
     {
         $localCharge = floatval($item['LOCAL_CHARGE'] ?? 0);
         $text = strtolower(trim($item['TEXT'] ?? ''));
+        $ppn = floatval($item['PPN'] ?? 0);
         
         // Jika text dimulai dengan 'local', tambahkan freight out ke local charge
         if (strpos($text, 'local') === 0) {
             $localCharge += floatval($item['FREIGHT_OUT'] ?? 0);
+        }
+        
+        // Jika local charge > 0, tambahkan PPN ke local charge
+        if ($localCharge > 0 && $ppn > 0) {
+            $localCharge += $ppn;
         }
         
         return $localCharge;
@@ -255,10 +275,16 @@ class DebitNoteController extends BaseController
     {
         $duty = floatval($item['DUTY'] ?? 0);
         $text = strtolower(trim($item['TEXT'] ?? ''));
+        $ppn = floatval($item['PPN'] ?? 0);
         
         // Jika text dimulai dengan 'duty', tambahkan freight out ke duty
         if (strpos($text, 'duty') === 0) {
             $duty += floatval($item['FREIGHT_OUT'] ?? 0);
+        }
+        
+        // Jika duty > 0, tambahkan PPN ke duty
+        if ($duty > 0 && $ppn > 0) {
+            $duty += $ppn;
         }
         
         return $duty;
@@ -270,8 +296,17 @@ class DebitNoteController extends BaseController
         $pallet = floatval($item['PALLET'] ?? 0);
         $bankCharge = floatval($item['BANK_CHARGE'] ?? 0);
         $freightInsurance = floatval($item['FREIGHT_INSURANCE'] ?? 0);
+        $another = floatval($item['ANOTHER'] ?? 0);
+        $ppn = floatval($item['PPN'] ?? 0);
         
-        return $sample + $pallet + $bankCharge + $freightInsurance;
+        $total = $sample + $pallet + $bankCharge + $freightInsurance + $another;
+        
+        // Jika total others > 0, tambahkan PPN ke others
+        if ($total > 0 && $ppn > 0) {
+            $total += $ppn;
+        }
+        
+        return $total;
     }
 
     public function exportExcel()
@@ -338,7 +373,7 @@ class DebitNoteController extends BaseController
                 $sheet->setCellValue('C' . $row, $item['DOC_NUMBER'] ?? '');
                 $sheet->setCellValue('D' . $row, $item['CURRENCY'] ?? '');
                 $sheet->setCellValue('E' . $row, $item['TEXT'] ?? '');
-                $sheet->setCellValue('F' . $row, $item['COURIER'] ?? 0);
+                $sheet->setCellValue('F' . $row, $this->calculateCourier($item));
                 $sheet->setCellValue('G' . $row, $this->calculateLocalCharge($item));
                 $sheet->setCellValue('H' . $row, $this->calculateDuty($item));
                 $sheet->setCellValue('I' . $row, $this->calculateOthers($item));
@@ -428,7 +463,7 @@ class DebitNoteController extends BaseController
                     $item['DOC_NUMBER'] ?? '',
                     $item['CURRENCY'] ?? '',
                     $item['TEXT'] ?? '',
-                    $item['COURIER'] ?? 0,
+                    $this->calculateCourier($item),
                     $this->calculateLocalCharge($item),
                     $this->calculateDuty($item),
                     $this->calculateOthers($item)
