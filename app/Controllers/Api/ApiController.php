@@ -307,6 +307,204 @@ class ApiController extends BaseController
         }
     }
 
+    public function getDN()
+    {
+        $request = service('request');
+
+        // Ambil Authorization Header
+        $authHeader = $request->getHeaderLine('Authorization');
+
+        if (!$authHeader || strpos($authHeader, 'Basic ') !== 0) {
+            return $this->response->setHeader('WWW-Authenticate', 'Basic realm="MyAPI"')->setJSON([
+                'error' => true,
+                'message' => 'Missing or invalid Authorization header'
+            ])->setStatusCode(401);
+        }
+
+        // Decode base64 username:password
+        $encoded = substr($authHeader, 6);
+        $decoded = base64_decode($encoded);
+        [$email, $password] = explode(':', $decoded, 2);
+
+        // Validasi user dari tabel
+        $userModel = new UserModel();
+
+        $user = $userModel->where('email', $email)->first();
+
+        if (!$user || !password_verify($password, $user['password'])) {
+            return $this->response->setHeader('WWW-Authenticate', 'Basic realm="MyAPI"')->setJSON([
+                'error' => true,
+                'message' => 'Unauthorized'
+            ])->setStatusCode(401);
+        }
+
+        // Kalau lolos auth, lanjut ke API SAP
+        $client = \Config\Services::curlrequest();
+        $url = "http://10.2.38.133:8000/zapi_sth/zapi_sodexo/zdndoc?sap-client=888";
+
+        try {
+            $response = $client->get($url, [
+                'headers' => [
+                    'Accept' => 'application/json'
+                ]
+            ]);
+
+            $result = json_decode($response->getBody(), true);
+
+            $fieldMap = [
+                'DOCNUM'    => 'DOC_NUMBER',
+                'DOCDATE'   => 'DOC_DATE',
+                'DOCYEAR'   => 'DOC_YEAR',
+                'CUST'      => 'CUSTOMER',
+                'CURR'      => 'CURRENCY',
+                'TEXT'      => 'TEXT',
+                'COURIER'   => 'COURIER',
+                'LOCCHRG'   => 'LOCAL_CHARGE',
+                'DUTY'      => 'DUTY',
+                'SAMPLE'    => 'SAMPLE',
+                'PALLET'    => 'PALLET',
+                'BANKCHRG'  => 'BANK_CHARGE',
+                'PPN'       => 'PPN',
+                'FRGHTINS'  => 'FREIGHT_INSURANCE',
+                'FRGHTOUT'  => 'FREIGHT_OUT',
+                'ANOTHER'   => 'ANOTHER',
+            ];
+
+            $params = $this->request->getGet();
+
+            $result = array_filter($result, function ($item) use ($params, $fieldMap) {
+                foreach ($params as $paramKey => $paramValue) {
+                    if (isset($fieldMap[$paramKey])) {
+                        $field = $fieldMap[$paramKey];
+                        if (!isset($item[$field]) || $item[$field] != $paramValue) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            });
+
+            $filtered = array_map(function ($item) {
+                return [
+                    'DOCNUM'    => $item['DOC_NUMBER'] ?? null,
+                    'DOCDATE'   => $item['DOC_DATE'] ?? null,
+                    'DOCYEAR'   => $item['DOC_YEAR'] ?? null,
+                    'CUST'      => $item['CUSTOMER'] ?? null,
+                    'CURR'      => $item['CURRENCY'] ?? null,
+                    'TEXT'      => $item['TEXT'] ?? null,
+                    'COURIER'   => $item['COURIER'] ?? null,
+                    'LOCCHRG'   => $item['LOCAL_CHARGE'] ?? null,
+                    'DUTY'      => $item['DUTY'] ?? null,
+                    'SAMPLE'    => $item['SAMPLE'] ?? null,
+                    'PALLET'    => $item['PALLET'] ?? null,
+                    'BANKCHRG'  => $item['BANK_CHARGE'] ?? null,
+                    'PPN'       => $item['PPN'] ?? null,
+                    'FRGHTINS'  => $item['FREIGHT_INSURANCE'] ?? null,
+                    'FRGHTOUT'  => $item['FREIGHT_OUT'] ?? null,
+                    'ANOTHER'   => $item['ANOTHER'] ?? null,
+                ];
+            }, $result);
+
+            return $this->response->setJSON(array_values($filtered));
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'error' => true,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function getCN()
+    {
+        $request = service('request');
+
+        // Ambil Authorization Header
+        $authHeader = $request->getHeaderLine('Authorization');
+
+        if (!$authHeader || strpos($authHeader, 'Basic ') !== 0) {
+            return $this->response->setHeader('WWW-Authenticate', 'Basic realm="MyAPI"')->setJSON([
+                'error' => true,
+                'message' => 'Missing or invalid Authorization header'
+            ])->setStatusCode(401);
+        }
+
+        // Decode base64 username:password
+        $encoded = substr($authHeader, 6);
+        $decoded = base64_decode($encoded);
+        [$email, $password] = explode(':', $decoded, 2);
+
+        // Validasi user dari tabel
+        $userModel = new UserModel();
+
+        $user = $userModel->where('email', $email)->first();
+
+        if (!$user || !password_verify($password, $user['password'])) {
+            return $this->response->setHeader('WWW-Authenticate', 'Basic realm="MyAPI"')->setJSON([
+                'error' => true,
+                'message' => 'Unauthorized'
+            ])->setStatusCode(401);
+        }
+
+        // Kalau lolos auth, lanjut ke API SAP
+        $client = \Config\Services::curlrequest();
+        $url = "http://10.2.38.133:8000/zapi_sth/zapi_sodexo/zcndoc?sap-client=888";
+
+        try {
+            $response = $client->get($url, [
+                'headers' => [
+                    'Accept' => 'application/json'
+                ]
+            ]);
+
+            $result = json_decode($response->getBody(), true);
+
+            $fieldMap = [
+                'DOCNUM'   => 'DOC_NUMBER',
+                'DOCDATE'  => 'DOC_DATE',
+                'CLRDATE'  => 'CLEARING_DATE',
+                'DOCYEAR'  => 'DOC_YEAR',
+                'VENDOR'   => 'VENDOR',
+                'CURR'     => 'CURRENCY',
+                'TEXT'     => 'TEXT',
+                'COMM'     => 'COMMISSION',
+            ];
+
+            $params = $this->request->getGet();
+
+            $result = array_filter($result, function ($item) use ($params, $fieldMap) {
+                foreach ($params as $paramKey => $paramValue) {
+                    if (isset($fieldMap[$paramKey])) {
+                        $field = $fieldMap[$paramKey];
+                        if (!isset($item[$field]) || $item[$field] != $paramValue) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            });
+
+            $filtered = array_map(function ($item) {
+                return [
+                    'DOCNUM'   => $item['DOC_NUMBER'] ?? null,
+                    'DOCDATE'  => $item['DOC_DATE'] ?? null,
+                    'CLRDATE'  => $item['CLEARING_DATE'] ?? null,
+                    'DOCYEAR'  => $item['DOC_YEAR'] ?? null,
+                    'VENDOR'   => $item['VENDOR'] ?? null,
+                    'CURR'     => $item['CURRENCY'] ?? null,
+                    'TEXT'     => $item['TEXT'] ?? null,
+                    'COMM'     => $item['COMMISSION'] ?? null,
+                ];
+            }, $result);
+
+            return $this->response->setJSON(array_values($filtered));
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'error' => true,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
     // With Token
     // public function getInventory()
     // {

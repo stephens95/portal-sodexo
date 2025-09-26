@@ -174,9 +174,15 @@
                                     <button type="button" class="btn btn-success btn-sm btn-export me-2" data-table="<?= $content['filter'] ?>" data-type="excel">
                                         <i class="fas fa-file-excel"></i> Excel (.xlsx)
                                     </button>
-                                    <button type="button" class="btn btn-primary btn-sm btn-export" data-table="<?= $content['filter'] ?>" data-type="csv">
+                                    <button type="button" class="btn btn-primary btn-sm btn-export me-2" data-table="<?= $content['filter'] ?>" data-type="csv">
                                         <i class="fas fa-file-csv"></i> CSV
                                     </button>
+                                    <?php if (auth()->isAdmin() || auth()->hasRoles(['Admin02'])) { ?>
+                                        <a target="_blank" href="<?= base_url('/api-cn') ?>"
+                                            class="btn btn-secondary btn-sm">
+                                            <i class="ti ti-screen-share"></i> JSON
+                                        </a>
+                                    <?php } ?>
                                 </div>
                             </div>
 
@@ -255,8 +261,7 @@
         }
 
         getTableConfig() {
-            const columns = [
-                {
+            const columns = [{
                     data: 0,
                     orderable: false,
                     searchable: false
@@ -306,8 +311,7 @@
                 order: [
                     [1, 'desc']
                 ],
-                columnDefs: [
-                    {
+                columnDefs: [{
                         targets: 0,
                         orderable: false,
                         searchable: false
@@ -323,8 +327,7 @@
                     [10, 25, 50, 100, "All"]
                 ],
                 dom: 'Bfrtip',
-                buttons: [
-                    {
+                buttons: [{
                         extend: 'excel',
                         text: '<i class="fas fa-file-excel"></i> Excel (Current Page)',
                         className: 'btn btn-success btn-sm me-2',

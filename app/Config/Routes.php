@@ -88,6 +88,9 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 $routes->get('/api-inventory', 'API\ApiController::getInventory');
 $routes->get('/api-so', 'API\ApiController::getSO');
 
+$routes->get('/api-dn', 'API\ApiController::getDN');
+$routes->get('/api-cn', 'API\ApiController::getCN');
+
 
 // $routes->group('', ['filter' => 'auth', 'namespace' => 'App\Controllers\Api'], function ($routes) {
 //     $routes->get('api-inventory', 'ApiController::getInventory');
