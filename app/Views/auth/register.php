@@ -25,7 +25,8 @@
     </div>
     <div class="mb-3">
         <label for="buyer_ids" class="form-label">Select Buyers <span class="text-danger">*</span></label>
-        <select class="form-select" id="buyer_ids" name="buyer_ids[]" multiple required>
+        <!-- <select class="form-select" id="buyer_ids" name="buyer_ids[]" multiple required> -->
+        <select class="form-select" id="buyer_ids" name="buyer_ids[]" required>
             <?php foreach ($buyers as $buyer): ?>
                 <option value="<?= $buyer['buyer_id'] ?>" <?= in_array($buyer['buyer_id'], old('buyer_ids') ?: []) ? 'selected' : '' ?>>
                     <?= esc($buyer['buyer_name']) ?><?= ($buyer['group_name'] === 'SSA') ? ' (' . esc($buyer['group_name']) . ')' : '' ?>
@@ -48,12 +49,12 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-$(document).ready(function() {
-    $('#buyer_ids').select2({
-        theme: 'bootstrap-5',
-        placeholder: 'Select buyers...',
-        allowClear: true
+    $(document).ready(function() {
+        $('#buyer_ids').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Select buyers...',
+            allowClear: true
+        });
     });
-});
 </script>
 <?= $this->endSection() ?>

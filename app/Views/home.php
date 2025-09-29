@@ -4,7 +4,7 @@
  <?= $this->endSection() ?> -->
 
 <?= $this->section('content') ?>
-<div class="row">
+<!-- <div class="row">
     <div class="col-xl-4 col-md-6">
         <div class="card bg-secondary-dark dashnum-card text-white overflow-hidden">
             <span class="round small"></span>
@@ -145,7 +145,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 <?= $this->endSection() ?>
 
 <!-- Additional JS -->
